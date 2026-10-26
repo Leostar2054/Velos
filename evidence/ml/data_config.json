@@ -1,0 +1,21 @@
+{
+  "size": 256,
+  "probe_px": 64,
+  "n_train": 200,
+  "n_val": 25,
+  "n_test": 30,
+  "dense_overlap": 0.7,
+  "sparse_overlap": 0.6,
+  "jitter_px": 2.0,
+  "photons": [
+    5000,
+    50000
+  ],
+  "engine": "wasp",
+  "engine_params": {
+    "probe_lr": 0.1
+  },
+  "sparse_iters": 100,
+  "dense_iters": 120,
+  "seed": 1234
+}

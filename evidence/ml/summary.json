@@ -1,0 +1,161 @@
+{
+  "physics_sparse": {
+    "nrmse_complex": {
+      "mean": 0.1203921117766325,
+      "std": 0.0718019459641325
+    },
+    "psnr_amplitude": {
+      "mean": 8.161530264121222,
+      "std": 4.92585035520084
+    },
+    "ssim_amplitude": {
+      "mean": 0.14046504076949123,
+      "std": 0.0719723503999154
+    },
+    "psnr_phase": {
+      "mean": 32.7295380909381,
+      "std": 7.026915575445719
+    },
+    "ssim_phase": {
+      "mean": 0.7650257932098047,
+      "std": 0.16205369047391335
+    },
+    "mae_phase_rad": {
+      "mean": 0.05960203483215679,
+      "std": 0.042682388894157194
+    }
+  },
+  "physics_sparse_long": {
+    "nrmse_complex": {
+      "mean": 0.08962545876078988,
+      "std": 0.061969512736136476
+    },
+    "psnr_amplitude": {
+      "mean": 10.462743201473005,
+      "std": 5.93494516335679
+    },
+    "ssim_amplitude": {
+      "mean": 0.2127589604933537,
+      "std": 0.11042522812924699
+    },
+    "psnr_phase": {
+      "mean": 36.94989449499827,
+      "std": 8.71063757389136
+    },
+    "ssim_phase": {
+      "mean": 0.885376237470177,
+      "std": 0.11322143723152946
+    },
+    "mae_phase_rad": {
+      "mean": 0.03565141665771027,
+      "std": 0.029404682555074394
+    }
+  },
+  "ml_refined": {
+    "nrmse_complex": {
+      "mean": 0.0945319125588302,
+      "std": 0.05541460964128037
+    },
+    "psnr_amplitude": {
+      "mean": 14.552908226963167,
+      "std": 5.225670469969703
+    },
+    "ssim_amplitude": {
+      "mean": 0.5042058010117947,
+      "std": 0.11292784870823838
+    },
+    "psnr_phase": {
+      "mean": 33.869840064838925,
+      "std": 6.66765615661566
+    },
+    "ssim_phase": {
+      "mean": 0.7843608370643056,
+      "std": 0.1226433505296099
+    },
+    "mae_phase_rad": {
+      "mean": 0.05006726068754553,
+      "std": 0.02905054912882211
+    }
+  },
+  "ml_refined_long": {
+    "nrmse_complex": {
+      "mean": 0.0826740601101094,
+      "std": 0.04727857420831487
+    },
+    "psnr_amplitude": {
+      "mean": 15.69875543053465,
+      "std": 5.194833620499576
+    },
+    "ssim_amplitude": {
+      "mean": 0.5602764124762452,
+      "std": 0.12026752998428436
+    },
+    "psnr_phase": {
+      "mean": 35.07326228727619,
+      "std": 6.570188253843956
+    },
+    "ssim_phase": {
+      "mean": 0.7962353484483405,
+      "std": 0.12260221753149789
+    },
+    "mae_phase_rad": {
+      "mean": 0.04487042612394006,
+      "std": 0.024656228365338876
+    }
+  },
+  "physics_dense": {
+    "nrmse_complex": {
+      "mean": 0.014422399291636577,
+      "std": 0.007024054647467937
+    },
+    "psnr_amplitude": {
+      "mean": 26.653137109706638,
+      "std": 5.15565505305994
+    },
+    "ssim_amplitude": {
+      "mean": 0.7811751567060199,
+      "std": 0.06836400236552218
+    },
+    "psnr_phase": {
+      "mean": 51.20769962813327,
+      "std": 5.485200532440428
+    },
+    "ssim_phase": {
+      "mean": 0.9763144971287018,
+      "std": 0.02555346200626128
+    },
+    "mae_phase_rad": {
+      "mean": 0.007973109049002348,
+      "std": 0.0039095077755696775
+    }
+  },
+  "_meta": {
+    "n_samples": 30,
+    "split": "test",
+    "checkpoint": "/home/claude/work/runs/baseline_unet/best.pt",
+    "sparse_frames": 64,
+    "dense_frames": 121,
+    "control_iters": 300,
+    "generator": {
+      "size": 256,
+      "probe_px": 64,
+      "n_train": 200,
+      "n_val": 25,
+      "n_test": 30,
+      "dense_overlap": 0.7,
+      "sparse_overlap": 0.6,
+      "jitter_px": 2.0,
+      "photons": [
+        5000,
+        50000
+      ],
+      "engine": "wasp",
+      "engine_params": {
+        "probe_lr": 0.1
+      },
+      "sparse_iters": 100,
+      "dense_iters": 120,
+      "seed": 1234
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "data": {
+    "root": "/home/claude/work/synthetic",
+    "crop": 128,
+    "limit_train": null
+  },
+  "model": {
+    "base": 32,
+    "depth": 3,
+    "residual": true
+  },
+  "train": {
+    "epochs": 30,
+    "batch_size": 8,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "seed": 0,
+    "num_workers": 0,
+    "loss": "l1",
+    "amp_weight": 1.0
+  },
+  "name": "baseline_unet",
+  "_resolved": {
+    "device": "cpu",
+    "n_train": 200,
+    "n_val": 25,
+    "params": 1928450,
+    "torch": "2.14.1+cu130"
+  }
+}

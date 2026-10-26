@@ -12,3 +12,7 @@ ml/data/
 ml/runs/*/last.pt
 *.npz
 !ml/sample_data/*.npz
+
+# large binaries are delivered in the evidence folder, not tracked in git
+evidence/ml/*.pt
+reports/

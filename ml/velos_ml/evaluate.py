@@ -8,6 +8,7 @@ Rows reported (mean ± std over the test split, inside the evaluation mask):
   physics_sparse        the Client's engine on the sparse scan (the ML input)  ← baseline
   physics_sparse_long   same, with --control-iters iterations (does more compute close the gap?)
   ml_refined            physics_sparse followed by the trained model
+  ml_refined_long       physics_sparse_long followed by the trained model (model trained on the shorter inputs)
   physics_dense         the Client's engine on the dense scan (reference ceiling)
 Outputs: metrics.csv (per sample), summary.json, summary.md, comparison grid and bar chart.
 """
@@ -61,6 +62,8 @@ def main(argv=None):
         if a.control_iters:
             variants["physics_sparse_long"] = _control(s, gen_cfg, a.control_iters)
         variants["ml_refined"] = refine_object(s["sparse_recon"], s["sparse_mask"], a.checkpoint)
+        if a.control_iters:
+            variants["ml_refined_long"] = refine_object(variants["physics_sparse_long"], s["sparse_mask"], a.checkpoint)
         variants["physics_dense"] = s["dense_recon"].astype(np.complex128)
         for name, z in variants.items():
             mm = amplitude_phase_metrics(z, gt, m)
@@ -86,7 +89,8 @@ def main(argv=None):
 
 
 LABELS = {"physics_sparse": "Physics (sparse scan)", "physics_sparse_long": "Physics (sparse, more iters)",
-          "ml_refined": "Physics (sparse) + ML", "physics_dense": "Physics (dense scan)"}
+          "ml_refined": "Physics (sparse) + ML", "ml_refined_long": "Physics (sparse, more iters) + ML",
+          "physics_dense": "Physics (dense scan)"}
 
 
 def _write_md(summary, variants, path):
@@ -135,10 +139,10 @@ def _bars(summary, variants, path):
     keys = [("psnr_phase", "PSNR phase (dB)"), ("ssim_phase", "SSIM phase"), ("psnr_amplitude", "PSNR amp (dB)"),
             ("ssim_amplitude", "SSIM amp"), ("nrmse_complex", "NRMSE (complex)")]
     fig, axs = plt.subplots(1, len(keys), figsize=(3.2 * len(keys), 3.4))
-    colors = ["#94a3b8", "#cbd5e1", "#7c3aed", "#0891b2"]
+    colors = ["#94a3b8", "#cbd5e1", "#7c3aed", "#a78bfa", "#0891b2"]
     for ax, (k, lab) in zip(axs, keys):
         means = [summary[v][k]["mean"] for v in variants]; stds = [summary[v][k]["std"] for v in variants]
-        ax.bar(range(len(variants)), means, yerr=stds, capsize=3, color=[colors[i % 4] for i in range(len(variants))])
+        ax.bar(range(len(variants)), means, yerr=stds, capsize=3, color=[colors[i % len(colors)] for i in range(len(variants))])
         ax.set_xticks(range(len(variants))); ax.set_xticklabels([LABELS.get(v, v).replace(" (", "\n(") for v in variants], fontsize=7)
         ax.set_title(lab, fontsize=9); ax.grid(axis="y", alpha=.3)
     fig.tight_layout(); fig.savefig(path, dpi=130); plt.close(fig)
