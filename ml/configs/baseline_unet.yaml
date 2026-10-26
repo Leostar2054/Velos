@@ -1,0 +1,17 @@
+# First ML baseline (M2): residual U-Net that refines the sparse-scan physics reconstruction.
+name: baseline_unet
+data:
+  root: data/synthetic
+  crop: 128           # random training crops; evaluation uses the full 256 px field
+model:
+  base: 32
+  depth: 3
+  residual: true
+train:
+  epochs: 30
+  batch_size: 8
+  lr: 0.001
+  weight_decay: 0.0001
+  seed: 0
+  loss: l1
+  num_workers: 0

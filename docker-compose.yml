@@ -1,0 +1,29 @@
+# Local / staging stack (M3 target): website + API + worker sharing one storage volume.
+# GPU inference worker (M4): add `deploy.resources.reservations.devices` with the nvidia runtime
+# and set VELOS_ML_CHECKPOINT.
+services:
+  api:
+    build: ./backend
+    env_file: ./backend/.env
+    environment:
+      VELOS_STORAGE_DIR: /data
+      VELOS_CORS_ORIGINS: http://localhost:3000
+    ports: ["8000:8000"]
+    volumes: ["velos-data:/data"]
+  worker:
+    build: ./backend
+    command: ["python", "-m", "velos_backend.worker"]
+    env_file: ./backend/.env
+    environment:
+      VELOS_STORAGE_DIR: /data
+    volumes: ["velos-data:/data"]
+    depends_on: [api]
+  website:
+    build:
+      context: ./website
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports: ["3000:80"]
+    depends_on: [api]
+volumes:
+  velos-data:

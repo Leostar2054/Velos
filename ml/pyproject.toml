@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "velos-ml"
+version = "0.2.0"
+description = "Velos BioImaging ML pipeline: synthetic data generation, sparse-scan refinement U-Net, training, evaluation, inference"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.26",
+    "torch>=2.2",
+    "pyyaml>=6",
+    "matplotlib>=3.8",
+    "scikit-image>=0.22",
+    "velos-backend>=0.2",   # provides velos_recon (the Client's physics engines)
+]
+
+[tool.setuptools.packages.find]
+include = ["velos_ml*"]

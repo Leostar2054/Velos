@@ -1,0 +1,96 @@
+{
+  "company": {
+    "name": "Velos BioImaging",
+    "tagline": "Label-free quantitative phase imaging for live-cell research",
+    "description": "Velos BioImaging builds Velos QPI, a compact 630 nm ptychographic imaging system, and SPARK, its physics-based, sparse-scanning and AI-assisted reconstruction software, for label-free live-cell monitoring, cell biology and drug discovery.",
+    "email": "",
+    "address": "GIST, 123 Cheomdan-gwagiro, Buk-gu, Gwangju 61005, Republic of Korea",
+    "affiliation": "Founded by researchers at the Gwangju Institute of Science and Technology (GIST)",
+    "status_note": "Velos QPI is a research-use product under development. Performance figures on this site are development targets that require experimental confirmation."
+  },
+  "nav": [
+    { "label": "Home", "href": "/" },
+    { "label": "Product", "href": "/product" },
+    { "label": "Team", "href": "/team" },
+    { "label": "Contact", "href": "/contact" }
+  ],
+  "home": {
+    "eyebrow": "Velos QPI + SPARK",
+    "headline": "See living cells quantitatively. No labels, fewer scans.",
+    "subheadline": "A compact benchtop quantitative phase imaging platform that recovers amplitude and phase of transparent specimens from fewer measurements, with physics-based reconstruction you can trust and AI acceleration when you need speed.",
+    "primary_cta": { "label": "Request a demo", "href": "/contact" },
+    "secondary_cta": { "label": "Explore the platform", "href": "/product" },
+    "stats": [
+      { "value": "630 nm", "label": "visible-light illumination, gentle on live cells" },
+      { "value": "30–50 %", "label": "fewer scan positions targeted with sparse-scanning reconstruction" },
+      { "value": "1–2 µm", "label": "resolution class targeted over a 0.5–1 mm² field of view" },
+      { "value": "< 1 min", "label": "acquisition-to-reconstruction target for selected modes" }
+    ],
+    "features": [
+      { "title": "Label-free live-cell imaging", "body": "Quantitative phase converts optical path delay into measurable images of morphology, dry-mass proxies and growth, without dyes or fluorescent labels." },
+      { "title": "Sparse-scanning reconstruction", "body": "Our core technology recovers high-quality phase from fewer scan positions, cutting acquisition time and motion sensitivity for time-lapse experiments." },
+      { "title": "Physics first, AI where it helps", "body": "SPARK keeps the physics-based engine as the quantitative reference and uses learned models for initialisation, refinement and fast previews, always checked against the measurement." },
+      { "title": "Built for biology labs", "body": "A compact enclosure, guided acquisition protocols and exportable metrics let labs without optics expertise run longitudinal assays." }
+    ],
+    "how_it_works": [
+      { "step": "1", "title": "Place the sample", "body": "Culture dish or slide on the XY stage; pick a predefined acquisition protocol." },
+      { "step": "2", "title": "Acquire", "body": "A coherent 630 nm probe scans overlapping positions while the CMOS camera records diffraction frames with full metadata." },
+      { "step": "3", "title": "Reconstruct in SPARK", "body": "Choose physics-based, sparse-scanning, AI-assisted or hybrid reconstruction; quality indicators are reported with every result." },
+      { "step": "4", "title": "Measure", "body": "Segment and track cells; export area, phase-derived biomass, migration and treatment-response metrics." }
+    ],
+    "applications": [
+      { "title": "Cell biology", "body": "Morphology and phenotyping, growth and proliferation, migration and wound healing, cell-cycle events, cell–material interactions." },
+      { "title": "Drug discovery & toxicology", "body": "Dose–response profiling, time-of-response analysis, cytotoxic vs cytostatic separation, combination studies, spheroid response tracking." },
+      { "title": "Microbiology & education", "body": "Yeast and microbial growth monitoring, and an affordable entry point for teaching labs and core facilities." }
+    ]
+  },
+  "product": {
+    "headline": "Velos QPI and SPARK",
+    "intro": "Velos QPI combines compact 630 nm imaging hardware with synchronised scanning and camera acquisition. SPARK turns the recorded diffraction frames into quantitative amplitude and phase images through a controlled set of reconstruction engines that share one data model, calibration and quality-control workflow.",
+    "hardware": [
+      { "module": "Illumination", "detail": "630 nm diode laser with spatial filtering or fibre delivery; monitored power and parasitic-reflection control." },
+      { "module": "Probe formation", "detail": "Aperture / relay optics define the illumination; the probe is characterised and jointly recovered in reconstruction." },
+      { "module": "Sample holder", "detail": "XY stage with culture-dish compatibility; temperature / CO₂ enclosure planned for long time-lapse." },
+      { "module": "Detector", "detail": "Scientific or industrial CMOS camera selected for pixel size, dynamic range and sensitivity." },
+      { "module": "Controller", "detail": "Hardware-triggered stage–camera synchronisation with per-frame coordinates and QC metadata." },
+      { "module": "Enclosure", "detail": "Light-tight benchtop housing with kinematic mounts and alignment references." }
+    ],
+    "modes": [
+      { "name": "Physics-based", "status": "Reference / reportable", "body": "Iterative ptychographic phase retrieval with probe recovery, position refinement and convergence monitoring. The quantitative reference and the source of training labels." },
+      { "name": "Sparse-scanning", "status": "Reportable after validation", "body": "Graph-based coupling between scan positions and adaptive priors keep phase quality with fewer measurements. A reconstruction is rejected if it changes quantitative cell features." },
+      { "name": "AI-assisted", "status": "Preview unless physics-checked", "body": "Learned initialisation, refinement and artifact detection for near-real-time previews; held-out validation and physics-consistency checks are built in." },
+      { "name": "Hybrid", "status": "Reportable with QC", "body": "AI initialisation followed by a physics-consistency step for difficult or low-signal datasets." }
+    ],
+    "software_platform": [
+      { "title": "Upload & manage data", "body": "Secure upload of microscopy datasets with automatic geometry checks and metadata capture." },
+      { "title": "Asynchronous reconstruction jobs", "body": "Submit jobs through the web or API; track status and progress; retrieve amplitude/phase results and metrics when ready." },
+      { "title": "Quality indicators", "body": "Data-consistency error, coverage maps and convergence curves accompany every reconstruction." },
+      { "title": "Open outputs", "body": "Images, phase maps, CSV metrics and reproducible experiment reports for your analysis pipeline." }
+    ],
+    "targets": [
+      { "metric": "Resolution", "value": "≈ 1–2 µm class" },
+      { "metric": "Field of view", "value": "0.5–1 mm²" },
+      { "metric": "Acquisition → reconstruction", "value": "sub-minute for selected modes" },
+      { "metric": "Scan reduction", "value": "30–50 % fewer positions (development target)" }
+    ],
+    "validation_note": "Validation progresses from calibration targets (USAF, phase steps, beads) to fixed cells, live 2D cultures and drug-response assays before any spheroid or organoid claims."
+  },
+  "team": {
+    "headline": "Team",
+    "intro": "An interdisciplinary team of optics, computational imaging, systems and biomedical researchers.",
+    "members": [
+      { "name": "Muhammad Awais", "role": "Team Lead · Computational imaging", "bio": "Ph.D. in Electrical Engineering and Computer Science (GIST). Overall technical direction: quantitative phase imaging, optical hardware, optical data processing, reconstruction algorithms and AI-assisted module development.", "initials": "MA" },
+      { "name": "Taeil Yoon", "role": "Optics and imaging", "bio": "Ph.D. in Electrical Engineering and Computer Science (GIST). Optical design, image-quality evaluation, system optimisation and performance review.", "initials": "TY" },
+      { "name": "Muhammad Usman", "role": "System integration", "bio": "M.S. candidate in Electrical Engineering and Computer Science (GIST). Electronics and computer-engineering support, experimental operation, synchronisation and prototype integration.", "initials": "MU" },
+      { "name": "Fatemeh Dehghan Nezhad Derarandash", "role": "Biological validation", "bio": "Ph.D. candidate in Biomedical Science and Engineering (GIST). Sample selection, cell-culture coordination, biological controls and drug-response validation.", "initials": "FD" }
+    ]
+  },
+  "contact": {
+    "headline": "Get in touch",
+    "intro": "Interested in a demo, a pilot study or a collaboration? Tell us about your samples and assays and we will get back to you.",
+    "topics": ["Request a demo", "Pilot study / early access", "Research collaboration", "Investment / partnership", "Other"]
+  },
+  "footer": {
+    "note": "© Velos BioImaging. Research-use only; not for diagnostic use."
+  }
+}

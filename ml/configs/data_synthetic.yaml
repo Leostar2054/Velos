@@ -1,0 +1,17 @@
+# Synthetic cell-phantom dataset for the sparse-scan refinement baseline (M2).
+# Geometry mirrors the Client's simulation framework (ptycho_core.py): 256 px object,
+# 64 px probe, raster scans with 2 px jitter, Poisson noise.
+size: 256
+probe_px: 64
+n_train: 200
+n_val: 25
+n_test: 30
+dense_overlap: 0.70      # 11x11 = 121 frames  (reference "dense" scan)
+sparse_overlap: 0.60     #  8x8  =  64 frames  (-47 % frames → the sparse-scan case)
+jitter_px: 2.0
+photons: [5000, 50000]   # mean photons per diffraction frame (log-uniform)
+engine: wasp
+engine_params: {probe_lr: 0.1}
+sparse_iters: 100
+dense_iters: 120
+seed: 1234

@@ -1,0 +1,27 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.17, pytest-9.1.1, pluggy-1.7.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/claude/velos-platform/backend
+configfile: pyproject.toml
+testpaths: tests
+plugins: platformdirs-4.12.4, anyio-4.15.1
+collecting ... collected 10 items
+
+tests/test_api.py::test_health_is_public PASSED                          [ 10%]
+tests/test_api.py::test_auth_required PASSED                             [ 20%]
+tests/test_api.py::test_upload_rejects_bad_files PASSED                  [ 30%]
+tests/test_api.py::test_full_workflow PASSED                             [ 40%]
+tests/test_api.py::test_cancel_queued_job PASSED                         [ 50%]
+tests/test_api.py::test_bad_engine_rejected PASSED                       [ 60%]
+tests/test_api.py::test_contact_endpoint PASSED                          [ 70%]
+tests/test_engine_integration.py::test_driver_matches_client_engine PASSED [ 80%]
+tests/test_engine_integration.py::test_engines_reduce_error_and_recover_object PASSED [ 90%]
+tests/test_engine_integration.py::test_sparse_subset_and_crop PASSED     [100%]
+
+=============================== warnings summary ===============================
+tests/test_api.py::test_upload_rejects_bad_files
+  /usr/local/lib/python3.13/site-packages/fastapi/telemetry/_api.py:244: StarletteDeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    return function(**arguments)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 10 passed, 1 warning in 2.79s =========================

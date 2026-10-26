@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+storage/
+backend/.env
+website/node_modules/
+website/.next/
+website/out/
+website/.env*.local
+ml/data/
+ml/runs/*/last.pt
+*.npz
+!ml/sample_data/*.npz
