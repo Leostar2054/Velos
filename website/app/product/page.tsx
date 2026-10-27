@@ -44,7 +44,7 @@ export default function ProductPage() {
           ))}
         </div>
         <div className="card mt-10 !p-2">
-          <Image src="/images/spark-workflow.jpg" alt="Recommended SPARK software workflow diagram" width={1600} height={855} className="rounded-xl" />
+          <Image src="/images/spark-workflow.svg" alt="Recommended SPARK software workflow diagram" width={1600} height={1000} className="rounded-xl" />
         </div>
         <div className="mt-10 grid gap-6 md:grid-cols-4">
           {p.software_platform.map((f) => (
@@ -67,7 +67,7 @@ export default function ProductPage() {
         </dl>
         <p className="mt-8 max-w-3xl text-slate-400">{p.validation_note}</p>
         <div className="card mt-8 !p-2">
-          <Image src="/images/validation-roadmap.jpg" alt="Progressive sample and validation roadmap" width={1600} height={674} className="rounded-xl" />
+          <Image src="/images/validation-roadmap.svg" alt="Progressive sample and validation roadmap" width={1600} height={660} className="rounded-xl" />
         </div>
       </Section>
     </>

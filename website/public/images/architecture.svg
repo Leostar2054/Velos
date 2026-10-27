@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 760" width="1600" height="760" font-family="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<defs>
+  <linearGradient id="g-accent" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient>
+  <linearGradient id="g-line" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient>
+  <linearGradient id="g-vline" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="760"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient>
+  <radialGradient id="glow-c" cx="0.3" cy="0.1" r="0.7"><stop offset="0" stop-color="#22d3ee" stop-opacity="0.16"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></radialGradient>
+  <radialGradient id="glow-v" cx="0.85" cy="0.9" r="0.7"><stop offset="0" stop-color="#8b5cf6" stop-opacity="0.18"/><stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/></radialGradient>
+  <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#000" flood-opacity="0.45"/></filter>
+  <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0.5 L9.5 5 L0 9.5 z" fill="#8b5cf6"/></marker>
+  <marker id="arrow-c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0.5 L9.5 5 L0 9.5 z" fill="#22d3ee"/></marker>
+  
+</defs>
+<rect width="1600" height="760" fill="#0b1020"/>
+<rect width="1600" height="760" fill="url(#glow-c)"/>
+<rect width="1600" height="760" fill="url(#glow-v)"/>
+<text x="800.0" y="64" text-anchor="middle" fill="#ffffff" font-size="36" font-weight="700" letter-spacing="-0.5">Velos QPI: acquisition and reconstruction architecture</text>
+<text x="800.0" y="98" text-anchor="middle" fill="#9fb0c8" font-size="18">From a 630 nm probe scanning a living sample to quantitative, biologically meaningful outputs</text>
+<rect x="54.0" y="140" width="222" height="186" rx="18" fill="#111a33" fill-opacity="0.92" stroke="#22d3ee" stroke-opacity="0.75" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="72.0" y="141" width="186" height="5" rx="2.5" fill="#22d3ee" fill-opacity="0.95"/>
+<text x="165.0" y="190" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="600"><tspan x="165.0" dy="0">630 nm source</tspan></text>
+<text x="165.0" y="224.0" text-anchor="middle" fill="#9fb0c8" font-size="15" font-weight="400"><tspan x="165.0" dy="0">Diode laser / LED +</tspan><tspan x="165.0" dy="20.25">spatial filter</tspan></text>
+<line x1="280.0" y1="233.0" x2="302.0" y2="233.0" stroke="url(#g-line)" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="308.0" y="140" width="222" height="186" rx="18" fill="#111a33" fill-opacity="0.92" stroke="#22d3ee" stroke-opacity="0.75" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="326.0" y="141" width="186" height="5" rx="2.5" fill="#22d3ee" fill-opacity="0.95"/>
+<text x="419.0" y="190" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="600"><tspan x="419.0" dy="0">Probe optics</tspan></text>
+<text x="419.0" y="224.0" text-anchor="middle" fill="#9fb0c8" font-size="15" font-weight="400"><tspan x="419.0" dy="0">Beam shaping and</tspan><tspan x="419.0" dy="20.25">aperture</tspan></text>
+<line x1="534.0" y1="233.0" x2="556.0" y2="233.0" stroke="url(#g-line)" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="562.0" y="140" width="222" height="186" rx="18" fill="#111a33" fill-opacity="0.92" stroke="#34d399" stroke-opacity="0.75" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="580.0" y="141" width="186" height="5" rx="2.5" fill="#34d399" fill-opacity="0.95"/>
+<text x="673.0" y="190" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="600"><tspan x="673.0" dy="0">Live-cell</tspan><tspan x="673.0" dy="25.299999999999997">sample</tspan></text>
+<text x="673.0" y="249.3" text-anchor="middle" fill="#9fb0c8" font-size="15" font-weight="400"><tspan x="673.0" dy="0">Culture dish on XY</tspan><tspan x="673.0" dy="20.25">stage; optional</tspan><tspan x="673.0" dy="20.25">incubator enclosure</tspan></text>
+<line x1="788.0" y1="233.0" x2="810.0" y2="233.0" stroke="url(#g-line)" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="816.0" y="140" width="222" height="186" rx="18" fill="#111a33" fill-opacity="0.92" stroke="#38bdf8" stroke-opacity="0.75" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="834.0" y="141" width="186" height="5" rx="2.5" fill="#38bdf8" fill-opacity="0.95"/>
+<text x="927.0" y="190" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="600"><tspan x="927.0" dy="0">Diffraction</tspan><tspan x="927.0" dy="25.299999999999997">field</tspan></text>
+<text x="927.0" y="249.3" text-anchor="middle" fill="#9fb0c8" font-size="15" font-weight="400"><tspan x="927.0" dy="0">Lensless or relay-</tspan><tspan x="927.0" dy="20.25">assisted propagation</tspan></text>
+<line x1="1042.0" y1="233.0" x2="1064.0" y2="233.0" stroke="url(#g-line)" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="1070.0" y="140" width="222" height="186" rx="18" fill="#111a33" fill-opacity="0.92" stroke="#38bdf8" stroke-opacity="0.75" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="1088.0" y="141" width="186" height="5" rx="2.5" fill="#38bdf8" fill-opacity="0.95"/>
+<text x="1181.0" y="190" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="600"><tspan x="1181.0" dy="0">CMOS camera</tspan></text>
+<text x="1181.0" y="224.0" text-anchor="middle" fill="#9fb0c8" font-size="15" font-weight="400"><tspan x="1181.0" dy="0">Raw intensity frames</tspan></text>
+<line x1="1296.0" y1="233.0" x2="1318.0" y2="233.0" stroke="url(#g-line)" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="1324.0" y="140" width="222" height="186" rx="18" fill="#111a33" fill-opacity="0.92" stroke="#a78bfa" stroke-opacity="0.75" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="1342.0" y="141" width="186" height="5" rx="2.5" fill="#a78bfa" fill-opacity="0.95"/>
+<text x="1435.0" y="190" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="600"><tspan x="1435.0" dy="0">Acquisition</tspan><tspan x="1435.0" dy="25.299999999999997">computer</tspan></text>
+<text x="1435.0" y="249.3" text-anchor="middle" fill="#9fb0c8" font-size="15" font-weight="400"><tspan x="1435.0" dy="0">Stage–camera</tspan><tspan x="1435.0" dy="20.25">synchronisation;</tspan><tspan x="1435.0" dy="20.25">metadata and quality</tspan><tspan x="1435.0" dy="20.25">control</tspan></text>
+<rect x="81.0" y="500" width="322" height="168" rx="18" fill="#111a33" fill-opacity="0.92" stroke="#fbbf24" stroke-opacity="0.75" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="99.0" y="501" width="286" height="5" rx="2.5" fill="#fbbf24" fill-opacity="0.95"/>
+<text x="242.0" y="550" text-anchor="middle" fill="#ffffff" font-size="23" font-weight="600"><tspan x="242.0" dy="0">Calibration &amp; QC</tspan></text>
+<text x="242.0" y="584.0" text-anchor="middle" fill="#9fb0c8" font-size="15" font-weight="400"><tspan x="242.0" dy="0">Dark/flat correction, position</tspan><tspan x="242.0" dy="20.25">check, background and saturation</tspan><tspan x="242.0" dy="20.25">control</tspan></text>
+<line x1="407.0" y1="584" x2="447.0" y2="584" stroke="url(#g-line)" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="453.0" y="500" width="322" height="168" rx="18" fill="#111a33" fill-opacity="0.92" stroke="#a78bfa" stroke-opacity="0.75" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="471.0" y="501" width="286" height="5" rx="2.5" fill="#a78bfa" fill-opacity="0.95"/>
+<text x="614.0" y="550" text-anchor="middle" fill="#ffffff" font-size="23" font-weight="600"><tspan x="614.0" dy="0">SPARK reconstruction</tspan></text>
+<text x="614.0" y="584.0" text-anchor="middle" fill="#9fb0c8" font-size="15" font-weight="400"><tspan x="614.0" dy="0">Physics-based, sparse-scanning and</tspan><tspan x="614.0" dy="20.25">AI-assisted reconstruction</tspan></text>
+<line x1="779.0" y1="584" x2="819.0" y2="584" stroke="url(#g-line)" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="825.0" y="500" width="322" height="168" rx="18" fill="#111a33" fill-opacity="0.92" stroke="#22d3ee" stroke-opacity="0.75" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="843.0" y="501" width="286" height="5" rx="2.5" fill="#22d3ee" fill-opacity="0.95"/>
+<text x="986.0" y="550" text-anchor="middle" fill="#ffffff" font-size="23" font-weight="600"><tspan x="986.0" dy="0">Quantitative outputs</tspan></text>
+<text x="986.0" y="584.0" text-anchor="middle" fill="#9fb0c8" font-size="15" font-weight="400"><tspan x="986.0" dy="0">Amplitude, phase, dry-mass</tspan><tspan x="986.0" dy="20.25">proxies, time-series features</tspan></text>
+<line x1="1151.0" y1="584" x2="1191.0" y2="584" stroke="url(#g-line)" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="1197.0" y="500" width="322" height="168" rx="18" fill="#111a33" fill-opacity="0.92" stroke="#34d399" stroke-opacity="0.75" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="1215.0" y="501" width="286" height="5" rx="2.5" fill="#34d399" fill-opacity="0.95"/>
+<text x="1358.0" y="550" text-anchor="middle" fill="#ffffff" font-size="23" font-weight="600"><tspan x="1358.0" dy="0">Biological analysis</tspan></text>
+<text x="1358.0" y="584.0" text-anchor="middle" fill="#9fb0c8" font-size="15" font-weight="400"><tspan x="1358.0" dy="0">Morphology, growth, migration,</tspan><tspan x="1358.0" dy="20.25">drug response and organoid metrics</tspan></text>
+<path d="M1395.0 326 V388 H673.0 V336" fill="none" stroke="#22d3ee" stroke-width="2.5" stroke-dasharray="8 7" marker-end="url(#arrow-c)"/>
+<text x="1054.0" y="378" text-anchor="middle" fill="#22d3ee" font-size="15" font-weight="600">Scan control: controlled overlapping scan positions and triggers</text>
+<path d="M1475.0 326 V452 H242.0 V492" fill="none" stroke="url(#g-line)" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="838.5" y="476" text-anchor="middle" fill="#9fb0c8" font-size="15">Raw frames + scan coordinates + acquisition metadata</text>
+<text x="54.0" y="126" fill="#22d3ee" font-size="13" font-weight="700" letter-spacing="2.5">ACQUISITION (VELOS QPI HARDWARE)</text>
+<text x="81.0" y="430" fill="#a78bfa" font-size="13" font-weight="700" letter-spacing="2.5">RECONSTRUCTION AND ANALYSIS (SPARK SOFTWARE)</text>
+</svg>

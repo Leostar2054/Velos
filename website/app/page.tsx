@@ -66,7 +66,7 @@ export default function HomePage() {
           ))}
         </ol>
         <div className="card mt-10 !p-2">
-          <Image src="/images/architecture.jpg" alt="Velos QPI acquisition and reconstruction architecture diagram" width={1600} height={688} className="rounded-xl" />
+          <Image src="/images/architecture.svg" alt="Velos QPI acquisition and reconstruction architecture diagram" width={1600} height={760} className="rounded-xl" />
         </div>
       </Section>
 

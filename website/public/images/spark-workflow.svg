@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" font-family="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<defs>
+  <linearGradient id="g-accent" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient>
+  <linearGradient id="g-line" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1600" y2="0"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient>
+  <linearGradient id="g-vline" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1000"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient>
+  <radialGradient id="glow-c" cx="0.3" cy="0.1" r="0.7"><stop offset="0" stop-color="#22d3ee" stop-opacity="0.16"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></radialGradient>
+  <radialGradient id="glow-v" cx="0.85" cy="0.9" r="0.7"><stop offset="0" stop-color="#8b5cf6" stop-opacity="0.18"/><stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/></radialGradient>
+  <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#000" flood-opacity="0.45"/></filter>
+  <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0.5 L9.5 5 L0 9.5 z" fill="#8b5cf6"/></marker>
+  <marker id="arrow-c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0.5 L9.5 5 L0 9.5 z" fill="#22d3ee"/></marker>
+  
+</defs>
+<rect width="1600" height="1000" fill="#0b1020"/>
+<rect width="1600" height="1000" fill="url(#glow-c)"/>
+<rect width="1600" height="1000" fill="url(#glow-v)"/>
+<text x="800.0" y="64" text-anchor="middle" fill="#ffffff" font-size="36" font-weight="700" letter-spacing="-0.5">SPARK software: from raw measurements to biological decisions</text>
+<text x="800.0" y="98" text-anchor="middle" fill="#9fb0c8" font-size="18">One data model, one calibration and one quality-control path shared by every reconstruction engine</text>
+<line x1="250" y1="194.0" x2="250" y2="874.0" stroke="url(#g-vline)" stroke-width="4" stroke-linecap="round"/>
+<line x1="250" y1="194.0" x2="330" y2="194.0" stroke="#22d3ee" stroke-opacity="0.6" stroke-width="2"/>
+<circle cx="250" cy="194.0" r="28" fill="#0b1020" stroke="url(#g-accent)" stroke-width="3"/><text x="250" y="203.0" text-anchor="middle" fill="#fff" font-size="24" font-weight="700">1</text>
+<rect x="330" y="140" width="1210" height="108" rx="18" fill="#111a33" fill-opacity="0.92" stroke="#22d3ee" stroke-opacity="0.7" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="330" y="140" width="7" height="108" rx="3.5" fill="#22d3ee"/>
+<text x="366" y="203.0" fill="#ffffff" font-size="26" font-weight="600">Import</text>
+<text x="750" y="202.0" fill="#9fb0c8" font-size="19">Intensity frames, scan coordinates, wavelength, pixel size</text>
+<line x1="250" y1="330.0" x2="330" y2="330.0" stroke="#38bdf8" stroke-opacity="0.6" stroke-width="2"/>
+<circle cx="250" cy="330.0" r="28" fill="#0b1020" stroke="url(#g-accent)" stroke-width="3"/><text x="250" y="339.0" text-anchor="middle" fill="#fff" font-size="24" font-weight="700">2</text>
+<rect x="330" y="276" width="1210" height="108" rx="18" fill="#111a33" fill-opacity="0.92" stroke="#38bdf8" stroke-opacity="0.7" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="330" y="276" width="7" height="108" rx="3.5" fill="#38bdf8"/>
+<text x="366" y="339.0" fill="#ffffff" font-size="26" font-weight="600">Quality control</text>
+<text x="750" y="338.0" fill="#9fb0c8" font-size="19">Saturation, drift, missing frames, position consistency</text>
+<line x1="250" y1="466.0" x2="330" y2="466.0" stroke="#38bdf8" stroke-opacity="0.6" stroke-width="2"/>
+<circle cx="250" cy="466.0" r="28" fill="#0b1020" stroke="url(#g-accent)" stroke-width="3"/><text x="250" y="475.0" text-anchor="middle" fill="#fff" font-size="24" font-weight="700">3</text>
+<rect x="330" y="412" width="1210" height="108" rx="18" fill="#111a33" fill-opacity="0.92" stroke="#38bdf8" stroke-opacity="0.7" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="330" y="412" width="7" height="108" rx="3.5" fill="#38bdf8"/>
+<text x="366" y="475.0" fill="#ffffff" font-size="26" font-weight="600">Initialization</text>
+<text x="750" y="474.0" fill="#9fb0c8" font-size="19">Probe/object estimate, support, calibration parameters</text>
+<line x1="250" y1="602.0" x2="330" y2="602.0" stroke="#a78bfa" stroke-opacity="0.6" stroke-width="2"/>
+<circle cx="250" cy="602.0" r="28" fill="#0b1020" stroke="url(#g-accent)" stroke-width="3"/><text x="250" y="611.0" text-anchor="middle" fill="#fff" font-size="24" font-weight="700">4</text>
+<rect x="330" y="548" width="1210" height="108" rx="18" fill="#111a33" fill-opacity="0.98" stroke="#a78bfa" stroke-opacity="0.95" stroke-width="2.2" filter="url(#shadow)"/>
+<rect x="330" y="548" width="7" height="108" rx="3.5" fill="#a78bfa"/>
+<text x="366" y="611.0" fill="#ffffff" font-size="26" font-weight="600">Reconstruction</text>
+<rect x="730" y="582.0" width="172.5" height="40" rx="20" fill="#22d3ee" fill-opacity="0.14" stroke="#22d3ee" stroke-opacity="0.8" stroke-width="1.5"/><text x="816.25" y="609.0" text-anchor="middle" fill="#22d3ee" font-size="18" font-weight="600">Physics-based</text>
+<rect x="920.5" y="582.0" width="193.5" height="40" rx="20" fill="#a78bfa" fill-opacity="0.14" stroke="#a78bfa" stroke-opacity="0.8" stroke-width="1.5"/><text x="1017.25" y="609.0" text-anchor="middle" fill="#a78bfa" font-size="18" font-weight="600">Sparse-scanning</text>
+<rect x="1132.0" y="582.0" width="151.5" height="40" rx="20" fill="#34d399" fill-opacity="0.14" stroke="#34d399" stroke-opacity="0.8" stroke-width="1.5"/><text x="1207.75" y="609.0" text-anchor="middle" fill="#34d399" font-size="18" font-weight="600">AI-assisted</text>
+<rect x="1301.5" y="582.0" width="99.0" height="40" rx="20" fill="#fbbf24" fill-opacity="0.14" stroke="#fbbf24" stroke-opacity="0.8" stroke-width="1.5"/><text x="1351.0" y="609.0" text-anchor="middle" fill="#fbbf24" font-size="18" font-weight="600">Hybrid</text>
+<text x="1424.5" y="609.0" fill="#9fb0c8" font-size="16">+ quality indicators</text>
+<line x1="250" y1="738.0" x2="330" y2="738.0" stroke="#34d399" stroke-opacity="0.6" stroke-width="2"/>
+<circle cx="250" cy="738.0" r="28" fill="#0b1020" stroke="url(#g-accent)" stroke-width="3"/><text x="250" y="747.0" text-anchor="middle" fill="#fff" font-size="24" font-weight="700">5</text>
+<rect x="330" y="684" width="1210" height="108" rx="18" fill="#111a33" fill-opacity="0.92" stroke="#34d399" stroke-opacity="0.7" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="330" y="684" width="7" height="108" rx="3.5" fill="#34d399"/>
+<text x="366" y="747.0" fill="#ffffff" font-size="26" font-weight="600">Quantification</text>
+<text x="750" y="746.0" fill="#9fb0c8" font-size="19">Phase, amplitude, optical path delay, cell features</text>
+<line x1="250" y1="874.0" x2="330" y2="874.0" stroke="#34d399" stroke-opacity="0.6" stroke-width="2"/>
+<circle cx="250" cy="874.0" r="28" fill="#0b1020" stroke="url(#g-accent)" stroke-width="3"/><text x="250" y="883.0" text-anchor="middle" fill="#fff" font-size="24" font-weight="700">6</text>
+<rect x="330" y="820" width="1210" height="108" rx="18" fill="#111a33" fill-opacity="0.92" stroke="#34d399" stroke-opacity="0.7" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="330" y="820" width="7" height="108" rx="3.5" fill="#34d399"/>
+<text x="366" y="883.0" fill="#ffffff" font-size="26" font-weight="600">Export &amp; report</text>
+<text x="750" y="882.0" fill="#9fb0c8" font-size="19">Images, videos, masks, CSV metrics, reproducible settings</text>
+</svg>
