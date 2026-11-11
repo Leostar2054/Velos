@@ -46,7 +46,7 @@ jobs:
         working-directory: ml
         run: >
           python -m velos_ml.train --config configs/refine_v2_synthetic.yaml --data /tmp/syn --out /tmp/run
-          --set train.epochs=1 --set data.crop=64 --set model.base=8
+          --set train.epochs=1 --set data.crop=64 --set model.base=8 --set train.batch_size=2
       - name: Package (ONNX + TorchScript) and verify against PyTorch
         working-directory: ml
         run: python -m velos_ml.package /tmp/run/best.pt --out /tmp/models/ci-model --version 0.0.0-ci

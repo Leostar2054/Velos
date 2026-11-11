@@ -142,8 +142,9 @@ def main(argv=None):
                                                target_frame=common["target_frame"]))
     from torch.utils.data import ConcatDataset
     tr_all = ConcatDataset(train_sets) if len(train_sets) > 1 else tr
-    tl = DataLoader(tr_all, batch_size=int(tcfg["batch_size"]), shuffle=True,
-                    num_workers=int(tcfg["num_workers"]), drop_last=True)
+    bs = int(tcfg["batch_size"])
+    tl = DataLoader(tr_all, batch_size=bs, shuffle=True, num_workers=int(tcfg["num_workers"]),
+                    drop_last=len(tr_all) > bs)          # tiny smoke-test sets still give ≥ 1 step
     vl = DataLoader(va, batch_size=4, shuffle=False)
     model = build_model(cfg).to(device)
     if tcfg.get("init_from"):                 # fine-tuning stage
