@@ -1,0 +1,25 @@
+{
+  "size": 256,
+  "probe_px": 64,
+  "n_train": 240,
+  "n_val": 25,
+  "n_test": 30,
+  "dense_overlap": 0.7,
+  "sparse_overlap": [
+    0.42,
+    0.62
+  ],
+  "jitter_px": 2.0,
+  "photons": [
+    5000,
+    50000
+  ],
+  "engine": "epie",
+  "engine_params": {
+    "alpha": 1.0,
+    "beta": 1.0
+  },
+  "sparse_iters": 300,
+  "dense_iters": 150,
+  "seed": 4321
+}

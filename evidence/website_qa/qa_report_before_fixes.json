@@ -1,0 +1,470 @@
+{
+ "base": "http://localhost:3100",
+ "date": "2026-11-11T07:59:55.343Z",
+ "results": [
+  {
+   "page": "/",
+   "viewport": 390,
+   "consoleErrors": [],
+   "pageErrors": [],
+   "failedRequests": [],
+   "title": "Velos BioImaging — Label-free quantitative phase imaging for live-cell research",
+   "description": "Velos BioImaging builds Velos QPI, a compact 630 nm ptychographic imaging system, and SPARK, its physics-based, sparse-scanning and AI-assisted reconstruction software, for label-free live-cell monitoring, cell biology and drug discovery.",
+   "lang": "en",
+   "h1": 1,
+   "overflow": false,
+   "scrollWidth": 390,
+   "offenders": [],
+   "images": 2,
+   "brokenImages": [],
+   "missingAlt": [],
+   "duplicateIds": [
+    "velos-g ×2"
+   ],
+   "favicon": false,
+   "axe": [
+    {
+     "id": "color-contrast",
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "nodes": 3,
+     "targets": [
+      ".text-xs.text-slate-500.mt-3",
+      ".gap-2 > span:nth-child(1)",
+      ".gap-2 > span:nth-child(2)"
+     ]
+    }
+   ],
+   "screenshot": "home_phone-390.png"
+  },
+  {
+   "page": "/product/",
+   "viewport": 390,
+   "consoleErrors": [],
+   "pageErrors": [],
+   "failedRequests": [],
+   "title": "Product — Velos QPI and SPARK · Velos BioImaging",
+   "description": "Velos QPI compact 630 nm quantitative phase imaging hardware and the SPARK reconstruction platform: physics-based, sparse-scanning, AI-assisted and hybrid modes.",
+   "lang": "en",
+   "h1": 1,
+   "overflow": false,
+   "scrollWidth": 390,
+   "offenders": [],
+   "images": 2,
+   "brokenImages": [],
+   "missingAlt": [],
+   "duplicateIds": [
+    "velos-g ×2"
+   ],
+   "favicon": false,
+   "axe": [
+    {
+     "id": "color-contrast",
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "nodes": 3,
+     "targets": [
+      ".text-slate-500.text-xs.mt-3",
+      ".items-start > span:nth-child(1)",
+      ".items-start > span:nth-child(2)"
+     ]
+    }
+   ],
+   "screenshot": "product_phone-390.png"
+  },
+  {
+   "page": "/team/",
+   "viewport": 390,
+   "consoleErrors": [],
+   "pageErrors": [],
+   "failedRequests": [],
+   "title": "Team · Velos BioImaging",
+   "description": "The Velos BioImaging team: optics, computational imaging, systems and biomedical researchers from GIST.",
+   "lang": "en",
+   "h1": 1,
+   "overflow": false,
+   "scrollWidth": 390,
+   "offenders": [],
+   "images": 0,
+   "brokenImages": [],
+   "missingAlt": [],
+   "duplicateIds": [
+    "velos-g ×2"
+   ],
+   "favicon": false,
+   "axe": [
+    {
+     "id": "color-contrast",
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "nodes": 4,
+     "targets": [
+      ".mt-10",
+      ".text-xs.text-slate-500.mt-3",
+      ".items-start > span:nth-child(1)"
+     ]
+    }
+   ],
+   "screenshot": "team_phone-390.png"
+  },
+  {
+   "page": "/contact/",
+   "viewport": 390,
+   "consoleErrors": [],
+   "pageErrors": [],
+   "failedRequests": [],
+   "title": "Contact · Velos BioImaging",
+   "description": "Request a Velos QPI demo, pilot study or collaboration.",
+   "lang": "en",
+   "h1": 1,
+   "overflow": false,
+   "scrollWidth": 390,
+   "offenders": [],
+   "images": 0,
+   "brokenImages": [],
+   "missingAlt": [],
+   "duplicateIds": [
+    "velos-g ×2"
+   ],
+   "favicon": false,
+   "axe": [
+    {
+     "id": "color-contrast",
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "nodes": 4,
+     "targets": [
+      "form > .text-xs.text-slate-500",
+      ".text-xs.text-slate-500.mt-3",
+      ".items-start > span:nth-child(1)"
+     ]
+    }
+   ],
+   "screenshot": "contact_phone-390.png"
+  },
+  {
+   "page": "/",
+   "viewport": 768,
+   "consoleErrors": [],
+   "pageErrors": [],
+   "failedRequests": [],
+   "title": "Velos BioImaging — Label-free quantitative phase imaging for live-cell research",
+   "description": "Velos BioImaging builds Velos QPI, a compact 630 nm ptychographic imaging system, and SPARK, its physics-based, sparse-scanning and AI-assisted reconstruction software, for label-free live-cell monitoring, cell biology and drug discovery.",
+   "lang": "en",
+   "h1": 1,
+   "overflow": false,
+   "scrollWidth": 768,
+   "offenders": [],
+   "images": 2,
+   "brokenImages": [],
+   "missingAlt": [],
+   "duplicateIds": [
+    "velos-g ×2"
+   ],
+   "favicon": false,
+   "axe": [
+    {
+     "id": "color-contrast",
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "nodes": 3,
+     "targets": [
+      ".text-xs.text-slate-500.mt-3",
+      ".gap-2 > span:nth-child(1)",
+      ".gap-2 > span:nth-child(2)"
+     ]
+    }
+   ],
+   "screenshot": "home_tablet-768.png"
+  },
+  {
+   "page": "/product/",
+   "viewport": 768,
+   "consoleErrors": [],
+   "pageErrors": [],
+   "failedRequests": [],
+   "title": "Product — Velos QPI and SPARK · Velos BioImaging",
+   "description": "Velos QPI compact 630 nm quantitative phase imaging hardware and the SPARK reconstruction platform: physics-based, sparse-scanning, AI-assisted and hybrid modes.",
+   "lang": "en",
+   "h1": 1,
+   "overflow": false,
+   "scrollWidth": 768,
+   "offenders": [],
+   "images": 2,
+   "brokenImages": [],
+   "missingAlt": [],
+   "duplicateIds": [
+    "velos-g ×2"
+   ],
+   "favicon": false,
+   "axe": [
+    {
+     "id": "color-contrast",
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "nodes": 3,
+     "targets": [
+      ".text-slate-500.text-xs.mt-3",
+      ".items-start > span:nth-child(1)",
+      ".items-start > span:nth-child(2)"
+     ]
+    }
+   ],
+   "screenshot": "product_tablet-768.png"
+  },
+  {
+   "page": "/team/",
+   "viewport": 768,
+   "consoleErrors": [],
+   "pageErrors": [],
+   "failedRequests": [],
+   "title": "Team · Velos BioImaging",
+   "description": "The Velos BioImaging team: optics, computational imaging, systems and biomedical researchers from GIST.",
+   "lang": "en",
+   "h1": 1,
+   "overflow": false,
+   "scrollWidth": 768,
+   "offenders": [],
+   "images": 0,
+   "brokenImages": [],
+   "missingAlt": [],
+   "duplicateIds": [
+    "velos-g ×2"
+   ],
+   "favicon": false,
+   "axe": [
+    {
+     "id": "color-contrast",
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "nodes": 4,
+     "targets": [
+      ".mt-10",
+      ".text-xs.text-slate-500.mt-3",
+      ".items-start > span:nth-child(1)"
+     ]
+    }
+   ],
+   "screenshot": "team_tablet-768.png"
+  },
+  {
+   "page": "/contact/",
+   "viewport": 768,
+   "consoleErrors": [],
+   "pageErrors": [],
+   "failedRequests": [],
+   "title": "Contact · Velos BioImaging",
+   "description": "Request a Velos QPI demo, pilot study or collaboration.",
+   "lang": "en",
+   "h1": 1,
+   "overflow": false,
+   "scrollWidth": 768,
+   "offenders": [],
+   "images": 0,
+   "brokenImages": [],
+   "missingAlt": [],
+   "duplicateIds": [
+    "velos-g ×2"
+   ],
+   "favicon": false,
+   "axe": [
+    {
+     "id": "color-contrast",
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "nodes": 4,
+     "targets": [
+      "form > .text-xs.text-slate-500",
+      ".text-xs.text-slate-500.mt-3",
+      ".items-start > span:nth-child(1)"
+     ]
+    }
+   ],
+   "screenshot": "contact_tablet-768.png"
+  },
+  {
+   "page": "/",
+   "viewport": 1440,
+   "consoleErrors": [],
+   "pageErrors": [],
+   "failedRequests": [],
+   "title": "Velos BioImaging — Label-free quantitative phase imaging for live-cell research",
+   "description": "Velos BioImaging builds Velos QPI, a compact 630 nm ptychographic imaging system, and SPARK, its physics-based, sparse-scanning and AI-assisted reconstruction software, for label-free live-cell monitoring, cell biology and drug discovery.",
+   "lang": "en",
+   "h1": 1,
+   "overflow": false,
+   "scrollWidth": 1440,
+   "offenders": [],
+   "images": 2,
+   "brokenImages": [],
+   "missingAlt": [],
+   "duplicateIds": [
+    "velos-g ×2"
+   ],
+   "favicon": false,
+   "axe": [
+    {
+     "id": "color-contrast",
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "nodes": 3,
+     "targets": [
+      ".text-xs.text-slate-500.mt-3",
+      ".gap-2 > span:nth-child(1)",
+      ".gap-2 > span:nth-child(2)"
+     ]
+    }
+   ],
+   "screenshot": "home_desktop-1440.png"
+  },
+  {
+   "page": "/product/",
+   "viewport": 1440,
+   "consoleErrors": [],
+   "pageErrors": [],
+   "failedRequests": [],
+   "title": "Product — Velos QPI and SPARK · Velos BioImaging",
+   "description": "Velos QPI compact 630 nm quantitative phase imaging hardware and the SPARK reconstruction platform: physics-based, sparse-scanning, AI-assisted and hybrid modes.",
+   "lang": "en",
+   "h1": 1,
+   "overflow": false,
+   "scrollWidth": 1440,
+   "offenders": [],
+   "images": 2,
+   "brokenImages": [],
+   "missingAlt": [],
+   "duplicateIds": [
+    "velos-g ×2"
+   ],
+   "favicon": false,
+   "axe": [
+    {
+     "id": "color-contrast",
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "nodes": 3,
+     "targets": [
+      ".text-slate-500.text-xs.mt-3",
+      ".items-start > span:nth-child(1)",
+      ".items-start > span:nth-child(2)"
+     ]
+    }
+   ],
+   "screenshot": "product_desktop-1440.png"
+  },
+  {
+   "page": "/team/",
+   "viewport": 1440,
+   "consoleErrors": [],
+   "pageErrors": [],
+   "failedRequests": [],
+   "title": "Team · Velos BioImaging",
+   "description": "The Velos BioImaging team: optics, computational imaging, systems and biomedical researchers from GIST.",
+   "lang": "en",
+   "h1": 1,
+   "overflow": false,
+   "scrollWidth": 1440,
+   "offenders": [],
+   "images": 0,
+   "brokenImages": [],
+   "missingAlt": [],
+   "duplicateIds": [
+    "velos-g ×2"
+   ],
+   "favicon": false,
+   "axe": [
+    {
+     "id": "color-contrast",
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "nodes": 4,
+     "targets": [
+      ".mt-10",
+      ".text-xs.text-slate-500.mt-3",
+      ".items-start > span:nth-child(1)"
+     ]
+    }
+   ],
+   "screenshot": "team_desktop-1440.png"
+  },
+  {
+   "page": "/contact/",
+   "viewport": 1440,
+   "consoleErrors": [],
+   "pageErrors": [],
+   "failedRequests": [],
+   "title": "Contact · Velos BioImaging",
+   "description": "Request a Velos QPI demo, pilot study or collaboration.",
+   "lang": "en",
+   "h1": 1,
+   "overflow": false,
+   "scrollWidth": 1440,
+   "offenders": [],
+   "images": 0,
+   "brokenImages": [],
+   "missingAlt": [],
+   "duplicateIds": [
+    "velos-g ×2"
+   ],
+   "favicon": false,
+   "axe": [
+    {
+     "id": "color-contrast",
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "nodes": 4,
+     "targets": [
+      "form > .text-xs.text-slate-500",
+      ".text-xs.text-slate-500.mt-3",
+      ".items-start > span:nth-child(1)"
+     ]
+    }
+   ],
+   "screenshot": "contact_desktop-1440.png"
+  }
+ ],
+ "links": {
+  "/": 200,
+  "/product/": 200,
+  "/team/": 200,
+  "/contact/": 200
+ },
+ "issues": [
+  "/ @ 390: duplicate ids: velos-g ×2",
+  "/ @ 390: no favicon link",
+  "/ @ 390: axe serious — color-contrast: Elements must meet minimum color contrast ratio thresholds (3 nodes: .text-xs.text-slate-500.mt-3, .gap-2 > span:nth-child(1), .gap-2 > span:nth-child(2))",
+  "/product/ @ 390: duplicate ids: velos-g ×2",
+  "/product/ @ 390: no favicon link",
+  "/product/ @ 390: axe serious — color-contrast: Elements must meet minimum color contrast ratio thresholds (3 nodes: .text-slate-500.text-xs.mt-3, .items-start > span:nth-child(1), .items-start > span:nth-child(2))",
+  "/team/ @ 390: duplicate ids: velos-g ×2",
+  "/team/ @ 390: no favicon link",
+  "/team/ @ 390: axe serious — color-contrast: Elements must meet minimum color contrast ratio thresholds (4 nodes: .mt-10, .text-xs.text-slate-500.mt-3, .items-start > span:nth-child(1))",
+  "/contact/ @ 390: duplicate ids: velos-g ×2",
+  "/contact/ @ 390: no favicon link",
+  "/contact/ @ 390: axe serious — color-contrast: Elements must meet minimum color contrast ratio thresholds (4 nodes: form > .text-xs.text-slate-500, .text-xs.text-slate-500.mt-3, .items-start > span:nth-child(1))",
+  "/ @ 768: duplicate ids: velos-g ×2",
+  "/ @ 768: no favicon link",
+  "/ @ 768: axe serious — color-contrast: Elements must meet minimum color contrast ratio thresholds (3 nodes: .text-xs.text-slate-500.mt-3, .gap-2 > span:nth-child(1), .gap-2 > span:nth-child(2))",
+  "/product/ @ 768: duplicate ids: velos-g ×2",
+  "/product/ @ 768: no favicon link",
+  "/product/ @ 768: axe serious — color-contrast: Elements must meet minimum color contrast ratio thresholds (3 nodes: .text-slate-500.text-xs.mt-3, .items-start > span:nth-child(1), .items-start > span:nth-child(2))",
+  "/team/ @ 768: duplicate ids: velos-g ×2",
+  "/team/ @ 768: no favicon link",
+  "/team/ @ 768: axe serious — color-contrast: Elements must meet minimum color contrast ratio thresholds (4 nodes: .mt-10, .text-xs.text-slate-500.mt-3, .items-start > span:nth-child(1))",
+  "/contact/ @ 768: duplicate ids: velos-g ×2",
+  "/contact/ @ 768: no favicon link",
+  "/contact/ @ 768: axe serious — color-contrast: Elements must meet minimum color contrast ratio thresholds (4 nodes: form > .text-xs.text-slate-500, .text-xs.text-slate-500.mt-3, .items-start > span:nth-child(1))",
+  "/ @ 1440: duplicate ids: velos-g ×2",
+  "/ @ 1440: no favicon link",
+  "/ @ 1440: axe serious — color-contrast: Elements must meet minimum color contrast ratio thresholds (3 nodes: .text-xs.text-slate-500.mt-3, .gap-2 > span:nth-child(1), .gap-2 > span:nth-child(2))",
+  "/product/ @ 1440: duplicate ids: velos-g ×2",
+  "/product/ @ 1440: no favicon link",
+  "/product/ @ 1440: axe serious — color-contrast: Elements must meet minimum color contrast ratio thresholds (3 nodes: .text-slate-500.text-xs.mt-3, .items-start > span:nth-child(1), .items-start > span:nth-child(2))",
+  "/team/ @ 1440: duplicate ids: velos-g ×2",
+  "/team/ @ 1440: no favicon link",
+  "/team/ @ 1440: axe serious — color-contrast: Elements must meet minimum color contrast ratio thresholds (4 nodes: .mt-10, .text-xs.text-slate-500.mt-3, .items-start > span:nth-child(1))",
+  "/contact/ @ 1440: duplicate ids: velos-g ×2",
+  "/contact/ @ 1440: no favicon link",
+  "/contact/ @ 1440: axe serious — color-contrast: Elements must meet minimum color contrast ratio thresholds (4 nodes: form > .text-xs.text-slate-500, .text-xs.text-slate-500.mt-3, .items-start > span:nth-child(1))"
+ ]
+}

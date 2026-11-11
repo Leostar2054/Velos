@@ -71,6 +71,6 @@ def make_identity_package(path: Path, tile: int = 64) -> Path:
     card = {"name": "identity-test", "version": "0.0.0", "tile": tile, "tile_overlap": tile // 4,
             "normalisation": "median_ramp", "inputs": "x[1,3,T,T] (Re, Im, mask)",
             "outputs": "y[1,2,T,T] (Re, Im)", "intended_use": "tests only",
-            "data_error_ratio_warn": 3.0}
+            "data_error_ratio_warn": 2.0, "data_error_abs_floor": 0.02}
     (path / "model_card.json").write_text(json.dumps(card, indent=1))
     return path

@@ -32,7 +32,7 @@ DEFAULT = {
     "model": {"base": 32, "depth": 3, "residual": True},
     "train": {"epochs": 30, "batch_size": 8, "lr": 1e-3, "weight_decay": 1e-4, "seed": 0,
               "num_workers": 0, "loss": "l1", "w_phase": 1.0, "w_grad": 0.5, "init_from": None,
-              "pct_start": 0.15},
+              "pct_start": 0.15, "select": "best"},
     "name": "baseline_unet",
 }
 
@@ -43,7 +43,7 @@ def set_seed(seed: int):
 
 def deep_update(d: dict, u: dict) -> dict:
     for k, v in u.items():
-        d[k] = deep_update(d.get(k, {}), v) if isinstance(v, dict) else v
+        d[k] = deep_update(d.get(k) or {}, v) if isinstance(v, dict) else v
     return d
 
 
@@ -178,7 +178,13 @@ def main(argv=None):
             rows.append((ep, train_loss, val_loss, lr, el)); w.writerow([ep, f"{train_loss:.6f}", f"{val_loss:.6f}", f"{lr:.2e}", f"{el:.0f}"]); f.flush()
             state = {"model": model.state_dict(), "config": cfg, "epoch": ep, "val_loss": val_loss}
             torch.save(state, out / "last.pt")
-            if val_loss < best:
+            # select "best" (lowest synthetic validation loss) or "last" (fixed schedule — used for the
+            # fine-tuning stage, where the synthetic validation loss alone does not measure the
+            # adaptation to experimental data)
+            if tcfg.get("select", "best") == "last":
+                if ep == epochs:
+                    best = val_loss; torch.save(state, out / "best.pt")
+            elif val_loss < best:
                 best = val_loss; torch.save(state, out / "best.pt")
             print(f"  epoch {ep:3d}/{epochs}  train {train_loss:.4f}  val {val_loss:.4f}  lr {lr:.1e}  ({el:.0f}s)"
                   + ("  *" if val_loss == best else ""), flush=True)

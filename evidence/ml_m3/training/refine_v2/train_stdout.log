@@ -1,0 +1,18 @@
+[train] initialised from runs/refine_v2_synthetic/best.pt (epoch 37)
+[train] refine_v2: 480 train / 25 val · 7,766,018 params · cpu
+  epoch   1/15  train 0.2208  val 0.0983  lr 2.3e-04  (56s)
+  epoch   2/15  train 0.1946  val 0.0940  lr 3.0e-04  (107s)
+  epoch   3/15  train 0.1832  val 0.0988  lr 2.9e-04  (156s)
+  epoch   4/15  train 0.1778  val 0.0929  lr 2.8e-04  (205s)
+  epoch   5/15  train 0.1704  val 0.0958  lr 2.5e-04  (252s)
+  epoch   6/15  train 0.1596  val 0.0953  lr 2.2e-04  (302s)
+  epoch   7/15  train 0.1652  val 0.0915  lr 1.9e-04  (352s)
+  epoch   8/15  train 0.1581  val 0.0904  lr 1.6e-04  (402s)
+  epoch   9/15  train 0.1568  val 0.0896  lr 1.2e-04  (455s)
+  epoch  10/15  train 0.1534  val 0.0912  lr 9.0e-05  (506s)
+  epoch  11/15  train 0.1511  val 0.0923  lr 6.0e-05  (558s)
+  epoch  12/15  train 0.1495  val 0.0879  lr 3.5e-05  (607s)
+  epoch  13/15  train 0.1549  val 0.0898  lr 1.6e-05  (658s)
+  epoch  14/15  train 0.1485  val 0.0886  lr 3.9e-06  (711s)
+  epoch  15/15  train 0.1531  val 0.0888  lr 2.3e-09  (760s)  *
+[train] done in 761s · best val loss 0.0888 → runs/refine_v2

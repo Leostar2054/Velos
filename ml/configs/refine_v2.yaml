@@ -31,3 +31,4 @@ train:
   w_phase: 1.0
   w_grad: 0.5
   init_from: runs/refine_v2_synthetic/best.pt
+  select: last          # fixed schedule; synthetic val loss alone does not measure real-data adaptation

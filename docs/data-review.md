@@ -1,4 +1,4 @@
-# Data review and physics-engine validation (M1 deliverable, completed in the M2 sprint)
+# Data review and physics-engine validation (M1 deliverable, completed in the M2 sprint, extended in M3)
 
 ## 1. Datasets received from the Client
 
@@ -57,3 +57,30 @@ platform therefore integrates only the Client's own Python engines and uses the 
 development/testing. Before any public demo or commercial release, Velos should (a) acquire its own datasets,
 (b) review the Phase Focus licence position for commercial ptychography software. This is a business decision
 outside the contractor's scope and is flagged here for completeness.
+
+
+## 4. M3 additions
+
+### 4.1 Engine choice for the training data (synthetic)
+On the v2 phantoms with a 64-frame scan (frame-overlap 0.60) and the true probe as starting point, ePIE (α = β = 1)
+reached NRMSE 0.026–0.028 after 300 iterations (ramp removed), the batch WASP-style engine (probe_lr 0.1) 0.125.
+Because ePIE is also the service default and the engine that works on the experimental data, dataset v2 uses ePIE.
+ePIE quality versus scan density (300 it, two phantoms): frame-overlap 0.58 (64 frames) NRMSE 0.04–0.06; 0.50
+(49 frames) 0.24–0.26; 0.42 (36 frames) 0.28–0.40; 0.35 (25 frames) 0.46–0.51. The v2 training range (0.42–0.62,
+36–81 frames) therefore spans the transition from failing to working reconstructions.
+
+### 4.2 Sub-pixel offsets between reconstructions
+Reconstructions of the same scan from different frame subsets — and even ePIE reconstructions of simulated data
+started from the true probe — are offset from each other (or from the ground truth) by 0.1–0.9 px: the joint
+object/probe translation is not fixed by the data. Comparing without registration overstates the differences
+(clam, 50–58 % of the frames: NRMSE 0.28–0.40 → 0.13–0.20 after registration). `velos_recon.metrics.estimate_shift`
+(phase correlation + direct optimisation of the aligned misfit) is now applied before every comparison with a
+reference, and training targets are registered to their inputs.
+
+### 4.3 The plant dataset (675 nm)
+The full 200-frame scan reconstructs well with ePIE and the automatic Fresnel chirp (N_F ≈ 2.65 at 128 px crop;
+normalised data error 0.042). Random 20–50 % subsets started from the default probe **fail** (featureless objects;
+error on the frames not used 0.15–0.16 although the used frames are fitted to 0.05–0.07). Starting the reduced
+scans from the probe of the full scan ("probe calibration") restores them (error on unused frames 0.067–0.084).
+The platform supports this workflow (`probe_from_job`). Two full-scan reconstructions with different random seeds
+differ by NRMSE ≈ 0.2 on this sample, which sets the repeatability floor for any comparison against it.

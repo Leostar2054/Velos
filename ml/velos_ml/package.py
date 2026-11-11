@@ -118,7 +118,13 @@ def export(checkpoint: str, out: str, tile: int = 256, overlap: int = 64, versio
                      "epoch": state.get("epoch"), "val_loss": state.get("val_loss")},
         "evaluation": ev,
         "verification": verification,
-        "data_error_ratio_warn": 3.0,
+        # consistency flag (backend worker): warn when the final estimate's data error exceeds BOTH
+        # ratio × physics error AND the absolute floor. Calibrated on the M3 evaluation: v2 stayed ≤ 1.5×
+        # physics on every experimental case; unsuitable models (M2, synthetic-only) reached 1.5–3.1×.
+        # The floor avoids false alarms on high-SNR data where physics fits the frames almost perfectly.
+        "data_error_ratio_warn": 2.0,
+        "data_error_abs_floor": 0.02,
+        "recommended_hybrid_iters": {"experimental": 10, "synthetic": 30},
         "intended_use": "Research and development use inside the Velos/SPARK platform: optional refinement "
                         "of ePIE reconstructions of reduced visible-light ptychography scans "
                         "(about 35-80 % of a dense raster), followed by the hybrid physics polish. "

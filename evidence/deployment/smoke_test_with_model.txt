@@ -1,0 +1,12 @@
+# Smoke test against a running API + worker with the model package installed (M3, 2026-11-11 18:40 KST)
+# command: SKIP_WEB=1 scripts/smoke_test.sh http://localhost:8000 <user key>
+
+PASS  health ok · version 0.3.0 · default model: velos-refine-v2
+PASS  API rejects requests without a key
+PASS  models endpoint · 1 package(s) installed
+PASS  upload · dataset 7363a3d1c31d4c0c · 81 patterns
+PASS  job submitted · b9bb229c493f4164 · refine_ml=true
+PASS  job succeeded after ~4s
+PASS  result + artifact download (phase.png)
+PASS  ML refinement · model velos-refine-v2 · runtime onnxruntime (CPUExecutionProvider) · consistency: ok
+ALL CHECKS PASSED (http://localhost:8000)

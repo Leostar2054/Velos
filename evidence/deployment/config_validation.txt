@@ -1,0 +1,19 @@
+# Deployment configuration checks (M3, 2026-11-11T08:23Z)
+
+$ docker compose version
+Docker Compose version v5.6.1
+
+$ docker compose -f docker-compose.prod.yml --env-file deploy/.env.example config --quiet && echo VALID
+VALID
+
+$ docker compose -f docker-compose.yml config --quiet && echo VALID
+VALID
+
+$ check-jsonschema --builtin-schema vendor.github-workflows .github/workflows/ci.yml
+ok -- validation done
+
+$ bash -n scripts/smoke_test.sh scripts/demo_m3.sh ml/scripts/m3_pipeline.sh && echo "shell syntax OK"
+shell syntax OK
+
+Note: the build environment has the Docker CLI but no Docker daemon, so images were not built here.
+Image builds (incl. 'caddy validate' inside deploy/Dockerfile.edge) run in the CI 'images' job and at the M4 deployment.

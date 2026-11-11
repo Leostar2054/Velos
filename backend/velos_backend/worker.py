@@ -74,7 +74,8 @@ def _run_ml_refinement(ds, cfg, res, params: dict, out_dir: Path, progress=None,
            "normalisation": ref.params.to_dict(),
            "data_error": {"physics": e_phys, "ml": e_ml},
            "files": {k: Path(v).name for k, v in files.items()} | {"refined_npz": "refined.npz"}}
-    warn = float(pkg.card.get("data_error_ratio_warn", 3.0))
+    warn = float(pkg.card.get("data_error_ratio_warn", 2.0))
+    floor = float(pkg.card.get("data_error_abs_floor", 0.02))
     n_h = int(params.get("hybrid_iters", 0) or 0)
     if n_h > 0:
         hres = hybrid(ds, res, ref.obj, cfg, n_h, progress=progress, should_cancel=should_cancel)
@@ -87,13 +88,16 @@ def _run_ml_refinement(ds, cfg, res, params: dict, out_dir: Path, progress=None,
         out["hybrid"] = {"iters": n_h, "elapsed_s": round(hres.elapsed_s, 2),
                          "files": {k: Path(v).name for k, v in hf.items()} | {"hybrid_npz": "hybrid.npz"}}
         out["data_error"]["hybrid"] = e_h
-        final_ratio = e_h / max(e_phys, 1e-30)
+        final_err = e_h
     else:
-        final_ratio = e_ml / max(e_phys, 1e-30)
+        final_err = e_ml
+    final_ratio = final_err / max(e_phys, 1e-30)
     out["data_error_ratio"] = final_ratio
-    out["consistency"] = "ok" if final_ratio <= warn else (
+    # flag only a gross misfit: above `warn` × the physics error AND above an absolute floor (on high-SNR
+    # data the physics fit is near perfect, so a ratio alone would flag harmless differences)
+    out["consistency"] = "ok" if (final_ratio <= warn or final_err <= floor) else (
         "warning: the refined object fits the measured data much worse than the physics result "
-        f"(ratio {final_ratio:.1f} > {warn}); prefer the physics or hybrid result")
+        f"(error {final_err:.3f} = {final_ratio:.1f}× physics); prefer the physics result")
     try:
         from velos_recon.viz import save_comparison
         panels = [("Physics", np.where(res.mask, ref.z_in, 0)), ("ML-refined", ref.z)]
@@ -153,7 +157,14 @@ def process_job(job_id: str) -> JobStatus:
                                        title=f"{ds.name} · {cfg.engine.upper()} · {cfg.iters} it")
             files["probe"] = save_probe_image(res.probe, out_dir)
             files["convergence"] = save_convergence(res.history, out_dir)
-            summary = {"dataset": res.dataset_summary, "reconstruction": res.summary(),
+            from velos_recon.engine import data_error
+            rsum = res.summary()
+            # normalised data-consistency error Σ(|F(P·O)| − √I)² / Σ I (comparable across datasets and
+            # with the ML / hybrid errors); final_data_error above is the engine's raw sum
+            rsum["data_error_normalised"] = data_error(res.obj, res.probe, ds, crop=cfg.crop)
+            if init_probe is not None:
+                rsum["probe_from_job"] = params["probe_from_job"]
+            summary = {"dataset": res.dataset_summary, "reconstruction": rsum,
                        "files": {k: Path(v).name for k, v in files.items()}}
             if params.get("refine_ml"):
                 update_progress(session, job_id, cfg.iters, cfg.iters, "ML refinement")

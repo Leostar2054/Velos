@@ -48,14 +48,17 @@ data (no ground truth needed). The result summary gains:
 ```json
 "ml_refinement": {
   "applied": true, "model": "velos-refine-v2", "model_version": "2.0.0",
-  "runtime": "onnxruntime (CPUExecutionProvider)", "elapsed_s": 2.1,
-  "data_error": {"physics": 0.021, "ml": 0.034, "hybrid": 0.020},
-  "data_error_ratio": 0.95,
-  "consistency": "ok",          // or "warning: …" when the final estimate fits the data much worse
-  "hybrid": {"iters": 30, "elapsed_s": 12.4, "files": {…}},
+  "runtime": "onnxruntime (CPUExecutionProvider)", "elapsed_s": 0.54,
+  "data_error": {"physics": 0.030, "ml": 0.037, "hybrid": 0.031},   // plant demo, 35 % of the frames
+  "data_error_ratio": 1.05,
+  "consistency": "ok",          // "warning: …" if the final error is > 2× physics AND > 0.02 (model card)
+  "hybrid": {"iters": 10, "elapsed_s": 1.2, "files": {…}},
   "files": {"amplitude": "refined_amplitude.png", "phase": "refined_phase.png", "comparison": "comparison.png", …}
 }
 ```
+
+Recommended `hybrid_iters` for experimental data: **10** (longer polishing over-fits the measured frames —
+see `docs/ml-pipeline.md`, M3 §6). Probe calibration: run a full scan first and pass its id as `probe_from_job`.
 
 Artifacts added: `refined.npz` (refined object in the physics frame and in the normalised frame, plus
 the normalisation parameters), `refined_*.png`, `hybrid.npz`, `hybrid_*.png`, `comparison.png`

@@ -1,0 +1,423 @@
+{
+ "protocol": "metrics after removing global complex scalar, linear phase ramp and sub-pixel translation; data_error_predict = misfit on frames not used (synthetic: the 121 dense-scan frames; real: held-out frames)",
+ "synthetic_test": {
+  "n": 30,
+  "frames": "36/49/64 (dense 121)",
+  "overall": {
+   "physics": {
+    "nrmse_complex": 0.1275,
+    "psnr_phase": 34.7724,
+    "ssim_phase": 0.7473,
+    "data_error_used": 0.0002,
+    "data_error_predict": 0.0135
+   },
+   "physics+300": {
+    "nrmse_complex": 0.116,
+    "psnr_phase": 35.9808,
+    "ssim_phase": 0.7718,
+    "data_error_used": 0.0005,
+    "data_error_predict": 0.013
+   },
+   "m2": {
+    "nrmse_complex": 0.1075,
+    "psnr_phase": 32.5801,
+    "ssim_phase": 0.7401,
+    "data_error_used": 0.0041,
+    "data_error_predict": 0.0128
+   },
+   "v2": {
+    "nrmse_complex": 0.0684,
+    "psnr_phase": 38.4903,
+    "ssim_phase": 0.8869,
+    "data_error_used": 0.003,
+    "data_error_predict": 0.0115
+   },
+   "hybrid@10": {
+    "nrmse_complex": 0.0608,
+    "psnr_phase": 40.5283,
+    "ssim_phase": 0.9013,
+    "data_error_used": 0.0016,
+    "data_error_predict": 0.0105
+   },
+   "hybrid@30": {
+    "nrmse_complex": 0.0592,
+    "psnr_phase": 41.334,
+    "ssim_phase": 0.9066,
+    "data_error_used": 0.0016,
+    "data_error_predict": 0.0103
+   },
+   "dense": {
+    "nrmse_complex": 0.009,
+    "psnr_phase": 55.3541,
+    "ssim_phase": 0.9959
+   }
+  },
+  "by_frames": {
+   "64 frames|physics": {
+    "nrmse_complex": 0.0659,
+    "psnr_phase": 41.3482,
+    "ssim_phase": 0.8997,
+    "data_error_used": 0.0002,
+    "data_error_predict": 0.0042
+   },
+   "64 frames|v2": {
+    "nrmse_complex": 0.045,
+    "psnr_phase": 43.2533,
+    "ssim_phase": 0.9368,
+    "data_error_used": 0.0008,
+    "data_error_predict": 0.0034
+   },
+   "64 frames|hybrid@30": {
+    "nrmse_complex": 0.0414,
+    "psnr_phase": 45.8826,
+    "ssim_phase": 0.9461,
+    "data_error_used": 0.0003,
+    "data_error_predict": 0.0032
+   },
+   "64 frames|dense": {
+    "nrmse_complex": 0.0096,
+    "psnr_phase": 54.5235,
+    "ssim_phase": 0.9942
+   },
+   "36 frames|physics": {
+    "nrmse_complex": 0.2459,
+    "psnr_phase": 25.5982,
+    "ssim_phase": 0.5222,
+    "data_error_used": 0.0003,
+    "data_error_predict": 0.0273
+   },
+   "36 frames|v2": {
+    "nrmse_complex": 0.1183,
+    "psnr_phase": 31.7752,
+    "ssim_phase": 0.8181,
+    "data_error_used": 0.0079,
+    "data_error_predict": 0.0233
+   },
+   "36 frames|hybrid@30": {
+    "nrmse_complex": 0.1076,
+    "psnr_phase": 33.6208,
+    "ssim_phase": 0.819,
+    "data_error_used": 0.0044,
+    "data_error_predict": 0.0206
+   },
+   "36 frames|dense": {
+    "nrmse_complex": 0.0088,
+    "psnr_phase": 56.2854,
+    "ssim_phase": 0.9971
+   },
+   "49 frames|physics": {
+    "nrmse_complex": 0.1067,
+    "psnr_phase": 34.2208,
+    "ssim_phase": 0.7444,
+    "data_error_used": 0.0003,
+    "data_error_predict": 0.0136
+   },
+   "49 frames|v2": {
+    "nrmse_complex": 0.0566,
+    "psnr_phase": 38.1466,
+    "ssim_phase": 0.8821,
+    "data_error_used": 0.0018,
+    "data_error_predict": 0.0116
+   },
+   "49 frames|hybrid@30": {
+    "nrmse_complex": 0.0417,
+    "psnr_phase": 42.0463,
+    "ssim_phase": 0.9294,
+    "data_error_used": 0.001,
+    "data_error_predict": 0.0107
+   },
+   "49 frames|dense": {
+    "nrmse_complex": 0.0083,
+    "psnr_phase": 55.6059,
+    "ssim_phase": 0.9969
+   }
+  }
+ },
+ "experimental": {
+  "real_clam/sub_00|physics": {
+   "nrmse_complex": 0.4276,
+   "psnr_phase": 24.568,
+   "ssim_phase": 0.3757,
+   "data_error_used": 0.0292,
+   "data_error_predict": 0.1129
+  },
+  "real_clam/sub_00|m2": {
+   "nrmse_complex": 0.4753,
+   "psnr_phase": 23.3771,
+   "ssim_phase": 0.2376,
+   "data_error_used": 0.0684,
+   "data_error_predict": 0.1143
+  },
+  "real_clam/sub_00|v2": {
+   "nrmse_complex": 0.3443,
+   "psnr_phase": 26.4522,
+   "ssim_phase": 0.4451,
+   "data_error_used": 0.0426,
+   "data_error_predict": 0.0843
+  },
+  "real_clam/sub_00|hybrid@10": {
+   "nrmse_complex": 0.3687,
+   "psnr_phase": 25.9736,
+   "ssim_phase": 0.4326,
+   "data_error_used": 0.0318,
+   "data_error_predict": 0.0915
+  },
+  "real_clam/sub_00|hybrid@30": {
+   "nrmse_complex": 0.3892,
+   "psnr_phase": 25.4869,
+   "ssim_phase": 0.4206,
+   "data_error_used": 0.0307,
+   "data_error_predict": 0.0981
+  },
+  "real_clam/sub_00|dense_repeat": {
+   "nrmse_complex": 0.0519,
+   "psnr_phase": 43.2987,
+   "ssim_phase": 0.9916,
+   "data_error_used": 0.0227,
+   "data_error_predict": 0.022
+  },
+  "real_clam/sub_01|physics": {
+   "nrmse_complex": 0.3035,
+   "psnr_phase": 27.1371,
+   "ssim_phase": 0.6016,
+   "data_error_used": 0.0252,
+   "data_error_predict": 0.0634
+  },
+  "real_clam/sub_01|m2": {
+   "nrmse_complex": 0.484,
+   "psnr_phase": 22.4244,
+   "ssim_phase": 0.2402,
+   "data_error_used": 0.0782,
+   "data_error_predict": 0.0939
+  },
+  "real_clam/sub_01|v2": {
+   "nrmse_complex": 0.2571,
+   "psnr_phase": 28.3894,
+   "ssim_phase": 0.6263,
+   "data_error_used": 0.0379,
+   "data_error_predict": 0.0527
+  },
+  "real_clam/sub_01|hybrid@10": {
+   "nrmse_complex": 0.2359,
+   "psnr_phase": 29.4212,
+   "ssim_phase": 0.7243,
+   "data_error_used": 0.0262,
+   "data_error_predict": 0.053
+  },
+  "real_clam/sub_01|hybrid@30": {
+   "nrmse_complex": 0.2127,
+   "psnr_phase": 30.3559,
+   "ssim_phase": 0.804,
+   "data_error_used": 0.0316,
+   "data_error_predict": 0.0535
+  },
+  "real_clam/sub_01|dense_repeat": {
+   "nrmse_complex": 0.0555,
+   "psnr_phase": 42.7073,
+   "ssim_phase": 0.991,
+   "data_error_used": 0.0212,
+   "data_error_predict": 0.0232
+  },
+  "real_plant_cal/sub_00|physics": {
+   "nrmse_complex": 0.453,
+   "psnr_phase": 24.9979,
+   "ssim_phase": 0.5867,
+   "data_error_used": 0.0215,
+   "data_error_predict": 0.0841
+  },
+  "real_plant_cal/sub_00|m2": {
+   "nrmse_complex": 0.5095,
+   "psnr_phase": 24.6376,
+   "ssim_phase": 0.4301,
+   "data_error_used": 0.0447,
+   "data_error_predict": 0.0996
+  },
+  "real_plant_cal/sub_00|v2": {
+   "nrmse_complex": 0.4207,
+   "psnr_phase": 26.4643,
+   "ssim_phase": 0.6234,
+   "data_error_used": 0.0319,
+   "data_error_predict": 0.0643
+  },
+  "real_plant_cal/sub_00|hybrid@10": {
+   "nrmse_complex": 0.4209,
+   "psnr_phase": 26.299,
+   "ssim_phase": 0.626,
+   "data_error_used": 0.026,
+   "data_error_predict": 0.0679
+  },
+  "real_plant_cal/sub_00|hybrid@30": {
+   "nrmse_complex": 0.4228,
+   "psnr_phase": 25.9754,
+   "ssim_phase": 0.6207,
+   "data_error_used": 0.0262,
+   "data_error_predict": 0.0729
+  },
+  "real_plant_cal/sub_00|dense_repeat": {
+   "nrmse_complex": 0.1881,
+   "psnr_phase": 31.6286,
+   "ssim_phase": 0.8483,
+   "data_error_used": 0.0401,
+   "data_error_predict": 0.0421
+  },
+  "real_plant_cal/sub_01|physics": {
+   "nrmse_complex": 0.4068,
+   "psnr_phase": 27.291,
+   "ssim_phase": 0.666,
+   "data_error_used": 0.0336,
+   "data_error_predict": 0.067
+  },
+  "real_plant_cal/sub_01|m2": {
+   "nrmse_complex": 0.5124,
+   "psnr_phase": 25.3015,
+   "ssim_phase": 0.4403,
+   "data_error_used": 0.0583,
+   "data_error_predict": 0.0834
+  },
+  "real_plant_cal/sub_01|v2": {
+   "nrmse_complex": 0.3885,
+   "psnr_phase": 28.0868,
+   "ssim_phase": 0.6813,
+   "data_error_used": 0.0432,
+   "data_error_predict": 0.0583
+  },
+  "real_plant_cal/sub_01|hybrid@10": {
+   "nrmse_complex": 0.3829,
+   "psnr_phase": 28.5575,
+   "ssim_phase": 0.7182,
+   "data_error_used": 0.0368,
+   "data_error_predict": 0.0604
+  },
+  "real_plant_cal/sub_01|hybrid@30": {
+   "nrmse_complex": 0.3802,
+   "psnr_phase": 28.3179,
+   "ssim_phase": 0.6881,
+   "data_error_used": 0.0392,
+   "data_error_predict": 0.0646
+  },
+  "real_plant_cal/sub_01|dense_repeat": {
+   "nrmse_complex": 0.1912,
+   "psnr_phase": 31.7797,
+   "ssim_phase": 0.8474,
+   "data_error_used": 0.0442,
+   "data_error_predict": 0.0404
+  },
+  "real_plant_cal/sub_02|physics": {
+   "nrmse_complex": 0.3595,
+   "psnr_phase": 27.5207,
+   "ssim_phase": 0.6918,
+   "data_error_used": 0.037,
+   "data_error_predict": 0.0743
+  },
+  "real_plant_cal/sub_02|m2": {
+   "nrmse_complex": 0.4727,
+   "psnr_phase": 25.8384,
+   "ssim_phase": 0.5187,
+   "data_error_used": 0.0565,
+   "data_error_predict": 0.0906
+  },
+  "real_plant_cal/sub_02|v2": {
+   "nrmse_complex": 0.3638,
+   "psnr_phase": 27.7669,
+   "ssim_phase": 0.6722,
+   "data_error_used": 0.0427,
+   "data_error_predict": 0.0644
+  },
+  "real_plant_cal/sub_02|hybrid@10": {
+   "nrmse_complex": 0.3553,
+   "psnr_phase": 28.3559,
+   "ssim_phase": 0.7136,
+   "data_error_used": 0.0388,
+   "data_error_predict": 0.066
+  },
+  "real_plant_cal/sub_02|hybrid@30": {
+   "nrmse_complex": 0.3477,
+   "psnr_phase": 28.2762,
+   "ssim_phase": 0.7144,
+   "data_error_used": 0.0433,
+   "data_error_predict": 0.07
+  },
+  "real_plant_cal/sub_02|dense_repeat": {
+   "nrmse_complex": 0.1736,
+   "psnr_phase": 32.1772,
+   "ssim_phase": 0.8706,
+   "data_error_used": 0.0415,
+   "data_error_predict": 0.0419
+  },
+  "real_plant/sub_01|physics": {
+   "nrmse_complex": 0.5428,
+   "psnr_phase": 22.0906,
+   "ssim_phase": 0.1939,
+   "data_error_used": 0.0633,
+   "data_error_predict": 0.1535
+  },
+  "real_plant/sub_01|m2": {
+   "nrmse_complex": 0.5847,
+   "psnr_phase": 22.263,
+   "ssim_phase": 0.159,
+   "data_error_used": 0.0767,
+   "data_error_predict": 0.1531
+  },
+  "real_plant/sub_01|v2": {
+   "nrmse_complex": 0.4916,
+   "psnr_phase": 23.409,
+   "ssim_phase": 0.2619,
+   "data_error_used": 0.0874,
+   "data_error_predict": 0.111
+  },
+  "real_plant/sub_01|hybrid@10": {
+   "nrmse_complex": 0.5001,
+   "psnr_phase": 23.1399,
+   "ssim_phase": 0.2544,
+   "data_error_used": 0.0723,
+   "data_error_predict": 0.1213
+  },
+  "real_plant/sub_01|hybrid@30": {
+   "nrmse_complex": 0.5084,
+   "psnr_phase": 22.7357,
+   "ssim_phase": 0.2504,
+   "data_error_used": 0.0749,
+   "data_error_predict": 0.133
+  },
+  "real_plant/sub_02|physics": {
+   "nrmse_complex": 0.4792,
+   "psnr_phase": 22.9817,
+   "ssim_phase": 0.2737,
+   "data_error_used": 0.0669,
+   "data_error_predict": 0.1481
+  },
+  "real_plant/sub_02|m2": {
+   "nrmse_complex": 0.5025,
+   "psnr_phase": 23.0952,
+   "ssim_phase": 0.2483,
+   "data_error_used": 0.0845,
+   "data_error_predict": 0.1592
+  },
+  "real_plant/sub_02|v2": {
+   "nrmse_complex": 0.4588,
+   "psnr_phase": 23.5901,
+   "ssim_phase": 0.2835,
+   "data_error_used": 0.0838,
+   "data_error_predict": 0.124
+  },
+  "real_plant/sub_02|hybrid@10": {
+   "nrmse_complex": 0.4535,
+   "psnr_phase": 23.4897,
+   "ssim_phase": 0.3187,
+   "data_error_used": 0.0728,
+   "data_error_predict": 0.1292
+  },
+  "real_plant/sub_02|hybrid@30": {
+   "nrmse_complex": 0.4547,
+   "psnr_phase": 23.3457,
+   "ssim_phase": 0.3124,
+   "data_error_used": 0.0784,
+   "data_error_predict": 0.1364
+  }
+ },
+ "notes": [
+  "clam: right 35 % of the field and frame draws 0-1 never used in training",
+  "plant: specimen never used in training; real_plant_cal = probe calibrated on the full scan; real_plant = no calibration (physics fails)",
+  "dense_repeat = second all-frames reconstruction (different seed): repeatability of the reference"
+ ]
+}

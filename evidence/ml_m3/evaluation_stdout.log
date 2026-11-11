@@ -1,0 +1,46 @@
+  synthetic 1/30 (64 frames): physics 26.0 · physics+300 26.0 · m2 26.4 · v2_syn 27.4 · v2 26.9 · hybrid@10 26.4 · hybrid@30 26.2 · hybrid@100 26.1 · dense 54.2  [25s]
+  synthetic 2/30 (64 frames): physics 34.7 · physics+300 34.9 · m2 37.4 · v2_syn 42.4 · v2 42.2 · hybrid@10 48.7 · hybrid@30 50.5 · hybrid@100 51.3 · dense 56.6  [24s]
+  synthetic 3/30 (64 frames): physics 48.7 · physics+300 49.1 · m2 30.8 · v2_syn 47.7 · v2 47.9 · hybrid@10 49.2 · hybrid@30 48.7 · hybrid@100 49.1 · dense 51.5  [24s]
+  synthetic 4/30 (36 frames): physics 21.0 · physics+300 21.4 · m2 21.0 · v2_syn 24.0 · v2 24.9 · hybrid@10 25.5 · hybrid@30 25.7 · hybrid@100 26.0 · dense 57.0  [19s]
+  synthetic 5/30 (36 frames): physics 25.2 · physics+300 24.9 · m2 27.7 · v2_syn 29.1 · v2 28.9 · hybrid@10 27.7 · hybrid@30 26.9 · hybrid@100 26.4 · dense 51.1  [19s]
+  synthetic 6/30 (64 frames): physics 54.1 · physics+300 55.8 · m2 38.9 · v2_syn 55.0 · v2 55.0 · hybrid@10 55.4 · hybrid@30 55.6 · hybrid@100 55.6 · dense 68.2  [24s]
+  synthetic 7/30 (64 frames): physics 47.8 · physics+300 49.1 · m2 29.1 · v2_syn 47.9 · v2 47.9 · hybrid@10 48.6 · hybrid@30 49.2 · hybrid@100 49.9 · dense 51.4  [24s]
+  synthetic 8/30 (64 frames): physics 51.0 · physics+300 51.2 · m2 39.7 · v2_syn 51.5 · v2 51.4 · hybrid@10 52.4 · hybrid@30 53.0 · hybrid@100 53.0 · dense 58.8  [24s]
+  synthetic 9/30 (49 frames): physics 38.3 · physics+300 39.6 · m2 38.9 · v2_syn 41.1 · v2 40.9 · hybrid@10 41.8 · hybrid@30 42.0 · hybrid@100 42.6 · dense 61.2  [21s]
+  synthetic 10/30 (49 frames): physics 37.8 · physics+300 39.3 · m2 36.7 · v2_syn 42.0 · v2 41.7 · hybrid@10 44.9 · hybrid@30 45.7 · hybrid@100 46.4 · dense 54.5  [19s]
+  synthetic 11/30 (36 frames): physics 21.0 · physics+300 21.5 · m2 24.2 · v2_syn 29.0 · v2 28.3 · hybrid@10 28.7 · hybrid@30 28.7 · hybrid@100 28.2 · dense 51.2  [18s]
+  synthetic 12/30 (64 frames): physics 32.9 · physics+300 44.3 · m2 33.6 · v2_syn 37.4 · v2 37.5 · hybrid@10 42.0 · hybrid@30 46.0 · hybrid@100 47.4 · dense 47.9  [24s]
+  synthetic 13/30 (64 frames): physics 46.1 · physics+300 48.9 · m2 40.4 · v2_syn 48.4 · v2 48.0 · hybrid@10 50.8 · hybrid@30 51.3 · hybrid@100 52.1 · dense 49.7  [24s]
+  synthetic 14/30 (64 frames): physics 35.2 · physics+300 35.4 · m2 30.1 · v2_syn 37.0 · v2 36.6 · hybrid@10 38.5 · hybrid@30 43.1 · hybrid@100 48.9 · dense 49.7  [22s]
+  synthetic 15/30 (49 frames): physics 30.4 · physics+300 30.2 · m2 32.9 · v2_syn 36.1 · v2 36.4 · hybrid@10 43.6 · hybrid@30 47.7 · hybrid@100 49.8 · dense 51.8  [20s]
+  synthetic 16/30 (36 frames): physics 27.2 · physics+300 28.1 · m2 28.7 · v2_syn 33.3 · v2 32.9 · hybrid@10 36.6 · hybrid@30 37.4 · hybrid@100 38.6 · dense 52.8  [19s]
+  synthetic 17/30 (49 frames): physics 27.2 · physics+300 27.4 · m2 32.7 · v2_syn 34.5 · v2 34.7 · hybrid@10 41.8 · hybrid@30 44.9 · hybrid@100 47.7 · dense 53.4  [21s]
+  synthetic 18/30 (36 frames): physics 26.6 · physics+300 28.3 · m2 29.8 · v2_syn 34.2 · v2 33.7 · hybrid@10 34.9 · hybrid@30 35.2 · hybrid@100 36.1 · dense 61.7  [19s]
+  synthetic 19/30 (49 frames): physics 29.4 · physics+300 29.7 · m2 30.8 · v2_syn 33.2 · v2 33.1 · hybrid@10 36.8 · hybrid@30 37.4 · hybrid@100 38.3 · dense 52.4  [21s]
+  synthetic 20/30 (49 frames): physics 46.2 · physics+300 47.5 · m2 35.4 · v2_syn 46.8 · v2 47.4 · hybrid@10 48.5 · hybrid@30 48.2 · hybrid@100 48.2 · dense 60.1  [20s]
+  synthetic 21/30 (49 frames): physics 26.1 · physics+300 27.9 · m2 29.0 · v2_syn 31.4 · v2 31.3 · hybrid@10 33.2 · hybrid@30 33.7 · hybrid@100 34.1 · dense 52.3  [23s]
+  synthetic 22/30 (49 frames): physics 40.2 · physics+300 41.5 · m2 34.4 · v2_syn 42.8 · v2 42.0 · hybrid@10 43.8 · hybrid@30 44.1 · hybrid@100 45.1 · dense 50.4  [23s]
+  synthetic 23/30 (49 frames): physics 40.9 · physics+300 41.8 · m2 42.3 · v2_syn 44.1 · v2 43.5 · hybrid@10 44.7 · hybrid@30 45.0 · hybrid@100 45.5 · dense 56.3  [22s]
+  synthetic 24/30 (49 frames): physics 25.6 · physics+300 27.1 · m2 28.0 · v2_syn 30.4 · v2 30.3 · hybrid@10 31.6 · hybrid@30 31.7 · hybrid@100 32.1 · dense 63.6  [23s]
+  synthetic 25/30 (36 frames): physics 22.3 · physics+300 23.8 · m2 27.5 · v2_syn 29.2 · v2 29.8 · hybrid@10 33.0 · hybrid@30 34.0 · hybrid@100 35.1 · dense 55.4  [21s]
+  synthetic 26/30 (64 frames): physics 40.8 · physics+300 41.3 · m2 38.9 · v2_syn 44.5 · v2 44.0 · hybrid@10 45.0 · hybrid@30 44.9 · hybrid@100 44.5 · dense 59.0  [24s]
+  synthetic 27/30 (64 frames): physics 21.9 · physics+300 23.3 · m2 23.4 · v2_syn 24.6 · v2 25.2 · hybrid@10 24.7 · hybrid@30 24.7 · hybrid@100 24.8 · dense 49.2  [25s]
+  synthetic 28/30 (36 frames): physics 33.1 · physics+300 34.8 · m2 36.1 · v2_syn 41.7 · v2 41.9 · hybrid@10 44.3 · hybrid@30 45.6 · hybrid@100 46.7 · dense 58.6  [18s]
+  synthetic 29/30 (64 frames): physics 56.8 · physics+300 56.3 · m2 41.4 · v2_syn 56.6 · v2 56.4 · hybrid@10 57.2 · hybrid@30 57.3 · hybrid@100 57.0 · dense 58.3  [25s]
+  synthetic 30/30 (36 frames): physics 28.4 · physics+300 28.7 · m2 31.2 · v2_syn 33.4 · v2 33.8 · hybrid@10 35.8 · hybrid@30 35.4 · hybrid@100 35.0 · dense 62.6  [18s]
+  real_clam sub_00 (140 frames): physics 24.6/0.113 · m2 23.4/0.114 · v2_syn 24.7/0.098 · v2 26.5/0.084 · hybrid@10 26.0/0.091 · hybrid@30 25.5/0.098 · hybrid@100 25.0/0.106 · dense_repeat 43.3/0.022
+  real_clam sub_01 (200 frames): physics 27.1/0.063 · m2 22.4/0.094 · v2_syn 21.9/0.087 · v2 28.4/0.053 · hybrid@10 29.4/0.053 · hybrid@30 30.4/0.053 · hybrid@100 30.4/0.059 · dense_repeat 42.7/0.023
+  real_plant_cal sub_00 (40 frames): physics 25.0/0.084 · m2 24.6/0.100 · v2_syn 23.3/0.098 · v2 26.5/0.064 · hybrid@10 26.3/0.068 · hybrid@30 26.0/0.073 · hybrid@100 25.4/0.081 · dense_repeat 31.6/0.042
+  real_plant_cal sub_01 (70 frames): physics 27.3/0.067 · m2 25.3/0.083 · v2_syn 24.0/0.085 · v2 28.1/0.058 · hybrid@10 28.6/0.060 · hybrid@30 28.3/0.065 · hybrid@100 28.1/0.076 · dense_repeat 31.8/0.040
+  real_plant_cal sub_02 (100 frames): physics 27.5/0.074 · m2 25.8/0.091 · v2_syn 24.0/0.090 · v2 27.8/0.064 · hybrid@10 28.4/0.066 · hybrid@30 28.3/0.070 · hybrid@100 27.9/0.089 · dense_repeat 32.2/0.042
+  real_plant sub_01 (70 frames): physics 22.1/0.154 · m2 22.3/0.153 · v2_syn 21.9/0.138 · v2 23.4/0.111 · hybrid@10 23.1/0.121 · hybrid@30 22.7/0.133 · hybrid@100 22.4/0.151
+  real_plant sub_02 (100 frames): physics 23.0/0.148 · m2 23.1/0.159 · v2_syn 23.2/0.143 · v2 23.6/0.124 · hybrid@10 23.5/0.129 · hybrid@30 23.3/0.136 · hybrid@100 23.2/0.152
+wrote results/m3
+results/m3/fig_synthetic_examples.png
+results/m3/fig_metrics_vs_frames.png
+results/m3/fig_hybrid_curve.png
+results/m3/fig_metrics_bars.png
+results/m3/fig_real_clam.png
+results/m3/fig_real_plant.png
+results/m3/fig_real_plant_cal.png
+results/m3/fig_training_curves.png

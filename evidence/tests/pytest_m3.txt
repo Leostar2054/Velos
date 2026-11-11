@@ -1,0 +1,33 @@
+# Backend + ML-runtime test suite (M3) — 2026-11-11 17:49 KST
+# python 3.13.17 · onnxruntime 1.29.0 · numpy 2.5.3
+============================= test session starts ==============================
+platform linux -- Python 3.13.17, pytest-9.1.1, pluggy-1.7.0 -- /usr/local/bin/python3
+rootdir: /home/claude/velos-platform/backend
+configfile: pyproject.toml
+plugins: platformdirs-4.12.4, anyio-4.15.1
+collecting ... collected 20 items
+
+tests/test_api.py::test_health_is_public PASSED                          [  5%]
+tests/test_api.py::test_auth_required PASSED                             [ 10%]
+tests/test_api.py::test_upload_rejects_bad_files PASSED                  [ 15%]
+tests/test_api.py::test_full_workflow PASSED                             [ 20%]
+tests/test_api.py::test_cancel_queued_job PASSED                         [ 25%]
+tests/test_api.py::test_bad_engine_rejected PASSED                       [ 30%]
+tests/test_api.py::test_contact_endpoint PASSED                          [ 35%]
+tests/test_api.py::test_models_endpoint_and_health PASSED                [ 40%]
+tests/test_api.py::test_job_with_ml_refinement_and_hybrid PASSED         [ 45%]
+tests/test_api.py::test_reduced_scan_fraction_and_unknown_model PASSED   [ 50%]
+tests/test_api.py::test_cancel_running_job_finalises PASSED              [ 55%]
+tests/test_api.py::test_probe_calibration_from_earlier_job PASSED        [ 60%]
+tests/test_engine_integration.py::test_driver_matches_client_engine PASSED [ 65%]
+tests/test_engine_integration.py::test_engines_reduce_error_and_recover_object PASSED [ 70%]
+tests/test_engine_integration.py::test_sparse_subset_and_crop PASSED     [ 75%]
+tests/test_refine.py::test_normalise_roundtrip_and_ramp_removal PASSED   [ 80%]
+tests/test_refine.py::test_identity_package_tiled_onnx PASSED            [ 85%]
+tests/test_refine.py::test_reconstruct_init_object_and_hybrid PASSED     [ 90%]
+tests/test_refine.py::test_subset_keeps_parent_grid PASSED               [ 95%]
+tests/test_refine.py::test_subpixel_registration_recovers_known_shift PASSED [100%]
+
+tests/test_api.py::test_upload_rejects_bad_files
+
+======================== 20 passed, 1 warning in 10.34s ========================

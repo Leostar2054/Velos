@@ -1,0 +1,62 @@
+{
+  "data": {
+    "root": "data/synthetic_v2",
+    "crop": 128,
+    "limit_train": null,
+    "norm": "median_ramp",
+    "target_frame": "input",
+    "preload": true,
+    "real": {
+      "root": "data/real_clam",
+      "subsets": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "col_range": [
+        0.0,
+        0.65
+      ],
+      "n_per_epoch": 240,
+      "crop": 128
+    }
+  },
+  "model": {
+    "base": 32,
+    "depth": 4,
+    "residual": true
+  },
+  "train": {
+    "epochs": 15,
+    "batch_size": 8,
+    "lr": 0.0003,
+    "weight_decay": 0.0001,
+    "seed": 1,
+    "num_workers": 0,
+    "loss": "phase_aware",
+    "w_phase": 1.0,
+    "w_grad": 0.5,
+    "init_from": "runs/refine_v2_synthetic/best.pt",
+    "pct_start": 0.1,
+    "select": "last"
+  },
+  "name": "refine_v2",
+  "_resolved": {
+    "device": "cpu",
+    "n_train": 480,
+    "n_val": 25,
+    "n_train_synthetic": 240,
+    "n_train_real_per_epoch": 240,
+    "params": 7766018,
+    "torch": "2.14.1+cu130"
+  }
+}

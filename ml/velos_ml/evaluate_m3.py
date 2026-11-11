@@ -205,7 +205,8 @@ def aggregate(rows, key_fields=("method",)):
 
 
 def _bin(frames):
-    return "36-49 frames" if frames < 50 else ("50-64 frames" if frames < 65 else "65-81 frames")
+    """The raster generator gives 6×6, 7×7, 8×8 or 9×9 positions → 36, 49, 64 or 81 frames."""
+    return f"{int(frames)} frames"
 
 
 def write_outputs(out, syn_rows, real_rows, method_order):

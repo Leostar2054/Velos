@@ -20,9 +20,10 @@ from velos_recon.metrics import align, estimate_shift, shift_image  # noqa: E402
 LABEL = {"physics": "Physics (reduced scan)", "physics+300": "Physics +300 it", "m2": "M2 model",
          "v2_syn": "v2 (synthetic only)", "v2": "v2 model", "hybrid@10": "Hybrid (+10 it)",
          "hybrid@30": "Hybrid (+30 it)", "hybrid@100": "Hybrid (+100 it)", "dense": "Dense scan (reference)",
-         "gt": "Ground truth"}
+         "gt": "Ground truth", "dense_repeat": "Dense, 2nd run (repeatability)"}
 COLOR = {"physics": "#64748b", "physics+300": "#94a3b8", "m2": "#f59e0b", "v2_syn": "#a78bfa", "v2": "#7c3aed",
-         "hybrid@10": "#67e8f9", "hybrid@30": "#06b6d4", "hybrid@100": "#0e7490", "dense": "#16a34a"}
+         "hybrid@10": "#67e8f9", "hybrid@30": "#06b6d4", "hybrid@100": "#0e7490", "dense": "#16a34a",
+         "dense_repeat": "#86efac"}
 
 
 def _bbox(mask):
@@ -80,7 +81,7 @@ def metrics_vs_frames(rows, out, methods=("physics", "v2", "hybrid@30", "dense")
                 continue
             x, y = np.array(pts).T
             ax.scatter(x, y, s=12, alpha=0.45, color=COLOR.get(m), label=None)
-            edges = [35, 50, 65, 82]
+            edges = [30, 42, 56, 72, 90]          # bins around 36 / 49 / 64 / 81 frames
             bx, by = [], []
             for lo, hi in zip(edges[:-1], edges[1:]):
                 sel = (x >= lo) & (x < hi)
@@ -170,16 +171,15 @@ def main(argv=None):
         made.append(bars(summary["synthetic"]["overall"], res / "fig_metrics_bars.png", order,
                          f"Synthetic test set (n = {summary['synthetic']['n_cases']}), mean ± std"))
     real = ex.get("real") or []
-    for name in ("real_clam", "real_plant"):
-        rs = [e for e in real if e["case"].startswith(name)]
-        if not rs:
-            continue
-        for e in rs:
-            e["mask"] = e["mask"]
-        cols = [c for c in ("dense", "physics", "m2", "v2", "hybrid@30") if c in rs[0]]
-        title = ("Clam (635 nm), spatial hold-out region — phase (rad), aligned to the all-frames reconstruction"
-                 if name == "real_clam" else "Plant (675 nm, specimen never used in training) — phase (rad), aligned to the all-frames reconstruction")
-        made.append(grid(rs, cols, "dense", res / f"fig_{name}.png", title,
+    titles = {
+        "real_clam": "Clam (635 nm), spatial hold-out region — phase (rad), registered to the all-frames reconstruction",
+        "real_plant_cal": "Plant (675 nm, never used in training), probe calibrated on the full scan — phase (rad)",
+        "real_plant": "Plant (675 nm), reduced scans WITHOUT probe calibration — physics fails — phase (rad)",
+    }
+    for name in sorted({e["case"].split("/")[0] for e in real}):
+        rs = [e for e in real if e["case"].split("/")[0] == name]
+        cols = [c for c in ("dense", "physics", "m2", "v2", "hybrid@30", "dense_repeat") if c in rs[0]]
+        made.append(grid(rs, cols, "dense", res / f"fig_{name}.png", titles.get(name, name),
                          row_labels=[f"{round(100 * e['fraction'])} % of frames" for e in rs], col_w=2.6, register=True))
     if a.runs:
         made.append(training_curves(a.runs, res / "fig_training_curves.png"))

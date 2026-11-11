@@ -1,7 +1,29 @@
 # velos-ml — ML training pipeline (Module 3)
 
-First baseline (M2): **sparse-scan refinement** — a residual U-Net that maps the physics reconstruction of a
-sparse scan (−47 % diffraction frames) toward the ground truth. Everything is config-driven and seeded.
+**Sparse-scan refinement**: a residual U-Net maps the physics (ePIE) reconstruction of a reduced scan toward the
+ground truth / the full-scan reconstruction. Everything is config-driven and seeded.
+
+## M3 — refinement model v2 (current)
+
+```bash
+pip install -e ../backend -e .                 # velos_recon (Client's engines + runtime) + velos_ml (+ torch, onnx)
+MAT_DIR="<folder with the .mat example datasets>" scripts/m3_pipeline.sh     # everything below in one go
+```
+
+| Step | Command | Output |
+|---|---|---|
+| synthetic data v2 | `python -m velos_ml.simulate --config configs/data_synthetic_v2.yaml --out data/synthetic_v2` | 240/25/30 phantoms, ePIE 300 it, 36–81 frames |
+| experimental data | `python -m velos_ml.realdata --mat "<clam.mat>" --name clam --out data/real_clam --repeat-seed 11` (+ plant, `--probe-from-dense`) | all-frames reference, random-subset reconstructions, repeat reference |
+| stage 1 | `python -m velos_ml.train --config configs/refine_v2_synthetic.yaml --out runs/refine_v2_synthetic` | synthetic only |
+| stage 2 | `python -m velos_ml.train --config configs/refine_v2.yaml --out runs/refine_v2` | + clam patches (left 65 %, frame draws 2–13) |
+| evaluation | `python -m velos_ml.evaluate_m3 …` (see the pipeline script) + `python -m velos_ml.figures_m3 results/m3` | metrics CSV/JSON, figures |
+| package | `python -m velos_ml.package runs/refine_v2/best.pt --out models/velos-refine-v2 --eval results/m3/summary.json` | ONNX + TorchScript + model card, verified |
+
+New modules: `realdata.py` (experimental pairs), `evaluate_m3.py`, `figures_m3.py`, `package.py`; shared
+normalisation and the inference runtime live in the backend (`velos_recon.normalise`, `velos_recon.refine`).
+Results and interpretation: `../docs/ml-pipeline.md` (M3 section).
+
+## M2 — first baseline
 
 ```bash
 pip install -e ../backend -e .          # velos_recon (Client's engines) + velos_ml (+ torch)

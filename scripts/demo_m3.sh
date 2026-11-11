@@ -6,6 +6,8 @@
 #
 # Requires a running API + worker with VELOS_MODEL_DIR containing a model package.
 # Set API and KEY in the environment if not default. Output is Markdown (pipe to a file).
+# CALIBRATE=1: first reconstruct the full scan and reuse its probe for the reduced scan
+# ("probe calibration" workflow: calibrate once, then scan sparsely).
 set -euo pipefail
 DATA=${1:?dataset path}; FRAC=${2:-0.35}; ITERS=${3:-200}; HYB=${4:-30}; OUT=${5:-demo_m3_out}
 API=${API:-http://localhost:8000}; KEY=${KEY:-dev-key}
@@ -35,8 +37,25 @@ UP=$(curl -s -H "X-API-Key: $KEY" -F "file=@$DATA" -F "name=$(basename "$DATA")"
 echo "$UP" | python3 -m json.tool; echo '```'
 DS=$(echo "$UP" | j id)
 
+CAL_FIELD=""
+if [[ "${CALIBRATE:-0}" == "1" ]]; then
+  echo; echo "## 3b. Probe calibration: full scan (all frames), physics only"; echo '```'
+  CJ=$(curl -s -H "X-API-Key: $KEY" -H "Content-Type: application/json" \
+       -d "{\"dataset_id\":\"$DS\",\"engine\":\"epie\",\"iters\":$ITERS}" "$API/api/v1/jobs")
+  CJID=$(echo "$CJ" | j id); echo "calibration job $CJID queued"
+  for i in $(seq 1 1200); do
+    ST=$(curl -s -H "X-API-Key: $KEY" "$API/api/v1/jobs/$CJID" | j status)
+    [[ "$ST" == "succeeded" || "$ST" == "failed" ]] && break; sleep 1
+  done
+  echo "calibration job $CJID: $ST after ~${i}s"
+  curl -s -H "X-API-Key: $KEY" "$API/api/v1/jobs/$CJID/result" | python3 -c 'import sys, json; s = json.load(sys.stdin)["summary"]["reconstruction"]; print(json.dumps(s, indent=1))'
+  curl -s -H "X-API-Key: $KEY" -o "$OUT/calibration_preview.png" "$API/api/v1/jobs/$CJID/artifacts/preview.png"
+  echo '```'
+  CAL_FIELD=",\"probe_from_job\":\"$CJID\""
+fi
+
 echo; echo "## 4. Submit: reduced scan (${FRAC} of the frames) + ML refinement + hybrid (${HYB} it)"; echo '```'
-BODY="{\"dataset_id\":\"$DS\",\"engine\":\"epie\",\"iters\":$ITERS,\"sparse_fraction\":$FRAC,\"refine_ml\":true,\"hybrid_iters\":$HYB}"
+BODY="{\"dataset_id\":\"$DS\",\"engine\":\"epie\",\"iters\":$ITERS,\"sparse_fraction\":$FRAC,\"refine_ml\":true,\"hybrid_iters\":$HYB$CAL_FIELD}"
 echo "POST /api/v1/jobs $BODY"
 JOB=$(curl -s -H "X-API-Key: $KEY" -H "Content-Type: application/json" -d "$BODY" "$API/api/v1/jobs")
 echo "$JOB" | python3 -m json.tool; echo '```'
