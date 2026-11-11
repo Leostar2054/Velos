@@ -69,12 +69,16 @@ def is_cancel_requested(session: Session, job_id: str) -> bool:
 
 def finish(session: Session, job_id: str, status: JobStatus, result: dict | None = None,
            error: str = "") -> None:
-    session.exec(update(Job).where(Job.id == job_id).values(
-        status=status, finished_at=_now(), error=error[:4000],
-        result_json=json.dumps(result) if result else "",
-        progress=1.0 if status == JobStatus.succeeded else None,
-        message={JobStatus.succeeded: "completed", JobStatus.failed: "failed",
-                 JobStatus.cancelled: "cancelled"}.get(status, "")))
+    values = dict(status=status, finished_at=_now(), error=error[:4000],
+                  result_json=json.dumps(result) if result else "",
+                  message={JobStatus.succeeded: "completed", JobStatus.failed: "failed",
+                           JobStatus.cancelled: "cancelled"}.get(status, ""))
+    if status == JobStatus.succeeded:
+        values["progress"] = 1.0
+    # failed / cancelled jobs keep the progress they reached (the column is NOT NULL; the M2
+    # code wrote None here, which made a failing or cancelled *running* job stay "running")
+    session.rollback()                       # discard a half-finished transaction from the failure
+    session.exec(update(Job).where(Job.id == job_id).values(**values))
     session.commit()
 
 

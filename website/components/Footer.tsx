@@ -12,7 +12,7 @@ export default function Footer() {
             <span className="font-semibold text-white">{SITE.company.name}</span>
           </div>
           <p className="mt-3 max-w-sm text-sm text-slate-400">{SITE.company.tagline}</p>
-          <p className="mt-3 text-xs text-slate-500">{SITE.company.affiliation}</p>
+          <p className="mt-3 text-xs text-slate-400">{SITE.company.affiliation}</p>
         </div>
         <div>
           <h3 className="text-sm font-semibold text-white">Navigate</h3>
@@ -31,7 +31,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-white/10">
-        <div className="container-x flex flex-col items-start justify-between gap-2 py-5 text-xs text-slate-500 sm:flex-row">
+        <div className="container-x flex flex-col items-start justify-between gap-2 py-5 text-xs text-slate-400 sm:flex-row">
           <span>{SITE.footer.note}</span>
           <span>{SITE.company.status_note}</span>
         </div>

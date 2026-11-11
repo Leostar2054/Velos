@@ -16,3 +16,9 @@ ml/runs/*/last.pt
 # large binaries are delivered in the evidence folder, not tracked in git
 evidence/ml/*.pt
 reports/
+
+# model packages (ONNX/TorchScript, ~30 MB each) are delivered separately (03_Model_Package)
+models/
+backend/models/
+ml/models/
+ml/results/

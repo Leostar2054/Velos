@@ -1,0 +1,58 @@
+# Production / staging stack (single VM). Usage on the server:
+#   cp deploy/.env.example deploy/.env  &&  edit it
+#   docker compose -f docker-compose.prod.yml --env-file deploy/.env up -d --build
+#   scripts/smoke_test.sh https://$SITE_DOMAIN <user-api-key>
+# Model packages are mounted read-only from ./models (one sub-directory per package).
+name: velos
+services:
+  edge:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.edge
+      args:
+        NEXT_PUBLIC_API_URL: ""
+        NEXT_PUBLIC_SITE_URL: https://${SITE_DOMAIN:?set SITE_DOMAIN in deploy/.env}
+    image: velos-edge:${VELOS_TAG:-dev}
+    restart: unless-stopped
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL:-}
+    ports: ["80:80", "443:443"]
+    volumes: ["caddy-data:/data", "caddy-config:/config"]
+    depends_on:
+      api:
+        condition: service_healthy
+  api:
+    build: ./backend
+    image: velos-backend:${VELOS_TAG:-dev}
+    restart: unless-stopped
+    environment: &backend_env
+      VELOS_STORAGE_DIR: /data
+      VELOS_MODEL_DIR: /models
+      VELOS_API_KEYS: ${VELOS_API_KEYS:?set VELOS_API_KEYS in deploy/.env}
+      VELOS_CORS_ORIGINS: https://${SITE_DOMAIN}
+      VELOS_MAX_UPLOAD_MB: ${VELOS_MAX_UPLOAD_MB:-2048}
+      VELOS_DEFAULT_MODEL: ${VELOS_DEFAULT_MODEL:-}
+      VELOS_LOG_LEVEL: ${VELOS_LOG_LEVEL:-INFO}
+    volumes: ["velos-data:/data", "./models:/models:ro"]
+    expose: ["8000"]
+  worker:
+    image: velos-backend:${VELOS_TAG:-dev}
+    command: ["python", "-m", "velos_backend.worker"]
+    restart: unless-stopped
+    environment: *backend_env
+    volumes: ["velos-data:/data", "./models:/models:ro"]
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      disable: true
+    # GPU worker (M4): uncomment and build the backend with ML_EXTRA=ml-gpu on a CUDA base image
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices: [{driver: nvidia, count: 1, capabilities: [gpu]}]
+volumes:
+  velos-data:
+  caddy-data:
+  caddy-config:

@@ -62,7 +62,10 @@ class PtychoDataset:
         """
         x = self.positions_m[:, 0]; y = self.positions_m[:, 1]
         if self.ground_truth is None:
-            x = x - x.min(); y = y - y.min()
+            # a subset keeps its parent's scan origin (meta["origin_m"]) so reduced-scan
+            # reconstructions land on exactly the same pixel grid as the full scan
+            ox, oy = self.meta.get("origin_m", (x.min(), y.min()))
+            x = x - ox; y = y - oy
         col = np.round(x / self.dx).astype(int)
         row = np.round(y / self.dx).astype(int)
         return np.stack([row, col], axis=1)
@@ -72,7 +75,12 @@ class PtychoDataset:
             return tuple(int(s) for s in self.ground_truth.shape)
         pos = self.positions_px()
         m, n = self.frame_shape
-        return int(pos[:, 0].max() + m), int(pos[:, 1].max() + n)
+        rmax, cmax = int(pos[:, 0].max()), int(pos[:, 1].max())
+        if "far_m" in self.meta and "origin_m" in self.meta:     # subset: parent's field of view
+            (fx, fy), (ox, oy) = self.meta["far_m"], self.meta["origin_m"]
+            rmax = max(rmax, int(round((fy - oy) / self.dx)))
+            cmax = max(cmax, int(round((fx - ox) / self.dx)))
+        return rmax + m, cmax + n
 
     def summary(self) -> dict:
         pos = self.positions_px()
@@ -142,9 +150,13 @@ class PtychoDataset:
     def subset(self, index: np.ndarray, name_suffix: str = "") -> "PtychoDataset":
         """Keep only the given pattern indices (used for sparse-scan experiments)."""
         index = np.asarray(index)
+        x, y = self.positions_m[:, 0], self.positions_m[:, 1]
+        meta = dict(self.meta, subset=len(index))
+        meta.setdefault("origin_m", (float(x.min()), float(y.min())))   # keep the parent grid
+        meta.setdefault("far_m", (float(x.max()), float(y.max())))
         return dataclasses.replace(
             self, dps=self.dps[index], positions_m=self.positions_m[index],
-            name=self.name + name_suffix, meta=dict(self.meta, subset=len(index)))
+            name=self.name + name_suffix, meta=meta)
 
     def amplitudes(self) -> np.ndarray:
         """Measured amplitudes √I as float64 [J, M, N] (what the engines consume)."""

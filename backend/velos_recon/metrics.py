@@ -93,10 +93,52 @@ def align(rec: np.ndarray, ref: np.ndarray, mask: np.ndarray, ramp: bool = True)
     return c * rec
 
 
-def amplitude_phase_metrics(rec: np.ndarray, ref: np.ndarray, mask: np.ndarray) -> Dict[str, float]:
+def estimate_shift(moving: np.ndarray, fixed: np.ndarray, mask: np.ndarray, upsample: int = 20,
+                   refine: bool = True):
+    """Sub-pixel translation (dy, dx) that registers ``moving`` onto ``fixed`` (complex images,
+    compared inside ``mask``). Ptychographic reconstructions of the same scan from different frame
+    subsets can be offset by a fraction of a pixel (joint object/probe translation ambiguity).
+
+    Phase correlation gives the starting estimate; with ``refine`` the shift is then optimised
+    directly for the agreement measured by :func:`core.nrmse` after removing the phase ramp and
+    complex scalar (robust when the masked edges or noise bias the correlation peak).
+    """
+    from skimage.registration import phase_cross_correlation
+    a = np.where(mask, fixed - fixed[mask].mean(), 0)
+    b = np.where(mask, moving - moving[mask].mean(), 0)
+    shift = phase_cross_correlation(a, b, upsample_factor=upsample, normalization=None)[0]
+    if refine:
+        from scipy.ndimage import fourier_shift
+        from scipy.optimize import minimize
+        F = np.fft.fft2(moving)
+
+        def cost(sh):
+            r = np.fft.ifft2(fourier_shift(F, sh))
+            return core.nrmse(align(r, fixed, mask), fixed, mask)
+        best = min((np.asarray(shift, float), np.zeros(2)), key=cost)       # never worse than no shift
+        res = minimize(cost, best, method="Nelder-Mead",
+                       options={"xatol": 0.02, "fatol": 1e-6, "maxiter": 80, "initial_simplex":
+                                [best, best + [0.3, 0], best + [0, 0.3]]})
+        shift = res.x if res.fun <= cost(best) else best
+    return float(shift[0]), float(shift[1])
+
+
+def shift_image(z: np.ndarray, shift) -> np.ndarray:
+    """Fourier (sub-pixel) shift of a complex image by (dy, dx)."""
+    from scipy.ndimage import fourier_shift
+    out = np.fft.ifft2(fourier_shift(np.fft.fft2(z), shift))
+    return out if np.iscomplexobj(z) else out.real
+
+
+def amplitude_phase_metrics(rec: np.ndarray, ref: np.ndarray, mask: np.ndarray,
+                            register: bool = False) -> Dict[str, float]:
     """Metrics of ``rec`` against ``ref`` (both complex, same shape) inside ``mask``.
     The linear phase ramp and global complex scalar — both unobservable in
-    ptychography — are removed from ``rec`` first (see :func:`align`)."""
+    ptychography — are removed from ``rec`` first (see :func:`align`). With ``register``
+    a sub-pixel translation is removed as well (used for experimental data, where the
+    reference is another reconstruction)."""
+    if register:
+        rec = shift_image(rec, estimate_shift(rec, ref, mask))
     rec = align(rec, ref, mask)
     rs, cs = _bbox(mask)
     m = mask[rs, cs]

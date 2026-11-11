@@ -1,22 +1,28 @@
-# Local / staging stack (M3 target): website + API + worker sharing one storage volume.
-# GPU inference worker (M4): add `deploy.resources.reservations.devices` with the nvidia runtime
-# and set VELOS_ML_CHECKPOINT.
+# Local development stack: website (nginx) + API + worker sharing one storage volume.
+# Model packages are mounted from ./models (see ml/README / velos_ml.package).
+# Production / staging (TLS edge, health checks, restart policies): docker-compose.prod.yml.
 services:
   api:
     build: ./backend
-    env_file: ./backend/.env
+    env_file:
+      - path: ./backend/.env      # copy backend/.env.example; optional for a first local run
+        required: false
     environment:
       VELOS_STORAGE_DIR: /data
+      VELOS_MODEL_DIR: /models
       VELOS_CORS_ORIGINS: http://localhost:3000
     ports: ["8000:8000"]
-    volumes: ["velos-data:/data"]
+    volumes: ["velos-data:/data", "./models:/models:ro"]
   worker:
     build: ./backend
     command: ["python", "-m", "velos_backend.worker"]
-    env_file: ./backend/.env
+    env_file:
+      - path: ./backend/.env      # copy backend/.env.example; optional for a first local run
+        required: false
     environment:
       VELOS_STORAGE_DIR: /data
-    volumes: ["velos-data:/data"]
+      VELOS_MODEL_DIR: /models
+    volumes: ["velos-data:/data", "./models:/models:ro"]
     depends_on: [api]
   website:
     build:

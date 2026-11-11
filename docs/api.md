@@ -5,7 +5,7 @@ Authentication: header `X-API-Key: <key>`; keys and roles come from `VELOS_API_K
 
 | Method | Path | Auth | Purpose |
 |---|---|---|---|
-| GET | `/health` | – | liveness, version, queue depth |
+| GET | `/health` | – | liveness, version, queue depth, installed model packages |
 | POST | `/api/v1/contact` | – | website lead capture (honeypot + 10/h per IP) |
 | GET | `/api/v1/contact` | admin | list captured leads |
 | POST | `/api/v1/datasets` | key | upload `.mat` / `.npz` / `.h5` (multipart `file`, optional `name`) |
@@ -17,6 +17,7 @@ Authentication: header `X-API-Key: <key>`; keys and roles come from `VELOS_API_K
 | POST | `/api/v1/jobs/{id}/cancel` | key | cancel queued/running job |
 | GET | `/api/v1/jobs/{id}/result` | key | summary + artifact links (409 until succeeded) |
 | GET | `/api/v1/jobs/{id}/artifacts/{name}` | key | download PNG / NPZ / JSON |
+| GET | `/api/v1/models` | key | installed ML model packages with their model cards (M3) |
 
 ## Job parameters
 
@@ -28,10 +29,37 @@ Authentication: header `X-API-Key: <key>`; keys and roles come from `VELOS_API_K
   "seed": 0,
   "crop": 256,               // optional centre-crop of diffraction frames (fast preview)
   "sparse_every": 1,         // 2 → keep every 2nd grid row & column (sparse-scan experiment)
+  "sparse_fraction": null,   // 0.35 → keep a random 35 % of the frames (reduced-scan experiment, M3)
   "engine_params": {},       // e.g. {"alpha": 1.0, "beta": 1.0} or {"probe_lr": 0.1}
-  "refine_ml": false         // apply the ML refinement model (needs VELOS_ML_CHECKPOINT)
+  "refine_ml": false,        // M3: apply the packaged refinement model after the physics engine
+  "model": null,             // M3: model package id from GET /api/v1/models (default package if null)
+  "hybrid_iters": 0          // M3: hybrid mode — N physics iterations seeded with the ML-refined object
 }
 ```
+
+### ML refinement and hybrid mode (M3)
+
+With `refine_ml: true` the worker normalises the physics object (phase ramp, median amplitude and
+phase), runs the model package with ONNX Runtime in 256×256 tiles (Hann-blended), maps the result back
+to the physics frame and, if `hybrid_iters > 0`, runs that many physics iterations starting from the
+refined object and the physics probe. Every estimate is scored against the **measured** diffraction
+data (no ground truth needed). The result summary gains:
+
+```json
+"ml_refinement": {
+  "applied": true, "model": "velos-refine-v2", "model_version": "2.0.0",
+  "runtime": "onnxruntime (CPUExecutionProvider)", "elapsed_s": 2.1,
+  "data_error": {"physics": 0.021, "ml": 0.034, "hybrid": 0.020},
+  "data_error_ratio": 0.95,
+  "consistency": "ok",          // or "warning: …" when the final estimate fits the data much worse
+  "hybrid": {"iters": 30, "elapsed_s": 12.4, "files": {…}},
+  "files": {"amplitude": "refined_amplitude.png", "phase": "refined_phase.png", "comparison": "comparison.png", …}
+}
+```
+
+Artifacts added: `refined.npz` (refined object in the physics frame and in the normalised frame, plus
+the normalisation parameters), `refined_*.png`, `hybrid.npz`, `hybrid_*.png`, `comparison.png`
+(physics | ML | hybrid, amplitude and phase on shared colour scales).
 
 ## Example session (curl)
 

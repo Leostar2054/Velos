@@ -21,7 +21,7 @@ export default function HomePage() {
               <Link href={h.primary_cta.href} className="btn-primary">{h.primary_cta.label}</Link>
               <Link href={h.secondary_cta.href} className="btn-secondary">{h.secondary_cta.label}</Link>
             </div>
-            <p className="mt-6 text-xs text-slate-500">{SITE.company.status_note}</p>
+            <p className="mt-6 text-xs text-slate-400">{SITE.company.status_note}</p>
           </div>
           <div className="card !p-2">
             <Image src="/images/velos-qpi-concept.jpg" alt="Velos QPI product concept: compact 630 nm live-cell imaging hardware with the SPARK reconstruction platform producing amplitude and quantitative phase images"

@@ -100,3 +100,31 @@ def _scalebar(ax, width_px: int, dx_um: float):
     x0, y0 = width_px * 0.05, ax.get_ylim()[0] * 0.95
     ax.plot([x0, x0 + bar_px], [y0, y0], color="white", lw=3)
     ax.text(x0, y0 - width_px * 0.02, f"{bar_um:g} µm", color="white", fontsize=9)
+
+
+def save_comparison(panels, mask: np.ndarray, path, dx_um: Optional[float] = None) -> str:
+    """Side-by-side amplitude (top) and phase (bottom) of several complex estimates on a
+    shared colour scale per row (range taken from the first panel), e.g. physics / ML / hybrid."""
+    m = crop_to_mask(mask, mask)
+    imgs = [(name, crop_to_mask(z, mask)) for name, z in panels]
+    n = len(imgs)
+    h, w = m.shape
+    fig, axs = plt.subplots(2, n, figsize=(3.6 * n, 7.2 * h / w + 0.6), squeeze=False)
+    ref_amp = np.abs(imgs[0][1])[m]; ref_pha = np.angle(imgs[0][1])[m]
+    ranges = (_robust_range(ref_amp), _robust_range(ref_pha))
+    for j, (name, z) in enumerate(imgs):
+        for i, (img, cmap) in enumerate(((np.abs(z), "gray"), (np.angle(z), "twilight"))):
+            ax = axs[i, j]
+            ax.imshow(np.where(m, img, np.nan), cmap=cmap, vmin=ranges[i][0], vmax=ranges[i][1],
+                      interpolation="nearest")
+            ax.set_axis_off()
+            if i == 0:
+                ax.set_title(name, fontsize=11)
+            if dx_um and j == 0:
+                _scalebar(ax, w, dx_um)
+    axs[0, 0].text(-0.04, 0.5, "amplitude", transform=axs[0, 0].transAxes, rotation=90, va="center", ha="right")
+    axs[1, 0].text(-0.04, 0.5, "phase", transform=axs[1, 0].transAxes, rotation=90, va="center", ha="right")
+    fig.tight_layout()
+    fig.savefig(path, dpi=140, bbox_inches="tight")
+    plt.close(fig)
+    return str(path)

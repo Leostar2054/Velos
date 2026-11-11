@@ -10,7 +10,9 @@ VELOS_DB_URL             sqlite:///<storage>/velos.db SQLAlchemy URL (SQLite for
 VELOS_API_KEYS           dev-key:dev:admin            Comma list of key:name:role (role = admin|user)
 VELOS_MAX_UPLOAD_MB      2048                         Upload size limit
 VELOS_CORS_ORIGINS       http://localhost:3000        Comma list of allowed website origins
-VELOS_ML_CHECKPOINT      (unset)                      TorchScript/PyTorch checkpoint for ML refinement
+VELOS_MODEL_DIR          ./models                     Model packages (one sub-directory each, see velos_recon.refine)
+VELOS_DEFAULT_MODEL      (first package found)        Package used when a job does not name one
+VELOS_ML_RUNTIME         auto                         auto | onnxruntime | torchscript
 VELOS_WORKER_POLL_S      1.0                          Worker poll interval
 VELOS_LOG_LEVEL          INFO
 """
@@ -35,7 +37,9 @@ class Settings:
     api_keys: Dict[str, ApiKeyInfo]
     max_upload_mb: int
     cors_origins: List[str]
-    ml_checkpoint: str | None
+    model_dir: Path
+    default_model: str | None
+    ml_runtime: str
     worker_poll_s: float
     log_level: str
     insecure_default_key: bool = field(default=False)
@@ -65,7 +69,10 @@ class Settings:
         return cls(
             storage_dir=storage, db_url=db_url, api_keys=keys,
             max_upload_mb=int(os.getenv("VELOS_MAX_UPLOAD_MB", "2048")),
-            cors_origins=origins, ml_checkpoint=os.getenv("VELOS_ML_CHECKPOINT") or None,
+            cors_origins=origins,
+            model_dir=Path(os.getenv("VELOS_MODEL_DIR", "./models")).resolve(),
+            default_model=os.getenv("VELOS_DEFAULT_MODEL") or None,
+            ml_runtime=os.getenv("VELOS_ML_RUNTIME", "auto"),
             worker_poll_s=float(os.getenv("VELOS_WORKER_POLL_S", "1.0")),
             log_level=os.getenv("VELOS_LOG_LEVEL", "INFO"), insecure_default_key=insecure,
         )

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "velos-backend"
-version = "0.2.0"
+version = "0.3.0"
 description = "Velos BioImaging / SPARK reconstruction backend: FastAPI API, job queue, worker and physics-engine integration"
 requires-python = ">=3.10"
 dependencies = [
@@ -20,8 +20,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "httpx>=0.27"]
-ml = ["torch>=2.2"]
+# ML refinement runtime: ONNX Runtime (CPU). For GPU workers install "ml-gpu" instead.
+ml = ["onnxruntime>=1.18"]
+ml-gpu = ["onnxruntime-gpu>=1.18"]
+# TorchScript fallback runtime (only if ONNX Runtime is unavailable on a platform)
+torchscript = ["torch>=2.2"]
+dev = ["pytest>=8", "httpx>=0.27", "onnx>=1.16", "onnxruntime>=1.18"]
 
 [project.scripts]
 velos-worker = "velos_backend.worker:main"

@@ -1,4 +1,4 @@
-# Velos BioImaging platform — architecture (M1 deliverable, updated at M2)
+# Velos BioImaging platform — architecture (M1 deliverable, updated at M2 and M3)
 
 ```
                          ┌──────────────────────────────┐
@@ -22,8 +22,10 @@
                                                                  │ velos_recon           ││
                                                                  │ Client's physics      ││
                                                                  │ engines (core.py)     ││
-                                                                 │ + velos_ml refinement ││
+                                                                 │ + refine.py: ONNX     ││
+                                                                 │ model package, hybrid ││
                                                                  └──────────────────────┘│
+   Production (M4): Caddy edge (TLS, static site, /api proxy) → api → worker(s); see docs/deployment.md
 ```
 
 ## Components
@@ -34,8 +36,9 @@
 | API | `backend/velos_backend/main.py` | FastAPI, SQLModel/SQLite, API-key auth | Upload / job / status / result / artifact / cancel / contact endpoints, Swagger docs |
 | Queue + worker | `backend/velos_backend/queue.py`, `worker.py` | DB-backed queue with atomic claim; worker is a separate process | Jobs never block the web request; progress + cancellation |
 | Physics engines | `backend/velos_recon/` | Client's `ptycho_core.py` vendored unchanged (`core.py`) + driver, data loaders, metrics, viz | ePIE / rPIE / WASP / GD / MAP selectable per job |
-| ML pipeline | `ml/velos_ml/` | PyTorch, YAML configs | Synthetic data generation, residual U-Net, training, evaluation vs GT & physics baseline, inference hook |
-| Deployment | `docker-compose.yml`, `*/Dockerfile` | Docker | Scaffold for the M3 staging stack; not yet deployed to a cloud account |
+| ML pipeline | `ml/velos_ml/` | PyTorch, YAML configs | Synthetic (v2) and experimental training data, refinement U-Net v2, two-stage training, evaluation vs GT / dense reference with registration, ONNX + TorchScript packaging with model card (M3) |
+| ML runtime | `backend/velos_recon/refine.py`, `normalise.py` | ONNX Runtime (CPU/CUDA), TorchScript fallback | Model packages in `VELOS_MODEL_DIR`; 256-px tiles with Hann blending; hybrid physics polish; data-consistency check (M3) |
+| Deployment | `docker-compose.prod.yml`, `deploy/`, `*/Dockerfile`, `.github/workflows/ci.yml` | Docker, Caddy, GitHub Actions | Deployment-ready (M3): validated configs, smoke test, runbook; cloud deployment on a Velos-owned account in M4 |
 
 ## Key design decisions
 
@@ -53,6 +56,13 @@
 6. **ML as a post-processing stage.** The first model refines the physics reconstruction from a sparse scan
    rather than replacing the physics; this keeps the quantitative reference intact and matches the SPARK mode
    model (physics-based → sparse-scanning → AI-assisted → hybrid).
+7. **Model packages, not checkpoints, in production (M3).** The worker loads a self-describing directory
+   (`model.onnx`, `model.ts`, `model_card.json` with normalisation, tile size, training data, evaluation,
+   limitations and file hashes) through ONNX Runtime; no training code or PyTorch is needed in the API image.
+   Several packages can be installed side by side and selected per job.
+8. **Every ML output is checked against the measurements (M3).** The worker reports the data-consistency error
+   (Fourier-magnitude misfit to the measured diffraction patterns) of the physics, ML and hybrid estimates and
+   flags results that fit the data much worse than the physics; the physics result is always kept.
 
 ## Request flow (end to end)
 
@@ -68,6 +78,8 @@
 
 * Dataset formats: MATLAB `expt` struct (`.mat`), `.npz`, `.h5` with `dps`, `positions`, `wavelength`,
   `pixel_pitch`, `distance`, optional `init_probe`, `ground_truth`.
-* Job parameters: `engine`, `iters`, `seed`, `crop`, `sparse_every`, `engine_params`, `refine_ml`.
+* Job parameters: `engine`, `iters`, `seed`, `crop`, `sparse_every`, `engine_params`, `refine_ml`; M3 adds
+  `sparse_fraction`, `model`, `hybrid_iters`, `probe_from_job` (see `docs/api.md`).
 * Result bundle: `result.npz` (object, probe, mask, positions, dx, error history), `amplitude.png`, `phase.png`,
-  `preview.png`, `probe.png`, `convergence.png`, `summary.json` (+ `refined_*` when ML is applied).
+  `preview.png`, `probe.png`, `convergence.png`, `summary.json` (+ `refined.npz`, `refined_*.png`, `hybrid.npz`,
+  `hybrid_*.png`, `comparison.png` when ML / hybrid mode is applied).

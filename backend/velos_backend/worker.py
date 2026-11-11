@@ -6,9 +6,10 @@ Reconstruction worker.
 
 For each claimed job the worker loads the dataset, runs the Client's physics
 engine through :func:`velos_recon.reconstruct` with progress reporting, optionally
-applies the ML refinement model, writes artifacts into the job directory and
-marks the job succeeded / failed / cancelled. The GPU inference worker of
-M3/M4 is the same process with CUDA available.
+applies the packaged ML refinement model (ONNX Runtime / TorchScript) and the
+optional hybrid physics polish, writes artifacts into the job directory and
+marks the job succeeded / failed / cancelled. The GPU inference worker (M4) is
+the same process with onnxruntime-gpu / CUDA available.
 """
 from __future__ import annotations
 
@@ -32,23 +33,76 @@ from .storage import get_storage
 log = logging.getLogger("velos.worker")
 
 
-def _run_ml_refinement(result, out_dir: Path) -> dict:
-    """Apply the ML refinement model if a checkpoint is configured (M3 integration hook)."""
+def resolve_model(name: str | None):
+    """Path of the requested (or default) model package, or None if none is installed."""
     settings = get_settings()
-    if not settings.ml_checkpoint:
-        return {"applied": False, "reason": "VELOS_ML_CHECKPOINT not configured"}
-    try:
-        from velos_ml.infer import refine_object  # optional dependency (ml/ package)
-    except Exception as e:  # pragma: no cover
-        return {"applied": False, "reason": f"velos_ml unavailable: {e}"}
-    t0 = time.perf_counter()
-    refined = refine_object(result.obj, result.mask, settings.ml_checkpoint)
-    files = save_object_images(refined, result.mask, out_dir, prefix="refined_",
-                               dx_um=result.dx_m * 1e6, title="ML-refined")
+    from velos_recon.refine import list_packages
+    cards = list_packages(settings.model_dir)
+    if not cards:
+        return None
+    wanted = name or settings.default_model
+    if wanted is None:
+        return settings.model_dir / cards[0]["id"]
+    if not (settings.model_dir / wanted / "model_card.json").exists():
+        raise ValueError(f"unknown model '{wanted}' (installed: {[c['id'] for c in cards]})")
+    return settings.model_dir / wanted
+
+
+def _run_ml_refinement(ds, cfg, res, params: dict, out_dir: Path, progress=None, should_cancel=None) -> dict:
+    """M3: apply the packaged refinement model (ONNX/TorchScript runtime) and, optionally,
+    the hybrid physics polish. Every estimate is scored against the measured data."""
     import numpy as np
-    np.savez_compressed(out_dir / "refined.npz", obj=refined.astype(np.complex64))
-    return {"applied": True, "checkpoint": settings.ml_checkpoint,
-            "elapsed_s": round(time.perf_counter() - t0, 2), "files": files}
+    from velos_recon.engine import data_error
+    from velos_recon.refine import hybrid, load_package, refine
+
+    settings = get_settings()
+    path = resolve_model(params.get("model"))
+    if path is None:
+        return {"applied": False, "reason": f"no model package installed in {settings.model_dir}"}
+    pkg = load_package(str(path), settings.ml_runtime)
+    ref = refine(res.obj, res.mask, pkg)
+    np.savez_compressed(out_dir / "refined.npz", obj=ref.obj.astype(np.complex64),
+                        obj_normalised=ref.z.astype(np.complex64), **{f"norm_{k}": v for k, v in ref.params.to_dict().items()})
+    dx_um = res.dx_m * 1e6
+    files = save_object_images(ref.z, res.mask, out_dir, prefix="refined_", dx_um=dx_um,
+                               title=f"ML-refined · {pkg.card.get('name')} {pkg.card.get('version')}")
+    e_phys = data_error(res.obj, res.probe, ds, crop=cfg.crop)
+    e_ml = data_error(ref.obj, res.probe, ds, crop=cfg.crop)
+    out = {"applied": True, "model": path.name, "model_name": pkg.card.get("name"),
+           "model_version": pkg.card.get("version"), "runtime": ref.runtime,
+           "elapsed_s": round(ref.elapsed_s, 3),
+           "normalisation": ref.params.to_dict(),
+           "data_error": {"physics": e_phys, "ml": e_ml},
+           "files": {k: Path(v).name for k, v in files.items()} | {"refined_npz": "refined.npz"}}
+    warn = float(pkg.card.get("data_error_ratio_warn", 3.0))
+    n_h = int(params.get("hybrid_iters", 0) or 0)
+    if n_h > 0:
+        hres = hybrid(ds, res, ref.obj, cfg, n_h, progress=progress, should_cancel=should_cancel)
+        e_h = data_error(hres.obj, hres.probe, ds, crop=cfg.crop)
+        from velos_recon.normalise import normalise
+        zh, _ = normalise(hres.obj, hres.mask)
+        hres.to_npz(out_dir / "hybrid.npz")
+        hf = save_object_images(zh, hres.mask, out_dir, prefix="hybrid_", dx_um=dx_um,
+                                title=f"Hybrid · ML + {n_h} physics it")
+        out["hybrid"] = {"iters": n_h, "elapsed_s": round(hres.elapsed_s, 2),
+                         "files": {k: Path(v).name for k, v in hf.items()} | {"hybrid_npz": "hybrid.npz"}}
+        out["data_error"]["hybrid"] = e_h
+        final_ratio = e_h / max(e_phys, 1e-30)
+    else:
+        final_ratio = e_ml / max(e_phys, 1e-30)
+    out["data_error_ratio"] = final_ratio
+    out["consistency"] = "ok" if final_ratio <= warn else (
+        "warning: the refined object fits the measured data much worse than the physics result "
+        f"(ratio {final_ratio:.1f} > {warn}); prefer the physics or hybrid result")
+    try:
+        from velos_recon.viz import save_comparison
+        panels = [("Physics", np.where(res.mask, ref.z_in, 0)), ("ML-refined", ref.z)]
+        if n_h > 0:
+            panels.append((f"Hybrid (+{n_h} it)", zh))
+        out["files"]["comparison"] = Path(save_comparison(panels, res.mask, out_dir / "comparison.png", dx_um)).name
+    except Exception as e:  # pragma: no cover - figure only
+        log.warning("comparison figure failed: %s", e)
+    return out
 
 
 def process_job(job_id: str) -> JobStatus:
@@ -67,7 +121,9 @@ def process_job(job_id: str) -> JobStatus:
             ds = load_dataset(ds_row.path, name=ds_row.name)
             if int(params.get("sparse_every", 1)) > 1:
                 ds = ds.sparse_subset(every=int(params["sparse_every"]))
-            cfg = ReconConfig(engine=params.get("engine", "wasp"), iters=int(params.get("iters", 100)),
+            if params.get("sparse_fraction") and float(params["sparse_fraction"]) < 1.0:
+                ds = ds.sparse_subset(fraction=float(params["sparse_fraction"]), seed=int(params.get("seed", 0)))
+            cfg = ReconConfig(engine=params.get("engine", "epie"), iters=int(params.get("iters", 100)),
                               seed=int(params.get("seed", 0)), crop=params.get("crop"),
                               engine_params=params.get("engine_params") or {},
                               progress_every=max(1, int(params.get("iters", 100)) // 50))
@@ -82,7 +138,16 @@ def process_job(job_id: str) -> JobStatus:
             def cancelled():
                 return is_cancel_requested(session, job_id)
 
-            res = reconstruct(ds, cfg, progress=progress, should_cancel=cancelled)
+            init_probe = None
+            if params.get("probe_from_job"):                 # probe calibration from an earlier job
+                import numpy as np
+                ref_file = storage.job_dir(params["probe_from_job"]) / "result.npz"
+                init_probe = np.load(ref_file)["probe"]
+                m = int(cfg.crop) if cfg.crop else min(ds.frame_shape)
+                if init_probe.shape != (m, m):
+                    raise ValueError(f"probe_from_job: probe {init_probe.shape} does not match frames ({m}, {m}); "
+                                     "use the same crop as the calibration job")
+            res = reconstruct(ds, cfg, progress=progress, should_cancel=cancelled, init_probe=init_probe)
             res.to_npz(out_dir / "result.npz")
             files = save_object_images(res.obj, res.mask, out_dir, dx_um=res.dx_m * 1e6,
                                        title=f"{ds.name} · {cfg.engine.upper()} · {cfg.iters} it")
@@ -91,7 +156,9 @@ def process_job(job_id: str) -> JobStatus:
             summary = {"dataset": res.dataset_summary, "reconstruction": res.summary(),
                        "files": {k: Path(v).name for k, v in files.items()}}
             if params.get("refine_ml"):
-                summary["ml_refinement"] = _run_ml_refinement(res, out_dir)
+                update_progress(session, job_id, cfg.iters, cfg.iters, "ML refinement")
+                summary["ml_refinement"] = _run_ml_refinement(ds, cfg, res, params, out_dir,
+                                                              should_cancel=cancelled)
             (out_dir / "summary.json").write_text(json.dumps(summary, indent=2))
             finish(session, job_id, JobStatus.succeeded, result=summary)
             log.info("job %s: succeeded in %.1fs", job_id, res.elapsed_s)

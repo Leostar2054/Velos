@@ -23,4 +23,4 @@ from .data import PtychoDataset, load_dataset, save_npz  # noqa: F401
 from .engine import ReconConfig, ReconResult, reconstruct, ENGINE_NAMES  # noqa: F401
 from .metrics import amplitude_phase_metrics, psnr, ssim  # noqa: F401
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"

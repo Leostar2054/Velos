@@ -1,0 +1,22 @@
+# Dataset v2 (M3). Changes vs v1 (M2), driven by the M2 findings:
+#  * engine ePIE (alpha=beta=1) — the backend default and the engine used on the real clam data,
+#    so the model sees the same artefact statistics in training and in service (M2 used WASP);
+#  * converged physics inputs (300 iterations; M2 used 100) — the model must beat a converged
+#    baseline, not an unfinished one;
+#  * a RANGE of scan densities, from where ePIE fails (overlap 0.42, ~36 frames) to where it
+#    works (0.62, ~81 frames), so the model learns to repair failures without harming good input.
+# Pre-check on 2 phantoms (ePIE, 300 it): overlap 0.58 → NRMSE 0.04–0.06; 0.50 → 0.24–0.26.
+size: 256
+probe_px: 64
+n_train: 240
+n_val: 25
+n_test: 30
+dense_overlap: 0.70            # 121 frames (physics reference)
+sparse_overlap: [0.42, 0.62]   # sampled per phantom: ~36–81 frames (−33 % to −70 %)
+jitter_px: 2.0
+photons: [5000, 50000]
+engine: epie
+engine_params: {alpha: 1.0, beta: 1.0}
+sparse_iters: 300
+dense_iters: 150
+seed: 4321

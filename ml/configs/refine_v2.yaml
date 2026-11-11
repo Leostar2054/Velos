@@ -1,0 +1,33 @@
+# M3 stage 2: fine-tune on synthetic + experimental (635 nm clam) patches.
+# Real pairs: input = reconstruction from a random 30–60 % of the frames, target = reconstruction
+# from all 400 frames. Only the left 65 % of the field and frame draws 2–13 are used; the right 35 %
+# and draws 0–1 (35 % / 50 % of frames) are the untouched real-data test set. The plant scan
+# (675 nm) is never used for training (unseen-specimen test).
+name: refine_v2
+data:
+  root: data/synthetic_v2
+  crop: 128
+  norm: median_ramp
+  target_frame: input
+  preload: true
+  real:
+    root: data/real_clam
+    subsets: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+    col_range: [0.0, 0.65]
+    n_per_epoch: 240
+    crop: 128
+model:
+  base: 32
+  depth: 4
+  residual: true
+train:
+  epochs: 15
+  batch_size: 8
+  lr: 0.0003
+  pct_start: 0.1
+  weight_decay: 0.0001
+  seed: 1
+  loss: phase_aware
+  w_phase: 1.0
+  w_grad: 0.5
+  init_from: runs/refine_v2_synthetic/best.pt

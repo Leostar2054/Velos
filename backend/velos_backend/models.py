@@ -85,7 +85,15 @@ class JobCreate(BaseModel):
     crop: Optional[int] = PField(default=None, ge=32, description="centre-crop frames to N px (fast preview)")
     sparse_every: int = PField(default=1, ge=1, le=8, description="keep every k-th grid row/col (sparse-scan test)")
     engine_params: Dict[str, Any] = PField(default_factory=dict)
+    sparse_fraction: Optional[float] = PField(default=None, gt=0.0, le=1.0,
+                                              description="keep a random fraction of the frames (reduced-scan test)")
     refine_ml: bool = PField(default=False, description="apply the ML refinement model after reconstruction")
+    model: Optional[str] = PField(default=None, description="model package id (GET /api/v1/models); default if omitted")
+    hybrid_iters: int = PField(default=0, ge=0, le=1000,
+                               description="hybrid mode: physics iterations seeded with the ML-refined object (0 = off)")
+    probe_from_job: Optional[str] = PField(default=None, description=(
+        "probe calibration: start from the probe reconstructed by this earlier (succeeded) job, e.g. a dense "
+        "scan of the same illumination — needed for strongly reduced scans of some samples"))
 
     @field_validator("engine")
     @classmethod

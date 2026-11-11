@@ -28,7 +28,7 @@ export default function TeamPage() {
             </li>
           ))}
         </ul>
-        <p className="mt-10 text-sm text-slate-500">{SITE.company.affiliation}</p>
+        <p className="mt-10 text-sm text-slate-400">{SITE.company.affiliation}</p>
       </Section>
     </>
   );

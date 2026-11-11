@@ -1,0 +1,18 @@
+# Edge image: the website's static export + Caddy (TLS, compression, reverse proxy to the API).
+# Build from the repository root:  docker build -f deploy/Dockerfile.edge .
+FROM node:22-alpine AS web
+WORKDIR /web
+COPY website/package*.json ./
+RUN npm ci --no-audit --no-fund
+COPY website/ ./
+# empty API URL = same-origin requests (/api/... is proxied by Caddy; no CORS needed)
+ARG NEXT_PUBLIC_API_URL=""
+ARG NEXT_PUBLIC_SITE_URL=https://velosbioimaging.example
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+RUN npm run build
+
+FROM caddy:2.8-alpine
+COPY deploy/Caddyfile /etc/caddy/Caddyfile
+COPY --from=web /web/out /srv/www
+# fail the build if the configuration is invalid
+RUN SITE_DOMAIN=":8080" caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile

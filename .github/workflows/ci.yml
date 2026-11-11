@@ -1,0 +1,122 @@
+# Continuous integration (runs on every push / pull request) and a deployment job that stays
+# disabled until the Velos-owned cloud account, registry and server exist (M4).
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend tests (API, queue, worker, ML runtime)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev,ml]"
+      - run: pytest -q
+
+  ml:
+    name: ML pipeline smoke run (simulate → train → package → verify)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - run: pip install -e "backend[ml]" -e ml
+      - name: Generate a tiny dataset
+        working-directory: ml
+        run: python -m velos_ml.simulate --config configs/data_synthetic_v2.yaml --out /tmp/syn --limit 2 --set sparse_iters=20 --set dense_iters=20
+      - name: Train one epoch
+        working-directory: ml
+        run: >
+          python -m velos_ml.train --config configs/refine_v2_synthetic.yaml --data /tmp/syn --out /tmp/run
+          --set train.epochs=1 --set data.crop=64 --set model.base=8
+      - name: Package (ONNX + TorchScript) and verify against PyTorch
+        working-directory: ml
+        run: python -m velos_ml.package /tmp/run/best.pt --out /tmp/models/ci-model --version 0.0.0-ci
+
+  website:
+    name: Website build + QA crawl
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
+      - name: QA crawl (3 viewports, links, images, duplicate ids, axe-core)
+        run: |
+          npm install --no-save playwright@1.49.1 axe-core@4.10.2
+          npx playwright install --with-deps chromium
+          (python3 -m http.server 3100 --directory out &) && sleep 1
+          node ../scripts/website_qa.js http://localhost:3100 qa node_modules/axe-core/axe.min.js
+          test "$(node -e "console.log(require('./qa/qa_report.json').issues.length)")" = "0"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: website-qa
+          path: website/qa
+
+  images:
+    name: Container images + stack smoke test
+    needs: [backend, website]
+    runs-on: ubuntu-latest
+    env:
+      SITE_DOMAIN: ":80"
+      VELOS_API_KEYS: "ci-user-key:ci:user,ci-admin-key:ci:admin"
+      VELOS_TAG: ci
+    steps:
+      - uses: actions/checkout@v4
+      - run: cp deploy/.env.example deploy/.env && mkdir -p models
+      - run: docker compose -f docker-compose.prod.yml --env-file deploy/.env config --quiet
+      - run: docker compose -f docker-compose.prod.yml --env-file deploy/.env build
+      - run: docker compose -f docker-compose.prod.yml --env-file deploy/.env up -d
+      - run: scripts/smoke_test.sh http://localhost ci-user-key
+      - if: always()
+        run: docker compose -f docker-compose.prod.yml --env-file deploy/.env logs --no-color | tail -200
+
+  deploy:
+    name: Deploy to staging (enabled in M4)
+    needs: [images, ml]
+    if: ${{ github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and push images to the Velos registry
+        run: |
+          echo "${{ secrets.REGISTRY_TOKEN }}" | docker login "${{ vars.REGISTRY }}" -u "${{ secrets.REGISTRY_USER }}" --password-stdin
+          docker compose -f docker-compose.prod.yml build
+          for s in backend edge; do
+            docker tag velos-$s:${VELOS_TAG:-dev} ${{ vars.REGISTRY }}/velos-$s:${{ github.sha }}
+            docker push ${{ vars.REGISTRY }}/velos-$s:${{ github.sha }}
+          done
+      - name: Roll out on the staging server and smoke-test
+        run: |
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > key && chmod 600 key
+          ssh -i key -o StrictHostKeyChecking=accept-new "${{ vars.DEPLOY_HOST }}" \
+            "cd /opt/velos && VELOS_TAG=${{ github.sha }} docker compose -f docker-compose.prod.yml --env-file deploy/.env pull && \
+             VELOS_TAG=${{ github.sha }} docker compose -f docker-compose.prod.yml --env-file deploy/.env up -d"
+          scripts/smoke_test.sh "https://${{ vars.STAGING_DOMAIN }}" "${{ secrets.SMOKE_API_KEY }}"

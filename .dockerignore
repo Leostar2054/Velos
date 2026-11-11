@@ -1,0 +1,14 @@
+**/node_modules
+**/.next
+website/out
+**/__pycache__
+**/*.egg-info
+**/.pytest_cache
+**/storage
+evidence
+reports
+ml/data
+ml/runs
+models
+**/.env
+.git

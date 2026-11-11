@@ -74,7 +74,11 @@ def make_sample(args):
     photons = float(10 ** rng.uniform(np.log10(cfg["photons"][0]), np.log10(cfg["photons"][1])))
     out = {"gt": O.astype(np.complex64), "seed": seed, "photons": photons}
     rc = ReconConfig(engine=cfg["engine"], engine_params=cfg.get("engine_params", {}), seed=seed)
-    for tag, overlap, iters in (("sparse", cfg["sparse_overlap"], cfg["sparse_iters"]),
+    so = cfg["sparse_overlap"]
+    if isinstance(so, (list, tuple)):          # range → sample one density per phantom
+        so = float(rng.uniform(so[0], so[1]))
+    out["sparse_overlap"] = so
+    for tag, overlap, iters in (("sparse", so, cfg["sparse_iters"]),
                                 ("dense", cfg["dense_overlap"], cfg["dense_iters"])):
         pos = core.make_positions(N, Np, overlap=overlap, jitter=cfg["jitter_px"], seed=seed)
         amps = core.simulate(O, P, pos, photons=photons, seed=seed)
@@ -85,6 +89,9 @@ def make_sample(args):
         out[f"{tag}_mask"] = res.mask                      # illuminated region (coverage > 5 % of max)
         out[f"{tag}_n_frames"] = len(pos)
         out[f"{tag}_err"] = float(res.history["err"][-1])
+        if tag == "sparse":                                # v2: what hybrid (ML → physics) mode needs
+            out["sparse_probe"] = res.probe.astype(np.complex64)
+            out["sparse_pos"] = np.asarray(pos, dtype=np.int32)
     # evaluation region: illuminated by BOTH scans, eroded to exclude the soft probe edge
     out["eval_mask"] = erode(out["sparse_mask"] & out["dense_mask"], 4)
     for tag in ("sparse", "dense"):
@@ -97,8 +104,11 @@ def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", required=True); ap.add_argument("--out", required=True)
     ap.add_argument("--workers", type=int, default=2); ap.add_argument("--limit", type=int, default=None)
+    ap.add_argument("--set", action="append", default=[], help="override a config key, e.g. sparse_iters=20")
     a = ap.parse_args(argv)
     cfg = dict(DEFAULT); cfg.update(yaml.safe_load(open(a.config)) or {})
+    for item in a.set:
+        k, v = item.split("=", 1); cfg[k] = yaml.safe_load(v)
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
     (out / "config.json").write_text(json.dumps(cfg, indent=2))
     splits = {"train": cfg["n_train"], "val": cfg["n_val"], "test": cfg["n_test"]}

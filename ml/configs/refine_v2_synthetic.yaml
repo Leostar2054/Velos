@@ -1,0 +1,23 @@
+# M3 stage 1: refinement model v2 trained on the v2 synthetic set (ePIE inputs, 36–81 frames).
+# Changes vs the M2 baseline: ramp-free normalisation + targets in the input frame,
+# phase-aware loss, deeper U-Net (receptive field ≥ probe size, where reduced-scan artefacts live).
+name: refine_v2_synthetic
+data:
+  root: data/synthetic_v2
+  crop: 128
+  norm: median_ramp
+  target_frame: input
+  preload: true
+model:
+  base: 32
+  depth: 4
+  residual: true
+train:
+  epochs: 40
+  batch_size: 8
+  lr: 0.001
+  weight_decay: 0.0001
+  seed: 0
+  loss: phase_aware
+  w_phase: 1.0
+  w_grad: 0.5

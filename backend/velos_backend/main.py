@@ -14,6 +14,7 @@ GET  /api/v1/jobs/{id}                    status / progress                     
 POST /api/v1/jobs/{id}/cancel             request cancellation                           [API key]
 GET  /api/v1/jobs/{id}/result             result summary + artifact links                [API key]
 GET  /api/v1/jobs/{id}/artifacts/{name}   download an artifact (png / npz / json)        [API key]
+GET  /api/v1/models                       installed ML model packages (model cards)      [API key]
 
 Interactive docs: /docs (Swagger UI), /redoc.
 """
@@ -106,7 +107,26 @@ def _get_job_or_404(session: Session, job_id: str, who: ApiKeyInfo) -> Job:
 def health(session: Session = Depends(get_session)):
     queued = session.exec(select(func.count()).select_from(Job).where(Job.status == JobStatus.queued)).one()
     running = session.exec(select(func.count()).select_from(Job).where(Job.status == JobStatus.running)).one()
-    return {"status": "ok", "version": __version__, "queue": {"queued": queued, "running": running}}
+    from velos_recon.refine import list_packages
+    settings = get_settings()
+    cards = list_packages(settings.model_dir)
+    models = {"installed": [c["id"] for c in cards],
+              "default": settings.default_model or (cards[0]["id"] if cards else None)}
+    return {"status": "ok", "version": __version__, "queue": {"queued": queued, "running": running},
+            "models": models}
+
+
+@app.get("/api/v1/models", tags=["models"])
+def list_models(who: ApiKeyInfo = Depends(require_api_key)):
+    """Installed refinement-model packages with their model cards (version, training data,
+    evaluation summary, intended use, limitations). Use the ``id`` as ``model`` in a job."""
+    from velos_recon.refine import list_packages
+    settings = get_settings()
+    cards = list_packages(settings.model_dir)
+    default = settings.default_model or (cards[0]["id"] if cards else None)
+    for c in cards:
+        c["default"] = c["id"] == default
+    return cards
 
 
 _contact_hits: dict[str, deque] = defaultdict(deque)
@@ -186,6 +206,12 @@ def submit_job(payload: JobCreate, who: ApiKeyInfo = Depends(require_api_key), s
     d = session.get(Dataset, payload.dataset_id)
     if d is None or not can_access(who, d.owner):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "dataset not found")
+    if payload.probe_from_job:
+        ref = session.get(Job, payload.probe_from_job)
+        if ref is None or not can_access(who, ref.owner):
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "probe_from_job: job not found")
+        if ref.status != JobStatus.succeeded:
+            raise HTTPException(status.HTTP_409_CONFLICT, f"probe_from_job: job is {ref.status.value}, not succeeded")
     job = enqueue(session, d.id, who.name, payload.model_dump())
     log.info("job %s queued by %s on dataset %s", job.id, who.name, d.id)
     return _job_out(job)

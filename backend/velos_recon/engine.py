@@ -102,6 +102,32 @@ class ReconCancelled(RuntimeError):
     pass
 
 
+def data_error(obj: np.ndarray, probe: np.ndarray, ds: PtychoDataset,
+               index: Optional[np.ndarray] = None, crop: Optional[int] = None) -> float:
+    """Normalised data-consistency error  Σ(|F(P·O_j)| − √I_j)² / Σ I_j  over frames ``index``
+    (all frames by default), using the engines' own forward model (``core.FT``).
+
+    It needs no ground truth, so it can score any object estimate — physics, ML-refined or
+    hybrid — against the measurements. Evaluated on frames that were *not* used for the
+    reconstruction it becomes a cross-validation (prediction) error.
+    """
+    if crop:
+        ds = ds.center_crop(int(crop))
+    amps = ds.amplitudes()
+    pos = ds.positions_px()
+    idx = np.arange(len(pos)) if index is None else np.asarray(index)
+    npix = probe.shape[0]
+    num = den = 0.0
+    for k in idx:
+        r0, c0 = pos[k]
+        patch = obj[r0:r0 + npix, c0:c0 + npix]
+        if patch.shape != probe.shape:
+            continue
+        a = np.abs(core.FT(probe * patch))
+        num += float(np.sum((a - amps[k]) ** 2)); den += float(np.sum(amps[k] ** 2))
+    return num / max(den, 1e-30)
+
+
 ProgressCB = Callable[[int, int, dict], None]
 
 
@@ -162,7 +188,16 @@ def _apply_probe_chirp(p0: np.ndarray, ds: PtychoDataset, cfg: ReconConfig) -> n
 
 def reconstruct(ds: PtychoDataset, cfg: ReconConfig,
                 progress: Optional[ProgressCB] = None,
-                should_cancel: Optional[Callable[[], bool]] = None) -> ReconResult:
+                should_cancel: Optional[Callable[[], bool]] = None,
+                init_object: Optional[np.ndarray] = None,
+                init_probe: Optional[np.ndarray] = None) -> ReconResult:
+    """Run ``cfg.iters`` iterations of the chosen engine on ``ds``.
+
+    ``init_object`` / ``init_probe`` (complex, object-frame and frame-sized) start the
+    engine from a given estimate instead of the Client's default initialisation — used by
+    the hybrid mode, where the ML-refined object seeds a short physics "polish" that
+    restores consistency with the measured data. The update rules are unchanged.
+    """
     if cfg.engine not in ENGINE_NAMES:
         raise ValueError(f"unknown engine '{cfg.engine}'; choose from {list(ENGINE_NAMES)}")
     if cfg.crop:
@@ -176,6 +211,14 @@ def reconstruct(ds: PtychoDataset, cfg: ReconConfig,
     shape = ds.object_shape()
     P0 = _init_probe(ds, cfg)
     O, P = core._init(shape, P0, cfg.seed)               # Client's initialisation
+    if init_probe is not None:
+        if np.shape(init_probe) != P.shape:
+            raise ValueError(f"init_probe shape {np.shape(init_probe)} != frame {P.shape}")
+        P = np.array(init_probe, dtype=np.complex128)
+    if init_object is not None:
+        if np.shape(init_object) != tuple(shape):
+            raise ValueError(f"init_object shape {np.shape(init_object)} != object {tuple(shape)}")
+        O = np.array(init_object, dtype=np.complex128)
     den = core.compute_denO(P0, pos, shape)
     mask = den > cfg.mask_threshold * den.max()
 

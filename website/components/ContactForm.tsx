@@ -85,7 +85,7 @@ export default function ContactForm() {
           </p>
         )}
       </div>
-      <p className="text-xs text-slate-500">We use your details only to respond to your enquiry.</p>
+      <p className="text-xs text-slate-400">We use your details only to respond to your enquiry.</p>
     </form>
   );
 }
