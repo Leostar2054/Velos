@@ -93,7 +93,8 @@ the model output.
   on one field of view per specimen type: re-evaluate it on new samples before use (model card, `docs/ml-pipeline.md`).
 * The four blood scans (and the leaf scans) of 23 Nov repeat the same field of view; the evaluation therefore uses
   spatial hold-out regions, unseen LED draws and sensor regions outside the training crop.
-* `run_info.json` labels the LEDs GREEN while the analysis uses 633 nm (red, as in the set-up photo) — confirm.
+* LED colour: the 23 Nov scans used red LEDs (633 nm, confirmed by Velos on 25 Nov), as in the analysis; their
+  `run_info.json` says GREEN — fix the `led_color` field in the acquisition program.
 * No dark frames are recorded; the camera offset is estimated from the darkest frame when possible.
 * SQLite is adequate for a single server; move to PostgreSQL (`VELOS_DB_URL`) before running several servers.
 * Warranty: 30 days after final acceptance for reproducible material bugs (Agreement §12).

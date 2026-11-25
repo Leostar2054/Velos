@@ -68,9 +68,12 @@ selects z = 59.4 mm and an optical-axis offset of (−0.70, −0.23) mm (MATLAB:
 
 ## Notes on the data (check list)
 
-* `run_info.json` labels the LEDs GREEN, while the MATLAB analysis of the CS2100M scans uses
-  λ = 0.633 µm (red) and the photo of the set-up shows a red LED; the platform uses 0.633 µm. Please
-  confirm the LED colour; a wrong wavelength is absorbed by a wrong fitted LED distance.
+* LED colour: the CS2100M scans of 23 Nov were taken with **red LEDs (λ = 0.633 µm)**, as confirmed by
+  Velos on 25 Nov 2026; this is the wavelength of the MATLAB analysis and of the platform. Their
+  `run_info.json` says GREEN: the `led_color` field is not reliable and should be fixed in the acquisition
+  program (the ToupTek scans of 16 Nov were taken with green light, 0.532–0.542 µm in the MATLAB runs,
+  although labelled RED). Always enter the wavelength of the light actually used: a wrong wavelength is
+  absorbed by a wrong fitted LED distance.
 * No dark frame is recorded: the camera offset (~60 grey levels) is not removed. Recording one dark
   frame per exposure time (`dark_<exposure>us.tif`) would improve the dark-field frames.
 * About 3 300 isolated hot pixels per 512-px patch are repaired automatically.
