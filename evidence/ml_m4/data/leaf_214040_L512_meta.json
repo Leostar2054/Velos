@@ -1,0 +1,97 @@
+{
+  "name": "leaf_214040_L512",
+  "source": "/mnt/user-data/uploads/Freelancer Work Complete M1_M4/_velos_packed/LEAF__fpm_cs2100m_raster_20261123_214040_L512_meta.mat",
+  "config": {
+    "lambda_um": 0.633,
+    "objective_NA": 0.1,
+    "camera_pixel_um": 5.04,
+    "magnification": 4.0,
+    "z_source_mm": 55.0,
+    "led_pitch_mm": 3.0,
+    "optical_axis_x_mm": 0.0,
+    "optical_axis_y_mm": 0.0,
+    "swap_led_xy": false,
+    "led_x_sign": 1,
+    "led_y_sign": -1,
+    "pupil_distance_mm": "inf",
+    "defocus_um": 0.0,
+    "Np": 512,
+    "crop_center_x_px": 320.5,
+    "crop_center_y_px": 540.5,
+    "background_offset": null,
+    "saturation_level": 65535.0,
+    "normalize_exposure": true,
+    "remove_hot_pixels": true,
+    "skip_clipped_frames": true,
+    "clipped_fraction": 0.6,
+    "skip_transition_frames": true,
+    "transition_band": 0.1,
+    "max_illumination_NA": "inf",
+    "algorithms": [
+      "EPRY"
+    ],
+    "n_passes": 24,
+    "n_warmup": 2,
+    "rpie_alpha": 0.5,
+    "rpie_beta": 0.5,
+    "intensity_correction": true,
+    "intensity_limit": 3.0,
+    "init_spherical_phase": true,
+    "upsample": null,
+    "geometry_check": "off",
+    "precision": "single"
+  },
+  "calibration_s": 0.0,
+  "config_from": "data/fpm/leaf_214040/meta.json",
+  "acquisition": {
+    "modality": "fpm",
+    "name": "leaf_214040_L512",
+    "n_frames": 225,
+    "frame_shape": [
+      1080,
+      1920
+    ],
+    "stored_region": [
+      284,
+      64,
+      512,
+      512
+    ],
+    "led_pitch_mm": 3.0,
+    "led_to_sample_mm": 60.0,
+    "led_color": "GREEN",
+    "camera": "Thorlabs CS2100M-USB",
+    "exposure_us": [
+      1000000.0
+    ],
+    "defaults": {}
+  },
+  "dense": {
+    "leds": 220,
+    "residual": 0.250033572387047,
+    "elapsed_s": 76.4,
+    "N_obj": 1536,
+    "pixel_um": 0.42,
+    "synthetic_NA": 0.5822130271423567
+  },
+  "subsets": {
+    "00": {
+      "fraction_darkfield": 0.3,
+      "draw": 0,
+      "leds_used": 73,
+      "residual": 0.27794257541457773,
+      "prediction_error": 0.45031914307698084,
+      "elapsed_s": 26.3,
+      "test_draw": true
+    },
+    "01": {
+      "fraction_darkfield": 0.5,
+      "draw": 0,
+      "leds_used": 116,
+      "residual": 0.264760126383186,
+      "prediction_error": 0.4312857117104013,
+      "elapsed_s": 39.5,
+      "test_draw": true
+    }
+  }
+}

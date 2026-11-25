@@ -138,7 +138,7 @@ def save_example_figure(ex: dict, methods, path, crop: int = 360):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    from velos_recon.metrics import align, estimate_shift, shift_image
+    from velos_recon.metrics import align
     D = ex["dense"]; c0 = ex["c_split"]
     H, W = D.shape
     r0 = (H - crop) // 2
@@ -150,14 +150,19 @@ def save_example_figure(ex: dict, methods, path, crop: int = 360):
     ref = D[win]
     for j, name in enumerate(cols):
         z = ex[name]
-        if name != "dense":
-            z = align(shift_image(z, estimate_shift(z, D, m)), D, m, ramp=True)
+        if name != "dense":       # same grid as the reference (no registration, as in the metrics)
+            z = align(z, D, m, ramp=True)
         z = z[win]
         ph = np.angle(z * np.exp(-1j * np.angle(np.mean(ref))))
         lo, hi = np.percentile(np.angle(ref * np.exp(-1j * np.angle(np.mean(ref)))), [1, 99])
         axs[0, j].imshow(np.abs(z), cmap="gray", vmin=np.percentile(np.abs(ref), 1), vmax=np.percentile(np.abs(ref), 99))
         axs[1, j].imshow(ph, cmap="twilight", vmin=lo, vmax=hi)
-        title = {"dense": f"all {ex['leds_full']} LEDs (reference)", "physics": f"physics, {ex['leds']} LEDs"}.get(name, name)
+        title = {"dense": f"all {ex['leds_full']} LEDs (reference)", "physics": f"physics, {ex['leds']} LEDs",
+                 "v2": "M3 model (no FPM training)", "fpm_v1": "FPM model (AI only)"}.get(name, name)
+        if name.startswith("physics+"):
+            title = f"physics + {name.split('+')[1]} passes"
+        elif name.startswith("hybrid@"):
+            title = f"hybrid: AI + {name.split('@')[1]} passes"
         axs[0, j].set_title(title, fontsize=10)
         for i in range(2):
             axs[i, j].set_axis_off()
@@ -228,17 +233,19 @@ def main(argv=None):
     for spec in a.model:
         n, ck = spec.split("=", 1)
         models[n] = TorchTiled(ck)
-    rows, examples = [], []
-    for spec in a.data:
-        d, mode = spec.rsplit(":", 1)
-        r, e = eval_dataset(Path(d), mode, models, a.hybrid_model, a.hybrid)
-        rows += r; examples += e
-    summary = write_summary(out, rows, [p.split(",") for p in a.repeat])
     hmax = max(a.hybrid) if a.hybrid else None
     methods = ["physics"] + ([f"physics+{hmax}"] if hmax else []) + list(models) + \
         ([f"hybrid@{hmax}"] if (hmax and a.hybrid_model) else [])
-    for ex in examples:
-        save_example_figure(ex, [m for m in methods if m in ex], out / f"fig_{ex['case'].replace('/', '_')}.png")
+    rows = []
+    for spec in a.data:
+        d, mode = spec.rsplit(":", 1)
+        r, examples = eval_dataset(Path(d), mode, models, a.hybrid_model, a.hybrid)
+        rows += r
+        write_summary(out, rows, [])            # partial results are kept if a later dataset fails
+        for ex in examples:                     # figures now, so the full-size arrays are not kept in memory
+            save_example_figure(ex, [m for m in methods if m in ex], out / f"fig_{ex['case'].replace('/', '_')}.png")
+        del examples
+    summary = write_summary(out, rows, [p.split(",") for p in a.repeat])
     print(json.dumps(summary["overall"], indent=1, default=float))
 
 

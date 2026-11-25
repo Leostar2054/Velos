@@ -1,0 +1,61 @@
+{
+  "data": {
+    "root": "data/synthetic_v2",
+    "crop": 128,
+    "limit_train": 48,
+    "norm": "median_ramp",
+    "target_frame": "input",
+    "preload": true,
+    "real": {
+      "root": [
+        "data/fpm/blood_222619",
+        "data/fpm/blood_223858",
+        "data/fpm/blood_225108",
+        "data/fpm/leaf_214040",
+        "data/fpm/leaf_215808"
+      ],
+      "subsets": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "col_range": [
+        0.0,
+        0.65
+      ],
+      "n_per_epoch": 480,
+      "crop": 128,
+      "register": false
+    }
+  },
+  "model": {
+    "base": 32,
+    "depth": 4,
+    "residual": true
+  },
+  "train": {
+    "epochs": 10,
+    "batch_size": 8,
+    "lr": 0.0003,
+    "weight_decay": 0.0001,
+    "seed": 1,
+    "num_workers": 0,
+    "loss": "phase_aware",
+    "w_phase": 1.0,
+    "w_grad": 0.5,
+    "init_from": "runs/refine_v2/best.pt",
+    "pct_start": 0.1,
+    "select": "last"
+  },
+  "name": "refine_fpm_v1",
+  "_resolved": {
+    "device": "cpu",
+    "n_train": 2448,
+    "n_val": 25,
+    "n_train_synthetic": 48,
+    "n_train_real_per_epoch": 2400,
+    "params": 7766018,
+    "torch": "2.14.1+cu130"
+  }
+}

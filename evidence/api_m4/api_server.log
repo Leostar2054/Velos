@@ -1,0 +1,243 @@
+INFO:     Started server process [14660]
+INFO:     Waiting for application startup.
+2026-11-25 18:13:36,698 INFO velos.api: Velos API 0.4.0 ready · storage=/home/claude/work/demo_m4_storage
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8010 (Press CTRL+C to quit)
+2026-11-25 18:13:37,731 INFO velos.api: GET /health → 200 (19 ms)
+INFO:     127.0.0.1:40658 - "GET /health HTTP/1.1" 200 OK
+2026-11-25 18:13:37,759 INFO velos.api: GET /health → 200 (7 ms)
+INFO:     127.0.0.1:40668 - "GET /health HTTP/1.1" 200 OK
+2026-11-25 18:13:37,837 INFO velos.api: GET /api/v1/models → 200 (9 ms)
+INFO:     127.0.0.1:40682 - "GET /api/v1/models HTTP/1.1" 200 OK
+2026-11-25 18:13:38,091 INFO velos.api: dataset 5d624c5419944c49 uploaded by demo (7187787 bytes, 225 patterns)
+2026-11-25 18:13:38,092 INFO velos.api: POST /api/v1/datasets → 201 (184 ms)
+INFO:     127.0.0.1:40690 - "POST /api/v1/datasets HTTP/1.1" 201 Created
+2026-11-25 18:13:38,254 INFO velos.api: job db12298ebedb48fd queued by demo on dataset 5d624c5419944c49
+2026-11-25 18:13:38,259 INFO velos.api: POST /api/v1/jobs → 202 (18 ms)
+INFO:     127.0.0.1:40692 - "POST /api/v1/jobs HTTP/1.1" 202 Accepted
+2026-11-25 18:13:38,428 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd → 200 (2 ms)
+INFO:     127.0.0.1:40708 - "GET /api/v1/jobs/db12298ebedb48fd HTTP/1.1" 200 OK
+2026-11-25 18:13:39,526 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd → 200 (3 ms)
+INFO:     127.0.0.1:40712 - "GET /api/v1/jobs/db12298ebedb48fd HTTP/1.1" 200 OK
+2026-11-25 18:13:40,697 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd → 200 (2 ms)
+INFO:     127.0.0.1:40724 - "GET /api/v1/jobs/db12298ebedb48fd HTTP/1.1" 200 OK
+2026-11-25 18:13:41,865 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd → 200 (9 ms)
+INFO:     127.0.0.1:40736 - "GET /api/v1/jobs/db12298ebedb48fd HTTP/1.1" 200 OK
+2026-11-25 18:13:43,025 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd → 200 (2 ms)
+INFO:     127.0.0.1:40748 - "GET /api/v1/jobs/db12298ebedb48fd HTTP/1.1" 200 OK
+2026-11-25 18:13:44,240 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd → 200 (5 ms)
+INFO:     127.0.0.1:58020 - "GET /api/v1/jobs/db12298ebedb48fd HTTP/1.1" 200 OK
+2026-11-25 18:13:45,409 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd → 200 (2 ms)
+INFO:     127.0.0.1:58032 - "GET /api/v1/jobs/db12298ebedb48fd HTTP/1.1" 200 OK
+2026-11-25 18:13:46,607 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd → 200 (5 ms)
+INFO:     127.0.0.1:58044 - "GET /api/v1/jobs/db12298ebedb48fd HTTP/1.1" 200 OK
+2026-11-25 18:13:47,778 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd → 200 (2 ms)
+INFO:     127.0.0.1:58046 - "GET /api/v1/jobs/db12298ebedb48fd HTTP/1.1" 200 OK
+2026-11-25 18:13:48,926 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd → 200 (2 ms)
+INFO:     127.0.0.1:58048 - "GET /api/v1/jobs/db12298ebedb48fd HTTP/1.1" 200 OK
+2026-11-25 18:13:50,077 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd → 200 (2 ms)
+INFO:     127.0.0.1:58056 - "GET /api/v1/jobs/db12298ebedb48fd HTTP/1.1" 200 OK
+2026-11-25 18:13:51,241 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd → 200 (2 ms)
+INFO:     127.0.0.1:58064 - "GET /api/v1/jobs/db12298ebedb48fd HTTP/1.1" 200 OK
+2026-11-25 18:13:52,395 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd → 200 (7 ms)
+INFO:     127.0.0.1:58080 - "GET /api/v1/jobs/db12298ebedb48fd HTTP/1.1" 200 OK
+2026-11-25 18:13:53,541 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd → 200 (2 ms)
+INFO:     127.0.0.1:58088 - "GET /api/v1/jobs/db12298ebedb48fd HTTP/1.1" 200 OK
+2026-11-25 18:13:54,740 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd → 200 (2 ms)
+INFO:     127.0.0.1:35252 - "GET /api/v1/jobs/db12298ebedb48fd HTTP/1.1" 200 OK
+2026-11-25 18:13:55,919 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd → 200 (2 ms)
+INFO:     127.0.0.1:35254 - "GET /api/v1/jobs/db12298ebedb48fd HTTP/1.1" 200 OK
+2026-11-25 18:13:57,084 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd → 200 (5 ms)
+INFO:     127.0.0.1:35268 - "GET /api/v1/jobs/db12298ebedb48fd HTTP/1.1" 200 OK
+2026-11-25 18:13:58,241 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd → 200 (2 ms)
+INFO:     127.0.0.1:35272 - "GET /api/v1/jobs/db12298ebedb48fd HTTP/1.1" 200 OK
+2026-11-25 18:13:59,411 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd → 200 (6 ms)
+INFO:     127.0.0.1:35284 - "GET /api/v1/jobs/db12298ebedb48fd HTTP/1.1" 200 OK
+2026-11-25 18:13:59,563 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd/result → 200 (2 ms)
+INFO:     127.0.0.1:35290 - "GET /api/v1/jobs/db12298ebedb48fd/result HTTP/1.1" 200 OK
+2026-11-25 18:13:59,621 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd/artifacts/preview.png → 200 (7 ms)
+INFO:     127.0.0.1:35292 - "GET /api/v1/jobs/db12298ebedb48fd/artifacts/preview.png HTTP/1.1" 200 OK
+2026-11-25 18:13:59,632 INFO velos.api: GET /api/v1/jobs/db12298ebedb48fd/artifacts/result.npz → 200 (2 ms)
+INFO:     127.0.0.1:35304 - "GET /api/v1/jobs/db12298ebedb48fd/artifacts/result.npz HTTP/1.1" 200 OK
+2026-11-25 18:13:59,652 INFO velos.api: job e7931e856c314387 queued by demo on dataset 5d624c5419944c49
+2026-11-25 18:13:59,653 INFO velos.api: POST /api/v1/jobs → 202 (4 ms)
+INFO:     127.0.0.1:35308 - "POST /api/v1/jobs HTTP/1.1" 202 Accepted
+2026-11-25 18:13:59,730 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (2 ms)
+INFO:     127.0.0.1:35310 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:00,893 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (2 ms)
+INFO:     127.0.0.1:35326 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:02,050 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (2 ms)
+INFO:     127.0.0.1:35330 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:03,228 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (11 ms)
+INFO:     127.0.0.1:35342 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:04,446 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (2 ms)
+INFO:     127.0.0.1:50492 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:05,623 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (8 ms)
+INFO:     127.0.0.1:50508 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:06,791 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (2 ms)
+INFO:     127.0.0.1:50522 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:07,970 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (2 ms)
+INFO:     127.0.0.1:50526 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:09,145 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (2 ms)
+INFO:     127.0.0.1:50534 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:10,308 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (9 ms)
+INFO:     127.0.0.1:50538 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:11,524 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (2 ms)
+INFO:     127.0.0.1:50546 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:12,703 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (6 ms)
+INFO:     127.0.0.1:50550 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:13,920 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (9 ms)
+INFO:     127.0.0.1:50560 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:15,120 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (5 ms)
+INFO:     127.0.0.1:59984 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:16,349 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (2 ms)
+INFO:     127.0.0.1:59992 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:17,533 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (2 ms)
+INFO:     127.0.0.1:60000 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:18,749 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (5 ms)
+INFO:     127.0.0.1:60016 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:19,887 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (2 ms)
+INFO:     127.0.0.1:60022 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:21,093 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (2 ms)
+INFO:     127.0.0.1:60038 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:22,301 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (2 ms)
+INFO:     127.0.0.1:60042 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:23,496 INFO velos.api: GET /api/v1/jobs/e7931e856c314387 → 200 (7 ms)
+INFO:     127.0.0.1:60052 - "GET /api/v1/jobs/e7931e856c314387 HTTP/1.1" 200 OK
+2026-11-25 18:14:23,639 INFO velos.api: GET /api/v1/jobs/e7931e856c314387/result → 200 (2 ms)
+INFO:     127.0.0.1:60068 - "GET /api/v1/jobs/e7931e856c314387/result HTTP/1.1" 200 OK
+2026-11-25 18:14:23,678 INFO velos.api: GET /api/v1/jobs/e7931e856c314387/artifacts/comparison_ml.png → 200 (2 ms)
+INFO:     127.0.0.1:60078 - "GET /api/v1/jobs/e7931e856c314387/artifacts/comparison_ml.png HTTP/1.1" 200 OK
+2026-11-25 18:14:23,705 INFO velos.api: GET /api/v1/jobs/e7931e856c314387/artifacts/preview.png → 200 (2 ms)
+INFO:     127.0.0.1:60082 - "GET /api/v1/jobs/e7931e856c314387/artifacts/preview.png HTTP/1.1" 200 OK
+2026-11-25 18:14:23,743 INFO velos.api: GET /api/v1/jobs/e7931e856c314387/artifacts/refined_preview.png → 200 (5 ms)
+INFO:     127.0.0.1:60084 - "GET /api/v1/jobs/e7931e856c314387/artifacts/refined_preview.png HTTP/1.1" 200 OK
+2026-11-25 18:14:23,768 INFO velos.api: GET /api/v1/jobs/e7931e856c314387/artifacts/hybrid_preview.png → 200 (4 ms)
+INFO:     127.0.0.1:60086 - "GET /api/v1/jobs/e7931e856c314387/artifacts/hybrid_preview.png HTTP/1.1" 200 OK
+2026-11-25 18:14:23,796 INFO velos.api: GET /api/v1/jobs/e7931e856c314387/artifacts/convergence.png → 200 (4 ms)
+INFO:     127.0.0.1:60094 - "GET /api/v1/jobs/e7931e856c314387/artifacts/convergence.png HTTP/1.1" 200 OK
+2026-11-25 18:14:23,819 INFO velos.api: GET /api/v1/jobs/e7931e856c314387/artifacts/result.npz → 200 (3 ms)
+INFO:     127.0.0.1:60104 - "GET /api/v1/jobs/e7931e856c314387/artifacts/result.npz HTTP/1.1" 200 OK
+2026-11-25 18:14:23,856 INFO velos.api: GET /api/v1/jobs/e7931e856c314387/artifacts/refined.npz → 200 (4 ms)
+INFO:     127.0.0.1:60114 - "GET /api/v1/jobs/e7931e856c314387/artifacts/refined.npz HTTP/1.1" 200 OK
+2026-11-25 18:14:23,892 INFO velos.api: GET /api/v1/jobs/e7931e856c314387/artifacts/hybrid.npz → 200 (4 ms)
+INFO:     127.0.0.1:60120 - "GET /api/v1/jobs/e7931e856c314387/artifacts/hybrid.npz HTTP/1.1" 200 OK
+2026-11-25 18:14:23,924 INFO velos.api: GET /api/v1/jobs/e7931e856c314387/artifacts/summary.json → 200 (4 ms)
+INFO:     127.0.0.1:60136 - "GET /api/v1/jobs/e7931e856c314387/artifacts/summary.json HTTP/1.1" 200 OK
+2026-11-25 18:14:23,958 INFO velos.api: GET /health → 200 (2 ms)
+INFO:     127.0.0.1:60138 - "GET /health HTTP/1.1" 200 OK
+2026-11-25 18:14:24,029 INFO velos.api: GET /api/v1/models → 200 (2 ms)
+INFO:     127.0.0.1:38752 - "GET /api/v1/models HTTP/1.1" 200 OK
+2026-11-25 18:14:24,336 INFO velos.api: dataset 056ff76ebec94e41 uploaded by demo (8070901 bytes, 225 patterns)
+2026-11-25 18:14:24,337 INFO velos.api: POST /api/v1/datasets → 201 (238 ms)
+INFO:     127.0.0.1:38756 - "POST /api/v1/datasets HTTP/1.1" 201 Created
+2026-11-25 18:14:24,480 INFO velos.api: job 348a4d4abca745d6 queued by demo on dataset 056ff76ebec94e41
+2026-11-25 18:14:24,481 INFO velos.api: POST /api/v1/jobs → 202 (8 ms)
+INFO:     127.0.0.1:38766 - "POST /api/v1/jobs HTTP/1.1" 202 Accepted
+2026-11-25 18:14:24,631 INFO velos.api: GET /api/v1/jobs/348a4d4abca745d6 → 200 (7 ms)
+INFO:     127.0.0.1:38768 - "GET /api/v1/jobs/348a4d4abca745d6 HTTP/1.1" 200 OK
+2026-11-25 18:14:25,829 INFO velos.api: GET /api/v1/jobs/348a4d4abca745d6 → 200 (2 ms)
+INFO:     127.0.0.1:38782 - "GET /api/v1/jobs/348a4d4abca745d6 HTTP/1.1" 200 OK
+2026-11-25 18:14:26,977 INFO velos.api: GET /api/v1/jobs/348a4d4abca745d6 → 200 (2 ms)
+INFO:     127.0.0.1:38790 - "GET /api/v1/jobs/348a4d4abca745d6 HTTP/1.1" 200 OK
+2026-11-25 18:14:28,121 INFO velos.api: GET /api/v1/jobs/348a4d4abca745d6 → 200 (2 ms)
+INFO:     127.0.0.1:38798 - "GET /api/v1/jobs/348a4d4abca745d6 HTTP/1.1" 200 OK
+2026-11-25 18:14:29,298 INFO velos.api: GET /api/v1/jobs/348a4d4abca745d6 → 200 (2 ms)
+INFO:     127.0.0.1:38806 - "GET /api/v1/jobs/348a4d4abca745d6 HTTP/1.1" 200 OK
+2026-11-25 18:14:30,465 INFO velos.api: GET /api/v1/jobs/348a4d4abca745d6 → 200 (2 ms)
+INFO:     127.0.0.1:38818 - "GET /api/v1/jobs/348a4d4abca745d6 HTTP/1.1" 200 OK
+2026-11-25 18:14:31,648 INFO velos.api: GET /api/v1/jobs/348a4d4abca745d6 → 200 (5 ms)
+INFO:     127.0.0.1:38832 - "GET /api/v1/jobs/348a4d4abca745d6 HTTP/1.1" 200 OK
+2026-11-25 18:14:32,824 INFO velos.api: GET /api/v1/jobs/348a4d4abca745d6 → 200 (7 ms)
+INFO:     127.0.0.1:38846 - "GET /api/v1/jobs/348a4d4abca745d6 HTTP/1.1" 200 OK
+2026-11-25 18:14:33,971 INFO velos.api: GET /api/v1/jobs/348a4d4abca745d6 → 200 (2 ms)
+INFO:     127.0.0.1:38856 - "GET /api/v1/jobs/348a4d4abca745d6 HTTP/1.1" 200 OK
+2026-11-25 18:14:35,149 INFO velos.api: GET /api/v1/jobs/348a4d4abca745d6 → 200 (2 ms)
+INFO:     127.0.0.1:51468 - "GET /api/v1/jobs/348a4d4abca745d6 HTTP/1.1" 200 OK
+2026-11-25 18:14:36,327 INFO velos.api: GET /api/v1/jobs/348a4d4abca745d6 → 200 (2 ms)
+INFO:     127.0.0.1:51478 - "GET /api/v1/jobs/348a4d4abca745d6 HTTP/1.1" 200 OK
+2026-11-25 18:14:37,478 INFO velos.api: GET /api/v1/jobs/348a4d4abca745d6 → 200 (2 ms)
+INFO:     127.0.0.1:51492 - "GET /api/v1/jobs/348a4d4abca745d6 HTTP/1.1" 200 OK
+2026-11-25 18:14:38,631 INFO velos.api: GET /api/v1/jobs/348a4d4abca745d6 → 200 (2 ms)
+INFO:     127.0.0.1:51504 - "GET /api/v1/jobs/348a4d4abca745d6 HTTP/1.1" 200 OK
+2026-11-25 18:14:39,800 INFO velos.api: GET /api/v1/jobs/348a4d4abca745d6 → 200 (2 ms)
+INFO:     127.0.0.1:51512 - "GET /api/v1/jobs/348a4d4abca745d6 HTTP/1.1" 200 OK
+2026-11-25 18:14:40,973 INFO velos.api: GET /api/v1/jobs/348a4d4abca745d6 → 200 (2 ms)
+INFO:     127.0.0.1:51514 - "GET /api/v1/jobs/348a4d4abca745d6 HTTP/1.1" 200 OK
+2026-11-25 18:14:42,131 INFO velos.api: GET /api/v1/jobs/348a4d4abca745d6 → 200 (6 ms)
+INFO:     127.0.0.1:51530 - "GET /api/v1/jobs/348a4d4abca745d6 HTTP/1.1" 200 OK
+2026-11-25 18:14:43,295 INFO velos.api: GET /api/v1/jobs/348a4d4abca745d6 → 200 (2 ms)
+INFO:     127.0.0.1:51532 - "GET /api/v1/jobs/348a4d4abca745d6 HTTP/1.1" 200 OK
+2026-11-25 18:14:43,440 INFO velos.api: GET /api/v1/jobs/348a4d4abca745d6/result → 200 (7 ms)
+INFO:     127.0.0.1:51536 - "GET /api/v1/jobs/348a4d4abca745d6/result HTTP/1.1" 200 OK
+2026-11-25 18:14:43,518 INFO velos.api: GET /api/v1/jobs/348a4d4abca745d6/artifacts/preview.png → 200 (2 ms)
+INFO:     127.0.0.1:51546 - "GET /api/v1/jobs/348a4d4abca745d6/artifacts/preview.png HTTP/1.1" 200 OK
+2026-11-25 18:14:43,539 INFO velos.api: GET /api/v1/jobs/348a4d4abca745d6/artifacts/result.npz → 200 (4 ms)
+INFO:     127.0.0.1:51552 - "GET /api/v1/jobs/348a4d4abca745d6/artifacts/result.npz HTTP/1.1" 200 OK
+2026-11-25 18:14:43,580 INFO velos.api: job 9e3bd431b1ea4243 queued by demo on dataset 056ff76ebec94e41
+2026-11-25 18:14:43,580 INFO velos.api: POST /api/v1/jobs → 202 (12 ms)
+INFO:     127.0.0.1:51568 - "POST /api/v1/jobs HTTP/1.1" 202 Accepted
+2026-11-25 18:14:43,740 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243 → 200 (4 ms)
+INFO:     127.0.0.1:51584 - "GET /api/v1/jobs/9e3bd431b1ea4243 HTTP/1.1" 200 OK
+2026-11-25 18:14:44,923 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243 → 200 (2 ms)
+INFO:     127.0.0.1:55548 - "GET /api/v1/jobs/9e3bd431b1ea4243 HTTP/1.1" 200 OK
+2026-11-25 18:14:46,102 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243 → 200 (2 ms)
+INFO:     127.0.0.1:55562 - "GET /api/v1/jobs/9e3bd431b1ea4243 HTTP/1.1" 200 OK
+2026-11-25 18:14:47,323 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243 → 200 (10 ms)
+INFO:     127.0.0.1:55578 - "GET /api/v1/jobs/9e3bd431b1ea4243 HTTP/1.1" 200 OK
+2026-11-25 18:14:48,486 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243 → 200 (2 ms)
+INFO:     127.0.0.1:55592 - "GET /api/v1/jobs/9e3bd431b1ea4243 HTTP/1.1" 200 OK
+2026-11-25 18:14:49,653 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243 → 200 (2 ms)
+INFO:     127.0.0.1:55606 - "GET /api/v1/jobs/9e3bd431b1ea4243 HTTP/1.1" 200 OK
+2026-11-25 18:14:50,827 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243 → 200 (7 ms)
+INFO:     127.0.0.1:55622 - "GET /api/v1/jobs/9e3bd431b1ea4243 HTTP/1.1" 200 OK
+2026-11-25 18:14:51,982 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243 → 200 (2 ms)
+INFO:     127.0.0.1:55628 - "GET /api/v1/jobs/9e3bd431b1ea4243 HTTP/1.1" 200 OK
+2026-11-25 18:14:53,181 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243 → 200 (2 ms)
+INFO:     127.0.0.1:55636 - "GET /api/v1/jobs/9e3bd431b1ea4243 HTTP/1.1" 200 OK
+2026-11-25 18:14:54,329 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243 → 200 (2 ms)
+INFO:     127.0.0.1:52384 - "GET /api/v1/jobs/9e3bd431b1ea4243 HTTP/1.1" 200 OK
+2026-11-25 18:14:55,529 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243 → 200 (2 ms)
+INFO:     127.0.0.1:52398 - "GET /api/v1/jobs/9e3bd431b1ea4243 HTTP/1.1" 200 OK
+2026-11-25 18:14:56,809 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243 → 200 (2 ms)
+INFO:     127.0.0.1:52412 - "GET /api/v1/jobs/9e3bd431b1ea4243 HTTP/1.1" 200 OK
+2026-11-25 18:14:58,000 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243 → 200 (4 ms)
+INFO:     127.0.0.1:52428 - "GET /api/v1/jobs/9e3bd431b1ea4243 HTTP/1.1" 200 OK
+2026-11-25 18:14:59,195 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243 → 200 (8 ms)
+INFO:     127.0.0.1:52430 - "GET /api/v1/jobs/9e3bd431b1ea4243 HTTP/1.1" 200 OK
+2026-11-25 18:15:00,445 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243 → 200 (2 ms)
+INFO:     127.0.0.1:52440 - "GET /api/v1/jobs/9e3bd431b1ea4243 HTTP/1.1" 200 OK
+2026-11-25 18:15:01,608 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243 → 200 (5 ms)
+INFO:     127.0.0.1:52444 - "GET /api/v1/jobs/9e3bd431b1ea4243 HTTP/1.1" 200 OK
+2026-11-25 18:15:02,767 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243 → 200 (2 ms)
+INFO:     127.0.0.1:52456 - "GET /api/v1/jobs/9e3bd431b1ea4243 HTTP/1.1" 200 OK
+2026-11-25 18:15:03,931 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243 → 200 (2 ms)
+INFO:     127.0.0.1:52470 - "GET /api/v1/jobs/9e3bd431b1ea4243 HTTP/1.1" 200 OK
+2026-11-25 18:15:05,085 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243 → 200 (2 ms)
+INFO:     127.0.0.1:35128 - "GET /api/v1/jobs/9e3bd431b1ea4243 HTTP/1.1" 200 OK
+2026-11-25 18:15:06,247 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243 → 200 (4 ms)
+INFO:     127.0.0.1:35144 - "GET /api/v1/jobs/9e3bd431b1ea4243 HTTP/1.1" 200 OK
+2026-11-25 18:15:06,403 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243/result → 200 (3 ms)
+INFO:     127.0.0.1:35152 - "GET /api/v1/jobs/9e3bd431b1ea4243/result HTTP/1.1" 200 OK
+2026-11-25 18:15:06,455 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243/artifacts/comparison_ml.png → 200 (3 ms)
+INFO:     127.0.0.1:35166 - "GET /api/v1/jobs/9e3bd431b1ea4243/artifacts/comparison_ml.png HTTP/1.1" 200 OK
+2026-11-25 18:15:06,484 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243/artifacts/preview.png → 200 (3 ms)
+INFO:     127.0.0.1:35172 - "GET /api/v1/jobs/9e3bd431b1ea4243/artifacts/preview.png HTTP/1.1" 200 OK
+2026-11-25 18:15:06,516 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243/artifacts/refined_preview.png → 200 (4 ms)
+INFO:     127.0.0.1:35188 - "GET /api/v1/jobs/9e3bd431b1ea4243/artifacts/refined_preview.png HTTP/1.1" 200 OK
+2026-11-25 18:15:06,544 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243/artifacts/hybrid_preview.png → 200 (3 ms)
+INFO:     127.0.0.1:35202 - "GET /api/v1/jobs/9e3bd431b1ea4243/artifacts/hybrid_preview.png HTTP/1.1" 200 OK
+2026-11-25 18:15:06,576 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243/artifacts/convergence.png → 200 (6 ms)
+INFO:     127.0.0.1:35218 - "GET /api/v1/jobs/9e3bd431b1ea4243/artifacts/convergence.png HTTP/1.1" 200 OK
+2026-11-25 18:15:06,607 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243/artifacts/result.npz → 200 (3 ms)
+INFO:     127.0.0.1:35232 - "GET /api/v1/jobs/9e3bd431b1ea4243/artifacts/result.npz HTTP/1.1" 200 OK
+2026-11-25 18:15:06,651 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243/artifacts/refined.npz → 200 (4 ms)
+INFO:     127.0.0.1:35242 - "GET /api/v1/jobs/9e3bd431b1ea4243/artifacts/refined.npz HTTP/1.1" 200 OK
+2026-11-25 18:15:06,691 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243/artifacts/hybrid.npz → 200 (6 ms)
+INFO:     127.0.0.1:35248 - "GET /api/v1/jobs/9e3bd431b1ea4243/artifacts/hybrid.npz HTTP/1.1" 200 OK
+2026-11-25 18:15:06,724 INFO velos.api: GET /api/v1/jobs/9e3bd431b1ea4243/artifacts/summary.json → 200 (7 ms)
+INFO:     127.0.0.1:35256 - "GET /api/v1/jobs/9e3bd431b1ea4243/artifacts/summary.json HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [14660]

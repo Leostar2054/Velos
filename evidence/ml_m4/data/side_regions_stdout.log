@@ -1,0 +1,17 @@
+[leaf_214040_L512] geometry from data/fpm/leaf_214040/meta.json: z 55.00 mm, axis (+0.00, +0.00) mm; patch centre (320.5, 540.5) px
+[leaf_214040_L512] dense: 220 LEDs, residual 0.2500, 76 s
+[leaf_214040_L512] sub_00: fraction 0.30 draw 0: 73 LEDs, residual 0.2779, prediction error 0.4503, 26 s
+[leaf_214040_L512] sub_01: fraction 0.50 draw 0: 116 LEDs, residual 0.2648, prediction error 0.4313, 40 s
+[blood_222619_L512] geometry from data/fpm/blood_222619/meta.json: z 59.40 mm, axis (-0.70, -0.23) mm; patch centre (320.5, 540.5) px
+[blood_222619_L512] dense: 219 LEDs, residual 0.2311, 72 s
+[blood_222619_L512] sub_00: fraction 0.30 draw 0: 73 LEDs, residual 0.2278, prediction error 0.4576, 25 s
+[blood_222619_L512] sub_01: fraction 0.50 draw 0: 115 LEDs, residual 0.2272, prediction error 0.4199, 41 s
+[leaf_214040_R512] geometry from data/fpm/leaf_214040/meta.json: z 55.00 mm, axis (+0.00, +0.00) mm; patch centre (1600.5, 540.5) px
+[leaf_214040_R512] dense: 220 LEDs, residual 0.2400, 75 s
+[leaf_214040_R512] sub_00: fraction 0.30 draw 0: 74 LEDs, residual 0.2672, prediction error 0.4459, 26 s
+[leaf_214040_R512] sub_01: fraction 0.50 draw 0: 114 LEDs, residual 0.2540, prediction error 0.4379, 38 s
+[blood_222619_R512] geometry from data/fpm/blood_222619/meta.json: z 59.40 mm, axis (-0.70, -0.23) mm; patch centre (1600.5, 540.5) px
+[blood_222619_R512] dense: 218 LEDs, residual 0.2659, 71 s
+[blood_222619_R512] sub_00: fraction 0.30 draw 0: 73 LEDs, residual 0.2640, prediction error 0.4936, 23 s
+[blood_222619_R512] sub_01: fraction 0.50 draw 0: 114 LEDs, residual 0.2625, prediction error 0.4946, 38 s
+SIDE_REGIONS_DONE

@@ -1,0 +1,207 @@
+{
+  "dataset": {
+    "modality": "fpm",
+    "name": "leaf_214040",
+    "n_frames": 225,
+    "frame_shape": [
+      1080,
+      1920
+    ],
+    "stored_region": [
+      460,
+      1056,
+      160,
+      160
+    ],
+    "led_pitch_mm": 3.0,
+    "led_to_sample_mm": 60.0,
+    "led_color": "GREEN",
+    "camera": "Thorlabs CS2100M-USB",
+    "exposure_us": [
+      1000000.0
+    ],
+    "defaults": {
+      "lambda_um": 0.633,
+      "objective_NA": 0.1,
+      "camera_pixel_um": 5.04,
+      "magnification": 4.0,
+      "z_source_mm": 55.0,
+      "led_pitch_mm": 3.0,
+      "optical_axis_x_mm": 0.0,
+      "optical_axis_y_mm": 0.0,
+      "swap_led_xy": false,
+      "led_x_sign": 1,
+      "led_y_sign": -1,
+      "n_warmup": 2,
+      "n_passes": 24,
+      "Np": 160,
+      "crop_center_x_px": 1136.5,
+      "crop_center_y_px": 540.5
+    }
+  },
+  "reconstruction": {
+    "modality": "fpm",
+    "config": {
+      "lambda_um": 0.633,
+      "objective_NA": 0.1,
+      "camera_pixel_um": 5.04,
+      "magnification": 4.0,
+      "z_source_mm": 55.0,
+      "led_pitch_mm": 3.0,
+      "optical_axis_x_mm": 0.0,
+      "optical_axis_y_mm": 0.0,
+      "swap_led_xy": false,
+      "led_x_sign": 1,
+      "led_y_sign": -1,
+      "pupil_distance_mm": "inf",
+      "defocus_um": 0.0,
+      "Np": 160,
+      "crop_center_x_px": 1136.5,
+      "crop_center_y_px": 540.5,
+      "background_offset": null,
+      "saturation_level": 65535.0,
+      "normalize_exposure": true,
+      "remove_hot_pixels": true,
+      "skip_clipped_frames": true,
+      "clipped_fraction": 0.6,
+      "skip_transition_frames": true,
+      "transition_band": 0.1,
+      "max_illumination_NA": "inf",
+      "algorithms": [
+        "EPRY"
+      ],
+      "n_passes": 24,
+      "n_warmup": 2,
+      "rpie_alpha": 0.5,
+      "rpie_beta": 0.5,
+      "intensity_correction": true,
+      "intensity_limit": 3.0,
+      "init_spherical_phase": true,
+      "upsample": 3,
+      "geometry_check": "off",
+      "precision": "single"
+    },
+    "patch": {
+      "Np": 160,
+      "row_start_1": 461,
+      "col_start_1": 1057,
+      "cx": 1136.5,
+      "cy": 540.5,
+      "patch_x_mm": 0.22175999999999998,
+      "patch_y_mm": 0.0,
+      "background_offset": 162.0,
+      "hot_pixels": 471,
+      "dataset": "leaf_214040"
+    },
+    "N_obj": 480,
+    "pixel_um": 0.42,
+    "raw_pixel_um": 1.26,
+    "synthetic_NA": 0.5770741116658369,
+    "frames_used": 74,
+    "n_bright": 15,
+    "resolution_um": {
+      "raw": 6.33,
+      "synthetic": 1.0969128352902926
+    },
+    "algorithms": [
+      {
+        "name": "EPRY",
+        "final_residual": 0.2372672140882821,
+        "time_s": 3.99,
+        "passes": 26
+      }
+    ],
+    "transition_leds": {
+      "pixel_x": [
+        30.0,
+        28.0,
+        28.0
+      ],
+      "pixel_y": [
+        52.0,
+        54.0,
+        50.0
+      ],
+      "direct_beam": [
+        null,
+        null,
+        null
+      ],
+      "used": false
+    },
+    "geometry_check": {
+      "done": false
+    },
+    "notes": [
+      "run_info.json says led_to_sample_mm = 60.0, this run uses z_source_mm = 55.0.",
+      "3 LED(s) are within 10 % of the objective NA (bright/dark transition): (30,52) (28,54) (28,50). They are NOT used (skip_transition_frames = false keeps them)."
+    ],
+    "total_s": 4.06,
+    "primary": "EPRY",
+    "flatten": {
+      "kappa": 4.692311302216552e-05,
+      "fr": 0.0,
+      "fc": 0.0,
+      "pixel_um": 0.42,
+      "phase0": 0.3076471181588577
+    },
+    "data_error_normalised": 0.22438950071731123,
+    "reduced_leds": {
+      "fraction_darkfield_kept": 0.3,
+      "leds_used": 74,
+      "leds_available": 222
+    },
+    "prediction_error_unused_frames": 0.5125494811256928
+  },
+  "files": {
+    "EPRY_amplitude": "EPRY_amplitude.tif",
+    "EPRY_phase": "EPRY_phase.tif",
+    "result_npz": "result.npz",
+    "frames_csv": "frames.csv",
+    "summary_txt": "summary.txt",
+    "comparison": "comparison.png",
+    "amplitude": "amplitude.png",
+    "phase": "phase.png",
+    "preview": "preview.png",
+    "convergence": "convergence.png",
+    "log": "fpm_log.txt"
+  },
+  "elapsed_s": 11.16,
+  "ml_refinement": {
+    "applied": true,
+    "model": "velos-refine-fpm-v1",
+    "model_name": "velos-refine-fpm",
+    "model_version": "1.0.0",
+    "runtime": "onnxruntime (CPUExecutionProvider)",
+    "elapsed_s": 3.814,
+    "data_error": {
+      "physics": 0.22324794820379382,
+      "ml": 0.23109141807076863,
+      "hybrid": 0.20181500526045948
+    },
+    "files": {
+      "amplitude": "refined_amplitude.png",
+      "phase": "refined_phase.png",
+      "preview": "refined_preview.png",
+      "refined_npz": "refined.npz",
+      "comparison_ml": "comparison_ml.png"
+    },
+    "prediction_error_unused_frames": {
+      "physics": 0.5125494811256928,
+      "ml": 0.5648030895904439,
+      "hybrid": 0.50390305178884
+    },
+    "hybrid": {
+      "passes": 10,
+      "elapsed_s": 1.47,
+      "files": {
+        "amplitude": "hybrid_amplitude.png",
+        "phase": "hybrid_phase.png",
+        "preview": "hybrid_preview.png",
+        "hybrid_npz": "hybrid.npz"
+      }
+    },
+    "data_error_ratio": 0.9039948939473832,
+    "consistency": "ok"
+  }
+}

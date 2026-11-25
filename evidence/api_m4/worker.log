@@ -1,0 +1,9 @@
+2026-11-25 18:13:36,600 INFO velos.worker: worker started (storage=/home/claude/work/demo_m4_storage, poll=1.0s)
+2026-11-25 18:13:38,669 INFO velos.worker: job db12298ebedb48fd: start ({'dataset_id': '5d624c5419944c49', 'engine': 'fpm', 'iters': 24, 'seed': 0, 'crop': None, 'sparse_every': 1, 'engine_params': {}, 'sparse_fraction': None, 'refine_ml': False, 'model': None, 'hybrid_iters': 0, 'fpm': {}, 'probe_from_job': None})
+2026-11-25 18:13:58,292 INFO velos.worker: job db12298ebedb48fd: FPM succeeded in 19.4s
+2026-11-25 18:14:00,303 INFO velos.worker: job e7931e856c314387: start ({'dataset_id': '5d624c5419944c49', 'engine': 'fpm', 'iters': 24, 'seed': 0, 'crop': None, 'sparse_every': 1, 'engine_params': {}, 'sparse_fraction': 0.3, 'refine_ml': True, 'model': None, 'hybrid_iters': 10, 'fpm': {}, 'probe_from_job': None})
+2026-11-25 18:14:22,648 INFO velos.worker: job e7931e856c314387: FPM succeeded in 11.1s
+2026-11-25 18:14:24,664 INFO velos.worker: job 348a4d4abca745d6: start ({'dataset_id': '056ff76ebec94e41', 'engine': 'fpm', 'iters': 24, 'seed': 0, 'crop': None, 'sparse_every': 1, 'engine_params': {}, 'sparse_fraction': None, 'refine_ml': False, 'model': None, 'hybrid_iters': 0, 'fpm': {}, 'probe_from_job': None})
+2026-11-25 18:14:43,071 INFO velos.worker: job 348a4d4abca745d6: FPM succeeded in 18.2s
+2026-11-25 18:14:44,081 INFO velos.worker: job 9e3bd431b1ea4243: start ({'dataset_id': '056ff76ebec94e41', 'engine': 'fpm', 'iters': 24, 'seed': 0, 'crop': None, 'sparse_every': 1, 'engine_params': {}, 'sparse_fraction': 0.3, 'refine_ml': True, 'model': None, 'hybrid_iters': 10, 'fpm': {}, 'probe_from_job': None})
+2026-11-25 18:15:05,932 INFO velos.worker: job 9e3bd431b1ea4243: FPM succeeded in 11.2s

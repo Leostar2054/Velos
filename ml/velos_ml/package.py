@@ -60,9 +60,14 @@ FPM_CARD = {
                     "result is always kept and returned alongside.",
     "limitations": [
         "Fine-tuned on ONE field of view per specimen type (blood smear; leaf section), left 65 % of a "
-        "645 um patch, five acquisitions; tested on the right 35 %, on unseen frame draws and on sensor "
+        "645 um patch, five acquisitions; tested on the right 35 %, on unseen LED draws and on sensor "
         "regions never used for training. Other specimens, objectives, wavelengths or LED geometries are "
         "out of distribution.",
+        "Validated for the BLOOD SMEAR in the hybrid mode (model + 5 EPRY passes): closer to the full-LED "
+        "reconstruction and slightly lower prediction error on the LEDs not used. The model output alone "
+        "removes reduced-LED artefacts but does not predict unmeasured LED images better: use it for viewing, "
+        "not for quantitative values. NOT validated for the leaf section (its output contradicts the measured "
+        "images; prediction error +34 to +105 %).",
         "Outputs are estimates, not measurements: use the data-consistency check (residual on the LEDs used "
         "and prediction error on LEDs not used) and prefer the physics or hybrid result when it disagrees.",
         "References are full-LED EPRY reconstructions, not ground truth; their own repeatability is reported "
@@ -169,7 +174,7 @@ def export(checkpoint: str, out: str, tile: int = 256, overlap: int = 64, versio
     card["modality"] = modality
     if modality == "fpm":
         card.update(FPM_CARD)
-        card["recommended_hybrid_iters"] = {"experimental": 10}
+        card["recommended_hybrid_iters"] = {"experimental": 5}      # M4 evaluation: 5 ≈ 10 passes, 5 better near the field edge
     for f in (onnx_path, ts_path):
         card["files"][f.name] = {"sha256": _sha256(f), "bytes": f.stat().st_size}
     (out / "model_card.json").write_text(json.dumps(card, indent=2, default=float))

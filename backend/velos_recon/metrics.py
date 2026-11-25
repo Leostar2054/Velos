@@ -93,7 +93,7 @@ def _fft_ramp(u: np.ndarray, mask: np.ndarray):
     return 2 * np.pi * fx, 2 * np.pi * fy
 
 
-def estimate_phase_ramp(z: np.ndarray, mask: np.ndarray, n_iter: int = 3):
+def estimate_phase_ramp(z: np.ndarray, mask: np.ndarray, n_iter: int = 3, select: str = "conservative"):
     """Robustly estimate a linear phase ramp exp(i(kx·x + ky·y)) in ``z`` over ``mask``.
 
     Uses the median of wrapped nearest-neighbour phase differences, so it is dominated
@@ -102,6 +102,9 @@ def estimate_phase_ramp(z: np.ndarray, mask: np.ndarray, n_iter: int = 3):
     of the field), wrapped differences are nearly uniform and their median underestimates a
     steep ramp; the estimate is therefore also started from the peak of the phasor spectrum,
     and that result is kept only if it flattens the phase clearly better (M4).
+    ``select="max"`` (used by the metrics) takes whichever candidate flattens the phase best — the
+    maximum-likelihood ramp under phase noise; ``"conservative"`` (model normalisation) changes the
+    median result only when the improvement is clear (> 5 %), so inputs stay as the models were trained.
     Returns (kx, ky) in rad/pixel.
     """
     yy, xx = np.mgrid[0:z.shape[0], 0:z.shape[1]].astype(float)
@@ -110,7 +113,7 @@ def estimate_phase_ramp(z: np.ndarray, mask: np.ndarray, n_iter: int = 3):
         return kx, ky
     u = z / np.maximum(np.abs(z), 1e-30)
     c_med = _coherence(u, mask, kx, ky, xx, yy)
-    if c_med > 0.9:                       # already flat: nothing to improve (the usual case)
+    if select != "max" and c_med > 0.9:   # already flat: keep the median result (M3 inputs unchanged)
         return kx, ky
     kx0, ky0 = _fft_ramp(u, mask)
     best = (_coherence(u, mask, kx0, ky0, xx, yy), kx0, ky0)
@@ -118,7 +121,8 @@ def estimate_phase_ramp(z: np.ndarray, mask: np.ndarray, n_iter: int = 3):
     c2 = _coherence(u, mask, kx2, ky2, xx, yy)
     if c2 > best[0]:
         best = (c2, kx2, ky2)
-    return (best[1], best[2]) if best[0] > 1.05 * c_med else (kx, ky)
+    margin = 1.0 if select == "max" else 1.05
+    return (best[1], best[2]) if best[0] > margin * c_med else (kx, ky)
 
 
 def remove_phase_ramp(z: np.ndarray, mask: np.ndarray) -> np.ndarray:
@@ -132,7 +136,7 @@ def align(rec: np.ndarray, ref: np.ndarray, mask: np.ndarray, ramp: bool = True)
     the linear phase ramp (raster-scan/probe-shift ambiguity, if ``ramp``) and the
     global complex scalar (``c = <rec, ref>/<rec, rec>`` over ``mask``)."""
     if ramp:
-        kx, ky = estimate_phase_ramp(rec * np.conj(ref), mask)
+        kx, ky = estimate_phase_ramp(rec * np.conj(ref), mask, select="max")
         yy, xx = np.mgrid[0:rec.shape[0], 0:rec.shape[1]].astype(float)
         rec = rec * np.exp(-1j * (kx * xx + ky * yy))
     c = core._align(rec, ref, mask)

@@ -1,0 +1,359 @@
+{
+ "protocol": "real LED-array FPM data (blood smear, leaf section; 23 Nov 2026). Input: EPRY reconstruction from a reduced LED set (all LEDs inside 1.1 x NA + 30 % or 50 % of the dark-field LEDs); reference: EPRY reconstruction from all usable LEDs of the same scan (no ground truth exists). Test data never used for training: right 35 % of the field with unseen LED draws (holdout), and sensor regions left/right of the training region (full). Metrics after removing the global complex scalar and the linear phase ramp; data_error_predict = misfit on the LEDs that were NOT used.",
+ "overall": {
+  "physics": {
+   "n": 20,
+   "nrmse_complex": 0.4385,
+   "psnr_phase": 23.6186,
+   "ssim_phase": 0.5201,
+   "psnr_amplitude": 18.8139,
+   "data_error_used": 0.2019,
+   "data_error_predict": 0.395
+  },
+  "v2": {
+   "n": 20,
+   "nrmse_complex": 0.4613,
+   "psnr_phase": 21.947,
+   "ssim_phase": 0.4966,
+   "psnr_amplitude": 18.8488,
+   "data_error_used": 0.2115,
+   "data_error_predict": 0.4131
+  },
+  "fpm_v1": {
+   "n": 20,
+   "nrmse_complex": 0.2917,
+   "psnr_phase": 26.6407,
+   "ssim_phase": 0.5688,
+   "psnr_amplitude": 22.5431,
+   "data_error_used": 0.2658,
+   "data_error_predict": 0.5441
+  },
+  "physics+5": {
+   "n": 20,
+   "nrmse_complex": 0.4399,
+   "psnr_phase": 23.6994,
+   "ssim_phase": 0.5181,
+   "psnr_amplitude": 18.8,
+   "data_error_used": 0.1994,
+   "data_error_predict": 0.395
+  },
+  "physics+10": {
+   "n": 20,
+   "nrmse_complex": 0.4435,
+   "psnr_phase": 23.6978,
+   "ssim_phase": 0.5125,
+   "psnr_amplitude": 18.732,
+   "data_error_used": 0.1976,
+   "data_error_predict": 0.3953
+  },
+  "hybrid@5": {
+   "n": 20,
+   "nrmse_complex": 0.3576,
+   "psnr_phase": 25.1157,
+   "ssim_phase": 0.554,
+   "psnr_amplitude": 20.654,
+   "data_error_used": 0.2033,
+   "data_error_predict": 0.4044
+  },
+  "hybrid@10": {
+   "n": 20,
+   "nrmse_complex": 0.3655,
+   "psnr_phase": 24.9897,
+   "ssim_phase": 0.5455,
+   "psnr_amplitude": 20.4046,
+   "data_error_used": 0.199,
+   "data_error_predict": 0.4031
+  }
+ },
+ "by_mode_fraction": {
+  "holdout@0.30": {
+   "physics": {
+    "n": 6,
+    "nrmse_complex": 0.3893,
+    "psnr_phase": 25.1681,
+    "ssim_phase": 0.5998,
+    "psnr_amplitude": 18.7367,
+    "data_error_used": 0.1785,
+    "data_error_predict": 0.368
+   },
+   "v2": {
+    "n": 6,
+    "nrmse_complex": 0.4126,
+    "psnr_phase": 23.5572,
+    "ssim_phase": 0.5819,
+    "psnr_amplitude": 18.9413,
+    "data_error_used": 0.1871,
+    "data_error_predict": 0.3812
+   },
+   "fpm_v1": {
+    "n": 6,
+    "nrmse_complex": 0.2121,
+    "psnr_phase": 29.3185,
+    "ssim_phase": 0.6991,
+    "psnr_amplitude": 23.2231,
+    "data_error_used": 0.2202,
+    "data_error_predict": 0.4305
+   },
+   "physics+5": {
+    "n": 6,
+    "nrmse_complex": 0.3904,
+    "psnr_phase": 25.2971,
+    "ssim_phase": 0.6002,
+    "psnr_amplitude": 18.7368,
+    "data_error_used": 0.176,
+    "data_error_predict": 0.3674
+   },
+   "physics+10": {
+    "n": 6,
+    "nrmse_complex": 0.3921,
+    "psnr_phase": 25.3724,
+    "ssim_phase": 0.5994,
+    "psnr_amplitude": 18.7157,
+    "data_error_used": 0.1742,
+    "data_error_predict": 0.3674
+   },
+   "hybrid@5": {
+    "n": 6,
+    "nrmse_complex": 0.3375,
+    "psnr_phase": 26.258,
+    "ssim_phase": 0.624,
+    "psnr_amplitude": 19.9318,
+    "data_error_used": 0.177,
+    "data_error_predict": 0.368
+   },
+   "hybrid@10": {
+    "n": 6,
+    "nrmse_complex": 0.3446,
+    "psnr_phase": 26.1559,
+    "ssim_phase": 0.6182,
+    "psnr_amplitude": 19.7114,
+    "data_error_used": 0.1737,
+    "data_error_predict": 0.3672
+   }
+  },
+  "holdout@0.50": {
+   "physics": {
+    "n": 6,
+    "nrmse_complex": 0.2758,
+    "psnr_phase": 28.1423,
+    "ssim_phase": 0.6682,
+    "psnr_amplitude": 22.0938,
+    "data_error_used": 0.1766,
+    "data_error_predict": 0.3437
+   },
+   "v2": {
+    "n": 6,
+    "nrmse_complex": 0.3309,
+    "psnr_phase": 24.5729,
+    "ssim_phase": 0.6174,
+    "psnr_amplitude": 20.7784,
+    "data_error_used": 0.1854,
+    "data_error_predict": 0.3608
+   },
+   "fpm_v1": {
+    "n": 6,
+    "nrmse_complex": 0.1962,
+    "psnr_phase": 30.3696,
+    "ssim_phase": 0.7175,
+    "psnr_amplitude": 24.0974,
+    "data_error_used": 0.196,
+    "data_error_predict": 0.3903
+   },
+   "physics+5": {
+    "n": 6,
+    "nrmse_complex": 0.2699,
+    "psnr_phase": 28.4064,
+    "ssim_phase": 0.6712,
+    "psnr_amplitude": 22.2667,
+    "data_error_used": 0.1741,
+    "data_error_predict": 0.343
+   },
+   "physics+10": {
+    "n": 6,
+    "nrmse_complex": 0.2667,
+    "psnr_phase": 28.5625,
+    "ssim_phase": 0.6719,
+    "psnr_amplitude": 22.3621,
+    "data_error_used": 0.1722,
+    "data_error_predict": 0.3425
+   },
+   "hybrid@5": {
+    "n": 6,
+    "nrmse_complex": 0.2353,
+    "psnr_phase": 29.1817,
+    "ssim_phase": 0.6901,
+    "psnr_amplitude": 22.9509,
+    "data_error_used": 0.175,
+    "data_error_predict": 0.3455
+   },
+   "hybrid@10": {
+    "n": 6,
+    "nrmse_complex": 0.2345,
+    "psnr_phase": 29.2391,
+    "ssim_phase": 0.6893,
+    "psnr_amplitude": 22.9764,
+    "data_error_used": 0.1724,
+    "data_error_predict": 0.3449
+   }
+  },
+  "full@0.30": {
+   "physics": {
+    "n": 4,
+    "nrmse_complex": 0.6732,
+    "psnr_phase": 17.4726,
+    "ssim_phase": 0.2882,
+    "psnr_amplitude": 14.3937,
+    "data_error_used": 0.2414,
+    "data_error_predict": 0.4619
+   },
+   "v2": {
+    "n": 4,
+    "nrmse_complex": 0.6513,
+    "psnr_phase": 17.8819,
+    "ssim_phase": 0.3133,
+    "psnr_amplitude": 15.9372,
+    "data_error_used": 0.2522,
+    "data_error_predict": 0.4772
+   },
+   "fpm_v1": {
+    "n": 4,
+    "nrmse_complex": 0.44,
+    "psnr_phase": 21.5231,
+    "ssim_phase": 0.3404,
+    "psnr_amplitude": 20.2437,
+    "data_error_used": 0.3965,
+    "data_error_predict": 0.7864
+   },
+   "physics+5": {
+    "n": 4,
+    "nrmse_complex": 0.6864,
+    "psnr_phase": 17.2177,
+    "ssim_phase": 0.2732,
+    "psnr_amplitude": 14.0747,
+    "data_error_used": 0.2397,
+    "data_error_predict": 0.4636
+   },
+   "physics+10": {
+    "n": 4,
+    "nrmse_complex": 0.7004,
+    "psnr_phase": 16.9378,
+    "ssim_phase": 0.2549,
+    "psnr_amplitude": 13.7772,
+    "data_error_used": 0.2388,
+    "data_error_predict": 0.4653
+   },
+   "hybrid@5": {
+    "n": 4,
+    "nrmse_complex": 0.5104,
+    "psnr_phase": 20.2987,
+    "ssim_phase": 0.3711,
+    "psnr_amplitude": 18.1339,
+    "data_error_used": 0.2488,
+    "data_error_predict": 0.4872
+   },
+   "hybrid@10": {
+    "n": 4,
+    "nrmse_complex": 0.5328,
+    "psnr_phase": 19.8729,
+    "ssim_phase": 0.3483,
+    "psnr_amplitude": 17.4685,
+    "data_error_used": 0.2419,
+    "data_error_predict": 0.4824
+   }
+  },
+  "full@0.50": {
+   "physics": {
+    "n": 4,
+    "nrmse_complex": 0.5218,
+    "psnr_phase": 20.6548,
+    "ssim_phase": 0.4105,
+    "psnr_amplitude": 18.4304,
+    "data_error_used": 0.2353,
+    "data_error_predict": 0.4459
+   },
+   "v2": {
+    "n": 4,
+    "nrmse_complex": 0.5398,
+    "psnr_phase": 19.658,
+    "ssim_phase": 0.3709,
+    "psnr_amplitude": 18.7275,
+    "data_error_used": 0.2468,
+    "data_error_predict": 0.4755
+   },
+   "fpm_v1": {
+    "n": 4,
+    "nrmse_complex": 0.4061,
+    "psnr_phase": 22.148,
+    "ssim_phase": 0.3788,
+    "psnr_amplitude": 21.491,
+    "data_error_used": 0.308,
+    "data_error_predict": 0.7029
+   },
+   "physics+5": {
+    "n": 4,
+    "nrmse_complex": 0.5225,
+    "psnr_phase": 20.7243,
+    "ssim_phase": 0.4101,
+    "psnr_amplitude": 18.4198,
+    "data_error_used": 0.2321,
+    "data_error_predict": 0.4461
+   },
+   "physics+10": {
+    "n": 4,
+    "nrmse_complex": 0.5286,
+    "psnr_phase": 20.6485,
+    "ssim_phase": 0.4007,
+    "psnr_amplitude": 18.266,
+    "data_error_used": 0.2296,
+    "data_error_predict": 0.4466
+   },
+   "hybrid@5": {
+    "n": 4,
+    "nrmse_complex": 0.4184,
+    "psnr_phase": 22.1202,
+    "ssim_phase": 0.4278,
+    "psnr_amplitude": 20.8122,
+    "data_error_used": 0.2397,
+    "data_error_predict": 0.4648
+   },
+   "hybrid@10": {
+    "n": 4,
+    "nrmse_complex": 0.4261,
+    "psnr_phase": 21.9833,
+    "ssim_phase": 0.4176,
+    "psnr_amplitude": 20.5225,
+    "data_error_used": 0.234,
+    "data_error_predict": 0.4649
+   }
+  }
+ },
+ "repeatability": [
+  {
+   "pair": "blood_222619 vs blood_223858",
+   "nrmse_complex": 0.0506,
+   "psnr_phase": 41.1892,
+   "ssim_phase": 0.9795,
+   "psnr_amplitude": 34.5616,
+   "ssim_amplitude": 0.9438,
+   "mae_phase_rad": 0.035
+  },
+  {
+   "pair": "blood_222619 vs blood_225108",
+   "nrmse_complex": 0.1261,
+   "psnr_phase": 33.8404,
+   "ssim_phase": 0.9217,
+   "psnr_amplitude": 28.5083,
+   "ssim_amplitude": 0.8858,
+   "mae_phase_rad": 0.0962
+  },
+  {
+   "pair": "leaf_214040 vs leaf_215808",
+   "nrmse_complex": 0.4248,
+   "psnr_phase": 20.1266,
+   "ssim_phase": 0.2036,
+   "psnr_amplitude": 19.0751,
+   "ssim_amplitude": 0.2992,
+   "mae_phase_rad": 0.4142
+  }
+ ]
+}

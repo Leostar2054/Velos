@@ -1,7 +1,82 @@
 # ML pipeline — results
 
-* [M3 — refinement model v2](#m3--refinement-model-v2-12-nov-2026) (current)
+* [M4 — real samples: FPM refinement model v1](#m4--real-samples-fpm-refinement-model-v1-25-nov-2026) (current)
+* [M3 — refinement model v2](#m3--refinement-model-v2-12-nov-2026)
 * [M2 — first baseline](#m2--first-baseline-28-oct-2026)
+
+## M4 — real samples: FPM refinement model v1 (25 Nov 2026)
+
+### Task and why it differs from M3
+The Velos in-house microscope is an **LED-array Fourier ptychographic microscope** (FPM; `docs/fpm.md`), not the
+scanning ptychography set-up of the M2/M3 data. Its acquisition time is set by the number of LED images (225 × 1 s).
+A **reduced LED set** keeps every LED inside 1.1 × the objective NA (bright-field and transition LEDs: the low
+spatial frequencies) plus a random 30 % or 50 % of the dark-field LEDs — about 75 or 117 of the 222 usable LEDs, i.e.
+34 % or 53 % of the acquisition time. EPRY on a reduced set loses high-frequency content and adds artefacts; the model
+should bring it closer to the reconstruction from all LEDs. Real samples have no ground truth, so the reference is the
+**EPRY reconstruction from all usable LEDs of the same scan**, and every estimate is also scored on the LED images that
+were **not** used (prediction error — needs no reference).
+
+| M3 (scanning ptychography) | M4 (LED-array FPM, real samples) |
+|---|---|
+| ePIE on reduced scan positions | EPRY on reduced LED sets, same reconstruction grid as the full set (1536 px, 0.42 µm) |
+| sub-pixel registration needed (0.1–0.9 px offsets) | reconstructions share one grid (offsets ≤ 0.1 px measured): **no registration** (`register: false`) |
+| object phase ramp + median normalisation | the LED point-source geometry adds a phase **curvature and tilt**: removed before the model (`apply_flatten`, refined fit) and restored after it (`undo_flatten`) |
+| clam / plant specimens | blood smear and leaf section, 23 Nov 2026 (`tools/fpm_packing/` packs the raw TIFFs) |
+| phase-ramp estimate = median of wrapped neighbour phase differences | FPM phases are noisy at the pixel level (leaf; regions near the field edge): the median **invented ramps** of up to 0.5 rad/px — in the model inputs, the training targets and the metrics. The estimate now also starts from the peak of the phasor spectrum (`velos_recon.metrics.estimate_phase_ramp`): the **metrics** take whichever candidate flattens the phase best (maximum-likelihood ramp under phase noise), the **model normalisation** changes the median result only when the improvement is clear (> 5 %); the M3 scanning-ptychography inputs are unchanged (checked on clam, plant and synthetic data). A first FPM model trained before this fix was discarded. |
+
+### Data (`ml/velos_ml/fpm_realdata.py`, `ml/scripts/m4_fpm_pipeline.sh`)
+* **Scans**: blood smear 222619, 223858, 225108 (1 s exposure) and 230302 (2 s), leaf section 214040 and 215808 — all
+  of one field per specimen; central 512 × 512 camera pixels (645 µm) packed per scan. Geometry calibrated once per
+  scan on all LEDs (blood: z = 59.4 mm, optical axis (−0.70, −0.23) mm; leaf: z = 55 mm, axis (0, 0)), then fixed.
+* **Pairs**: dense reference = EPRY (2 warm-up + 24 passes) on all usable LEDs (221–222); inputs = EPRY on reduced
+  sets (30 % and 50 % dark field, 3 random draws each → `sub_00`–`sub_05`; the 2 s scan: 1 draw). Draw 0 of each
+  fraction (`sub_00`, `sub_01`) is reserved for testing.
+* **Training** (`configs/refine_fpm_v1.yaml`): fine-tuning of `velos-refine-v2` (M3) on the five 1 s scans, **left 65 %
+  of the field only**, LED draws `sub_02`–`sub_05` (480 random 128-px crops per scan and epoch, augmented) plus 48 synthetic M3 pairs;
+  phase-aware loss; 10 epochs, lr 3e-4 one-cycle; last epoch kept. CPU, 2 cores: 48 min.
+* **Test sets — never used for training**:
+  (a) *hold-out*: the right 35 % of the field of all six scans (incl. the 2 s scan, not used at all), LED draws 0/1;
+  (b) *side regions*: two further 512 × 512 regions left and right of the centre (no overlap with it) of blood 222619
+  and leaf 214040, packed separately (`pack_fpm_side_regions.m`), geometry taken from the centre calibration.
+* **Methods**: physics (EPRY, reduced set) · physics + 5 / + 10 passes (control for the hybrid mode) · M3 model v2
+  without FPM training · FPM model v1 · hybrid = FPM model + 5 / 10 EPRY passes on the reduced set.
+* **Metrics**: complex NRMSE, phase and amplitude PSNR/SSIM vs the full-LED reference after removing the global complex
+  scalar and the linear phase ramp; data residual on the LEDs used; prediction error on the LEDs not used.
+
+### Results (test data never used for training)
+
+Grouped by specimen and test set, 30 % and 50 % dark-field LEDs pooled; physics row = phase PSNR against the full-LED reconstruction · prediction error on the LED images not used; other rows = change relative to physics. All tables per LED fraction and per scan: `evidence/ml_m4/summary.md`.
+
+| Method | Blood hold-out (n=8) | Blood side regions (n=4) | Leaf hold-out (n=4) | Leaf side regions (n=4) |
+|---|---|---|---|---|
+| Physics (EPRY, reduced LED set) | 32.0 dB · 0.314 | 24.8 dB · 0.466 | 16.0 dB · 0.439 | 13.3 dB · 0.441 |
+| Physics + 5 passes (control) | +0.3 dB · ±0 % | -0.1 dB · ±0 % | +0.1 dB · ±0 % | ±0.0 dB · ±0 % |
+| Physics + 10 passes (control) | +0.4 dB · -1 % | -0.4 dB · ±0 % | +0.1 dB · +1 % | -0.1 dB · +1 % |
+| M3 model (no FPM training) | -4.1 dB · +5 % | -0.8 dB · +8 % | +0.4 dB · +3 % | +0.2 dB · +2 % |
+| FPM model v1 (AI only) | +1.6 dB · +2 % | +2.2 dB · +25 % | +6.4 dB · +34 % | +3.4 dB · +105 % |
+| Hybrid: FPM model + 5 passes | +0.6 dB · -1 % | +2.2 dB · -1 % | +2.0 dB · +3 % | +2.1 dB · +11 % |
+| Hybrid: FPM model + 10 passes | +0.6 dB · -2 % | +1.8 dB · -1 % | +1.9 dB · +2 % | +1.9 dB · +10 % |
+
+Repeatability of the reference (full-LED reconstructions of repeated scans of the same field, hold-out region): blood_222619 vs blood_223858: 41.2 dB, NRMSE 0.05; blood_222619 vs blood_225108: 33.8 dB, NRMSE 0.13; leaf_214040 vs leaf_215808: 20.1 dB, NRMSE 0.42.
+
+![blood hold-out](../evidence/ml_m4/fig_blood_222619_sub_00.png)
+![blood side region](../evidence/ml_m4/fig_blood_222619_L512_sub_00.png)
+![leaf hold-out](../evidence/ml_m4/fig_leaf_214040_sub_00.png)
+
+### Interpretation (including what did not work)
+1. Fine-tuning on the real FPM data is essential: the M3 model, trained for scanning ptychography, makes the blood smear worse (-4.1 dB on the hold-out region).
+2. Blood smear — the hybrid mode (FPM model, then 5 EPRY passes on the same reduced LED set) improves both measures at once: closer to the full-LED reconstruction (+0.6 dB hold-out, +2.2 dB side regions) with a slightly lower prediction error on the LED images that were not measured (-1 %, -1 %). In the hold-out region this is only marginally better than spending the same passes on physics alone (+0.3 dB / +0.4 dB for 5 / 10 passes); near the edge of the field, where the reduced-LED physics is worse, the hybrid gains +2.2 dB while extra physics passes lose (-0.4 dB).
+3. The AI output alone removes the reduced-LED artefacts most strongly (+1.6 dB hold-out, +2.2 dB side regions; Figures) but does not predict the unmeasured images better (+2 %, +25 %): it cleans the image rather than recovering the missing high-resolution information, so it is for viewing, not for quantitative measurements. The platform therefore returns physics, AI and hybrid results side by side with their data-consistency numbers, and recommends the hybrid mode (5 passes).
+4. Leaf section — even the physics reconstruction from a reduced LED set is far from the full-LED one (16 dB, thick scattering specimen; residual 0.22–0.25 even with all LEDs). The AI raises the phase agreement (+6.4 dB) but its output contradicts the measured images (prediction error +34 % hold-out, +105 % side regions); the hybrid limits this to +3 % / +11 %. The model is therefore not validated for the leaf: more leaf fields and a reconstruction with aberration correction (the MATLAB leaf run used LEAP) are needed first.
+5. Size of the effect: full-LED reconstructions of repeated scans of the same blood field agree to 34–41 dB in the hold-out region (repeatability of the reference); the reduced-LED physics result reaches 32.0 dB, and the hybrid closes 0.6 dB of that gap — more near the edge of the field (2.2 dB), where the reduced-LED physics is worse (24.8 dB). For the leaf, two full-LED scans of the same field agree only to 20 dB, so the leaf reference itself is not reproducible and PSNR changes there are not meaningful; the prediction error is the decisive measure.
+
+### Package
+`velos-refine-fpm-v1` 1.0.0 (`models/velos-refine-fpm-v1`, `"modality": "fpm"`): ONNX + TorchScript + model card;
+export verified against PyTorch (max |Δ| 1.5e-5 ONNX, 0 TorchScript); ONNX Runtime ≈ 0.35 s per 256-px tile on
+2 CPU cores (a 1536-px field ≈ 20 s, a 480-px API crop ≈ 4 s). Recommended `hybrid_iters`: 5. Installed next to
+`velos-refine-v2`; FPM jobs pick it automatically. Reproduce data, training, evaluation and package with
+`PACK=<_velos_packed> ml/scripts/m4_fpm_pipeline.sh`.
+
 
 ## M3 — refinement model v2 (12 Nov 2026)
 

@@ -1,0 +1,172 @@
+  ! run_info.json says led_to_sample_mm = 60.0, this run uses z_source_mm = 55.0.
+Patch: 512 x 512 px, centre (x 960.5, y 540.5) = (0.000, 0.000) mm from the image centre
+Sample-plane pixel: 1.2600 um, patch width 645.1 um
+Pupil radius: 101.91 spectrum pixels; bright-field LEDs 9 of 225 (predicted), max. illumination NA 0.4751
+Background offset: 123.00 (median of the darkest frame; no dark frame given)
+Hot pixels: 417 replaced in every frame (0.16 % of the patch)
+Direct beam: clear background of the patch (1352 pixels): 10 bright-field, 3 transition, 212 dark-field LEDs
+  ! 1 LED(s) with a bright background are dark-field LEDs for these settings and 0 LED(s) with a dark background are bright-field LEDs: check z_source_mm, optical_axis_*_mm, objective_NA and the orientation flags.
+  ! 3 LED(s) light this patch through the edge of the objective aperture (clear background at 20-26 % of the bright-field level): (28,54) (26,53) (26,51) - bright/dark transition frames, which do not fit one coherent pupil. They are NOT used (skip_transition_frames = false keeps them).
+Frames used: 222 (9 bright-field by prediction)
+Geometry check (34 low-angle frames, short AP runs on the central 256 px, misfit to the frames as measured):
+   z [mm]     :   44.0   46.2   48.4   50.6   52.8   55.0   57.2   59.4   61.6   63.8   66.0
+   misfit     : 0.4291 0.4260 0.4206 0.4097 0.3955 0.3818 0.3690 0.3316 0.3376 0.3558 0.3761
+   orientation at 59.4 mm: as set 0.3316 | led_y_sign * -1 0.3961 | swap_led_xy reversed 0.4043 | both 0.4285
+   step search (139 runs): z = 59.4 mm, optical axis (-0.70, -0.23) mm, swap_led_xy = 0, led_y_sign = -1
+   misfit: 0.3818 (and 1 LED(s) on the wrong side of the aperture edge) with the settings as given, 0.2303 with the best values found
+   APPLIED to this run.
+  ! Geometry check: z_source_mm = 59.4 mm fits the frames better than 55.0 mm (objective_NA = 0.108 at 55.0 mm is equivalent). Measure the LED-to-sample distance again.
+  ! Geometry check: optical_axis_x_mm = -0.70, optical_axis_y_mm = -0.23 fits better than (0.00, 0.00): the scan centre is not exactly on the optical axis.
+  ! Geometry check: misfit 0.3818 (and 1 LED(s) on the wrong side of the aperture edge) with the settings as given, 0.2303 with the values above.
+Reconstruction grid: 1536 x 1536 (pixel 0.4200 um), synthetic NA 0.555
+Resolution (full pitch): raw lambda/NA = 6.33 um -> lambda/NA_syn = 1.14 um
+[blood_222619] geometry: z 59.40 mm, axis (-0.70, -0.23) mm, swap False, y sign -1
+[blood_222619] dense: 222 LEDs, residual 0.1752, 73 s
+[blood_222619] sub_00: fraction 0.30 draw 0: 75 LEDs, residual 0.1637, prediction error 0.3292, 25 s
+[blood_222619] sub_01: fraction 0.50 draw 0: 117 LEDs, residual 0.1667, prediction error 0.2936, 36 s
+[blood_222619] sub_02: fraction 0.30 draw 1: 75 LEDs, residual 0.1643, prediction error 0.35, 25 s
+[blood_222619] sub_03: fraction 0.50 draw 1: 117 LEDs, residual 0.1680, prediction error 0.3017, 39 s
+[blood_222619] sub_04: fraction 0.30 draw 2: 75 LEDs, residual 0.1594, prediction error 0.3431, 24 s
+[blood_222619] sub_05: fraction 0.50 draw 2: 117 LEDs, residual 0.1666, prediction error 0.3109, 36 s
+  ! run_info.json says led_to_sample_mm = 60.0, this run uses z_source_mm = 55.0.
+Patch: 512 x 512 px, centre (x 960.5, y 540.5) = (0.000, 0.000) mm from the image centre
+Sample-plane pixel: 1.2600 um, patch width 645.1 um
+Pupil radius: 101.91 spectrum pixels; bright-field LEDs 9 of 225 (predicted), max. illumination NA 0.4751
+  ! No dark frame and no frame without light: the camera offset is NOT removed (give dark_frame_file or background_offset).
+Hot pixels: 3303 replaced in every frame (1.26 % of the patch)
+Direct beam: no clear background in this patch; transition LEDs are taken from the geometry (+-10 % of the NA)
+  ! 0 LED(s) predicted bright-field are dark and 3 predicted dark-field are bright in this patch: check z_source_mm, optical_axis_*_mm and the orientation flags.
+  ! 4 LED(s) are within 10 % of the objective NA (bright/dark transition): (28,54) (30,52) (26,52) (28,50). They are NOT used (skip_transition_frames = false keeps them).
+Frames used: 221 (9 bright-field by prediction)
+Geometry check (33 low-angle frames, short AP runs on the central 256 px, misfit to the frames as measured):
+   z [mm]     :   44.0   46.2   48.4   50.6   52.8   55.0   57.2   59.4   61.6   63.8   66.0
+   misfit     : 0.4202 0.4235 0.4288 0.4304 0.4325 0.4377 0.4395 0.4396 0.4404 0.4364 0.4350
+   orientation at 55.0 mm: as set 0.4377 | led_y_sign * -1 0.4513 | swap_led_xy reversed 0.4501 | both 0.4504
+   step search (19 runs): z = 55.0 mm, optical axis (+0.00, +0.00) mm, swap_led_xy = 0, led_y_sign = -1
+   misfit: 0.4377 with the settings as given, 0.4377 with the best values found
+Reconstruction grid: 1536 x 1536 (pixel 0.4200 um), synthetic NA 0.575
+Resolution (full pitch): raw lambda/NA = 6.33 um -> lambda/NA_syn = 1.10 um
+[leaf_214040] geometry: z 55.00 mm, axis (+0.00, +0.00) mm, swap False, y sign -1
+[leaf_214040] dense: 221 LEDs, residual 0.2353, 68 s
+[leaf_214040] sub_00: fraction 0.30 draw 0: 73 LEDs, residual 0.2461, prediction error 0.4408, 24 s
+[leaf_214040] sub_01: fraction 0.50 draw 0: 115 LEDs, residual 0.2363, prediction error 0.4403, 37 s
+[leaf_214040] sub_02: fraction 0.30 draw 1: 73 LEDs, residual 0.2473, prediction error 0.4499, 21 s
+[leaf_214040] sub_03: fraction 0.50 draw 1: 115 LEDs, residual 0.2393, prediction error 0.4421, 37 s
+[leaf_214040] sub_04: fraction 0.30 draw 2: 73 LEDs, residual 0.2395, prediction error 0.4547, 21 s
+[leaf_214040] sub_05: fraction 0.50 draw 2: 115 LEDs, residual 0.2457, prediction error 0.4385, 34 s
+  ! run_info.json says led_to_sample_mm = 60.0, this run uses z_source_mm = 55.0.
+Patch: 512 x 512 px, centre (x 960.5, y 540.5) = (0.000, 0.000) mm from the image centre
+Sample-plane pixel: 1.2600 um, patch width 645.1 um
+Pupil radius: 101.91 spectrum pixels; bright-field LEDs 9 of 225 (predicted), max. illumination NA 0.4751
+Background offset: 123.00 (median of the darkest frame; no dark frame given)
+Hot pixels: 426 replaced in every frame (0.16 % of the patch)
+Direct beam: clear background of the patch (1339 pixels): 10 bright-field, 3 transition, 212 dark-field LEDs
+  ! 1 LED(s) with a bright background are dark-field LEDs for these settings and 0 LED(s) with a dark background are bright-field LEDs: check z_source_mm, optical_axis_*_mm, objective_NA and the orientation flags.
+  ! 3 LED(s) light this patch through the edge of the objective aperture (clear background at 20-26 % of the bright-field level): (28,54) (26,53) (26,51) - bright/dark transition frames, which do not fit one coherent pupil. They are NOT used (skip_transition_frames = false keeps them).
+Frames used: 222 (9 bright-field by prediction)
+Geometry check (34 low-angle frames, short AP runs on the central 256 px, misfit to the frames as measured):
+   z [mm]     :   44.0   46.2   48.4   50.6   52.8   55.0   57.2   59.4   61.6   63.8   66.0
+   misfit     : 0.4289 0.4258 0.4207 0.4096 0.3961 0.3822 0.3691 0.3315 0.3371 0.3557 0.3755
+   orientation at 59.4 mm: as set 0.3315 | led_y_sign * -1 0.3957 | swap_led_xy reversed 0.4038 | both 0.4280
+   step search (139 runs): z = 59.4 mm, optical axis (-0.70, -0.23) mm, swap_led_xy = 0, led_y_sign = -1
+   misfit: 0.3822 (and 1 LED(s) on the wrong side of the aperture edge) with the settings as given, 0.2309 with the best values found
+   APPLIED to this run.
+  ! Geometry check: z_source_mm = 59.4 mm fits the frames better than 55.0 mm (objective_NA = 0.108 at 55.0 mm is equivalent). Measure the LED-to-sample distance again.
+  ! Geometry check: optical_axis_x_mm = -0.70, optical_axis_y_mm = -0.23 fits better than (0.00, 0.00): the scan centre is not exactly on the optical axis.
+  ! Geometry check: misfit 0.3822 (and 1 LED(s) on the wrong side of the aperture edge) with the settings as given, 0.2309 with the values above.
+Reconstruction grid: 1536 x 1536 (pixel 0.4200 um), synthetic NA 0.555
+Resolution (full pitch): raw lambda/NA = 6.33 um -> lambda/NA_syn = 1.14 um
+[blood_223858] geometry: z 59.40 mm, axis (-0.70, -0.23) mm, swap False, y sign -1
+[blood_223858] dense: 222 LEDs, residual 0.1756, 74 s
+[blood_223858] sub_00: fraction 0.30 draw 0: 75 LEDs, residual 0.1641, prediction error 0.33, 25 s
+[blood_223858] sub_01: fraction 0.50 draw 0: 117 LEDs, residual 0.1671, prediction error 0.2943, 37 s
+[blood_223858] sub_02: fraction 0.30 draw 1: 75 LEDs, residual 0.1648, prediction error 0.3516, 23 s
+[blood_223858] sub_03: fraction 0.50 draw 1: 117 LEDs, residual 0.1686, prediction error 0.3022, 36 s
+[blood_223858] sub_04: fraction 0.30 draw 2: 75 LEDs, residual 0.1601, prediction error 0.3449, 23 s
+[blood_223858] sub_05: fraction 0.50 draw 2: 117 LEDs, residual 0.1665, prediction error 0.31, 37 s
+  ! run_info.json says led_to_sample_mm = 60.0, this run uses z_source_mm = 55.0.
+Patch: 512 x 512 px, centre (x 960.5, y 540.5) = (0.000, 0.000) mm from the image centre
+Sample-plane pixel: 1.2600 um, patch width 645.1 um
+Pupil radius: 101.91 spectrum pixels; bright-field LEDs 9 of 225 (predicted), max. illumination NA 0.4751
+  ! No dark frame and no frame without light: the camera offset is NOT removed (give dark_frame_file or background_offset).
+Hot pixels: 3345 replaced in every frame (1.28 % of the patch)
+Direct beam: no clear background in this patch; transition LEDs are taken from the geometry (+-10 % of the NA)
+  ! 0 LED(s) predicted bright-field are dark and 3 predicted dark-field are bright in this patch: check z_source_mm, optical_axis_*_mm and the orientation flags.
+  ! 4 LED(s) are within 10 % of the objective NA (bright/dark transition): (28,54) (30,52) (26,52) (28,50). They are NOT used (skip_transition_frames = false keeps them).
+Frames used: 221 (9 bright-field by prediction)
+Geometry check (33 low-angle frames, short AP runs on the central 256 px, misfit to the frames as measured):
+   z [mm]     :   44.0   46.2   48.4   50.6   52.8   55.0   57.2   59.4   61.6   63.8   66.0
+   misfit     : 0.4196 0.4196 0.4176 0.4161 0.4137 0.4101 0.4055 0.4022 0.4004 0.3970 0.3993
+   orientation at 55.0 mm: as set 0.4101 | led_y_sign * -1 0.4415 | swap_led_xy reversed 0.4364 | both 0.4426
+   step search (19 runs): z = 55.0 mm, optical axis (+0.00, +0.00) mm, swap_led_xy = 0, led_y_sign = -1
+   misfit: 0.4101 with the settings as given, 0.4101 with the best values found
+Reconstruction grid: 1536 x 1536 (pixel 0.4200 um), synthetic NA 0.575
+Resolution (full pitch): raw lambda/NA = 6.33 um -> lambda/NA_syn = 1.10 um
+[leaf_215808] geometry: z 55.00 mm, axis (+0.00, +0.00) mm, swap False, y sign -1
+[leaf_215808] dense: 221 LEDs, residual 0.2189, 67 s
+[leaf_215808] sub_00: fraction 0.30 draw 0: 73 LEDs, residual 0.2288, prediction error 0.4372, 23 s
+[leaf_215808] sub_01: fraction 0.50 draw 0: 115 LEDs, residual 0.2141, prediction error 0.4364, 42 s
+[leaf_215808] sub_02: fraction 0.30 draw 1: 73 LEDs, residual 0.2266, prediction error 0.4463, 27 s
+[leaf_215808] sub_03: fraction 0.50 draw 1: 115 LEDs, residual 0.2222, prediction error 0.4328, 36 s
+[leaf_215808] sub_04: fraction 0.30 draw 2: 73 LEDs, residual 0.2187, prediction error 0.4525, 24 s
+[leaf_215808] sub_05: fraction 0.50 draw 2: 115 LEDs, residual 0.2243, prediction error 0.4352, 35 s
+  ! run_info.json says led_to_sample_mm = 60.0, this run uses z_source_mm = 55.0.
+Patch: 512 x 512 px, centre (x 960.5, y 540.5) = (0.000, 0.000) mm from the image centre
+Sample-plane pixel: 1.2600 um, patch width 645.1 um
+Pupil radius: 101.91 spectrum pixels; bright-field LEDs 9 of 225 (predicted), max. illumination NA 0.4751
+Background offset: 123.00 (median of the darkest frame; no dark frame given)
+Hot pixels: 416 replaced in every frame (0.16 % of the patch)
+Direct beam: clear background of the patch (1424 pixels): 10 bright-field, 4 transition, 211 dark-field LEDs
+  ! 1 LED(s) with a bright background are dark-field LEDs for these settings and 0 LED(s) with a dark background are bright-field LEDs: check z_source_mm, optical_axis_*_mm, objective_NA and the orientation flags.
+  ! 4 LED(s) light this patch through the edge of the objective aperture (clear background at 10-28 % of the bright-field level): (28,54) (27,54) (26,53) (26,51) - bright/dark transition frames, which do not fit one coherent pupil. They are NOT used (skip_transition_frames = false keeps them).
+Frames used: 221 (9 bright-field by prediction)
+Geometry check (33 low-angle frames, short AP runs on the central 256 px, misfit to the frames as measured):
+   z [mm]     :   44.0   46.2   48.4   50.6   52.8   55.0   57.2   59.4   61.6   63.8   66.0
+   misfit     : 0.4151 0.4124 0.4067 0.3951 0.3788 0.3658 0.3540 0.3167 0.3213 0.3355 0.3583
+   orientation at 59.4 mm: as set 0.3167 | led_y_sign * -1 0.3804 | swap_led_xy reversed 0.3871 | both 0.4130
+   step search (139 runs): z = 59.4 mm, optical axis (-0.70, -0.23) mm, swap_led_xy = 0, led_y_sign = -1
+   misfit: 0.3658 (and 1 LED(s) on the wrong side of the aperture edge) with the settings as given, 0.2283 with the best values found
+   APPLIED to this run.
+  ! Geometry check: z_source_mm = 59.4 mm fits the frames better than 55.0 mm (objective_NA = 0.108 at 55.0 mm is equivalent). Measure the LED-to-sample distance again.
+  ! Geometry check: optical_axis_x_mm = -0.70, optical_axis_y_mm = -0.23 fits better than (0.00, 0.00): the scan centre is not exactly on the optical axis.
+  ! Geometry check: misfit 0.3658 (and 1 LED(s) on the wrong side of the aperture edge) with the settings as given, 0.2283 with the values above.
+Reconstruction grid: 1536 x 1536 (pixel 0.4200 um), synthetic NA 0.555
+Resolution (full pitch): raw lambda/NA = 6.33 um -> lambda/NA_syn = 1.14 um
+[blood_225108] geometry: z 59.40 mm, axis (-0.70, -0.23) mm, swap False, y sign -1
+[blood_225108] dense: 221 LEDs, residual 0.1756, 69 s
+[blood_225108] sub_00: fraction 0.30 draw 0: 74 LEDs, residual 0.1627, prediction error 0.334, 23 s
+[blood_225108] sub_01: fraction 0.50 draw 0: 116 LEDs, residual 0.1663, prediction error 0.2983, 37 s
+[blood_225108] sub_02: fraction 0.30 draw 1: 74 LEDs, residual 0.1633, prediction error 0.3695, 25 s
+[blood_225108] sub_03: fraction 0.50 draw 1: 116 LEDs, residual 0.1671, prediction error 0.3069, 40 s
+[blood_225108] sub_04: fraction 0.30 draw 2: 74 LEDs, residual 0.1566, prediction error 0.3524, 23 s
+[blood_225108] sub_05: fraction 0.50 draw 2: 116 LEDs, residual 0.1672, prediction error 0.315, 36 s
+  ! run_info.json says led_to_sample_mm = 60.0, this run uses z_source_mm = 55.0.
+Patch: 512 x 512 px, centre (x 960.5, y 540.5) = (0.000, 0.000) mm from the image centre
+Sample-plane pixel: 1.2600 um, patch width 645.1 um
+Pupil radius: 101.91 spectrum pixels; bright-field LEDs 9 of 225 (predicted), max. illumination NA 0.4751
+Background offset: 142.00 (median of the darkest frame; no dark frame given)
+Hot pixels: 416 replaced in every frame (0.16 % of the patch)
+Direct beam: clear background of the patch (1838 pixels): 10 bright-field, 4 transition, 211 dark-field LEDs
+  ! 1 LED(s) with a bright background are dark-field LEDs for these settings and 0 LED(s) with a dark background are bright-field LEDs: check z_source_mm, optical_axis_*_mm, objective_NA and the orientation flags.
+  ! 4 LED(s) light this patch through the edge of the objective aperture (clear background at 11-30 % of the bright-field level): (28,54) (27,54) (26,53) (26,51) - bright/dark transition frames, which do not fit one coherent pupil. They are NOT used (skip_transition_frames = false keeps them).
+Frames used: 221 (9 bright-field by prediction)
+Geometry check (33 low-angle frames, short AP runs on the central 256 px, misfit to the frames as measured):
+   z [mm]     :   44.0   46.2   48.4   50.6   52.8   55.0   57.2   59.4   61.6   63.8   66.0
+   misfit     : 0.4145 0.4126 0.4084 0.3971 0.3823 0.3696 0.3565 0.3170 0.3212 0.3347 0.3563
+   orientation at 59.4 mm: as set 0.3170 | led_y_sign * -1 0.3796 | swap_led_xy reversed 0.3861 | both 0.4114
+   step search (139 runs): z = 59.4 mm, optical axis (-0.70, -0.23) mm, swap_led_xy = 0, led_y_sign = -1
+   misfit: 0.3696 (and 1 LED(s) on the wrong side of the aperture edge) with the settings as given, 0.2316 with the best values found
+   APPLIED to this run.
+  ! Geometry check: z_source_mm = 59.4 mm fits the frames better than 55.0 mm (objective_NA = 0.108 at 55.0 mm is equivalent). Measure the LED-to-sample distance again.
+  ! Geometry check: optical_axis_x_mm = -0.70, optical_axis_y_mm = -0.23 fits better than (0.00, 0.00): the scan centre is not exactly on the optical axis.
+  ! Geometry check: misfit 0.3696 (and 1 LED(s) on the wrong side of the aperture edge) with the settings as given, 0.2316 with the values above.
+Reconstruction grid: 1536 x 1536 (pixel 0.4200 um), synthetic NA 0.555
+Resolution (full pitch): raw lambda/NA = 6.33 um -> lambda/NA_syn = 1.14 um
+[blood_230302_2s] geometry: z 59.40 mm, axis (-0.70, -0.23) mm, swap False, y sign -1
+[blood_230302_2s] dense: 221 LEDs, residual 0.1742, 65 s
+[blood_230302_2s] sub_00: fraction 0.30 draw 0: 74 LEDs, residual 0.1610, prediction error 0.3366, 24 s
+[blood_230302_2s] sub_01: fraction 0.50 draw 0: 116 LEDs, residual 0.1645, prediction error 0.2993, 37 s
+skip Blood__fpm_cs2100m_raster_20261123_222619_L512 (not packed)
+skip LEAF__fpm_cs2100m_raster_20261123_214040_L512 (not packed)
+skip Blood__fpm_cs2100m_raster_20261123_222619_R512 (not packed)
+skip LEAF__fpm_cs2100m_raster_20261123_214040_R512 (not packed)

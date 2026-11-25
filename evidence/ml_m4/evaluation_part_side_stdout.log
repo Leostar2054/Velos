@@ -1,0 +1,10 @@
+  blood_230302_2s sub_00 (74 LEDs): physics 30.36dB/0.3366 · v2 27.76dB/0.3558 · fpm_v1 32.85dB/0.3463 · physics+5 30.60dB/0.3357 · physics+10 30.71dB/0.3352 · hybrid@5 31.37dB/0.3300 · hybrid@10 31.24dB/0.3305
+  blood_230302_2s sub_01 (116 LEDs): physics 33.49dB/0.2993 · v2 27.85dB/0.3186 · fpm_v1 34.39dB/0.3038 · physics+5 33.75dB/0.2973 · physics+10 33.88dB/0.2956 · hybrid@5 33.87dB/0.2967 · hybrid@10 33.87dB/0.2952
+  blood_222619_L512 sub_00 (73 LEDs): physics 23.71dB/0.4576 · v2 24.22dB/0.4750 · fpm_v1 27.38dB/0.6362 · physics+5 23.28dB/0.4594 · physics+10 22.76dB/0.4612 · hybrid@5 27.78dB/0.4442 · hybrid@10 27.33dB/0.4483
+  blood_222619_L512 sub_01 (115 LEDs): physics 30.00dB/0.4199 · v2 26.53dB/0.4698 · fpm_v1 29.36dB/0.5108 · physics+5 30.10dB/0.4195 · physics+10 29.86dB/0.4195 · hybrid@5 31.03dB/0.4125 · hybrid@10 30.88dB/0.4127
+  blood_222619_R512 sub_00 (73 LEDs): physics 21.07dB/0.4936 · v2 22.04dB/0.5281 · fpm_v1 25.52dB/0.6438 · physics+5 20.62dB/0.4921 · physics+10 20.11dB/0.4909 · hybrid@5 24.06dB/0.4939 · hybrid@10 23.22dB/0.4925
+  blood_222619_R512 sub_01 (114 LEDs): physics 24.41dB/0.4946 · v2 23.34dB/0.5385 · fpm_v1 25.66dB/0.5416 · physics+5 24.62dB/0.4942 · physics+10 24.65dB/0.4938 · hybrid@5 25.24dB/0.4949 · hybrid@10 24.98dB/0.4941
+  leaf_214040_L512 sub_00 (73 LEDs): physics 12.30dB/0.4503 · v2 12.34dB/0.4544 · fpm_v1 16.52dB/0.9298 · physics+5 12.24dB/0.4536 · physics+10 12.21dB/0.4569 · hybrid@5 14.47dB/0.5056 · hybrid@10 14.25dB/0.4955
+  leaf_214040_L512 sub_01 (116 LEDs): physics 13.94dB/0.4313 · v2 14.22dB/0.4431 · fpm_v1 16.69dB/0.9252 · physics+5 13.94dB/0.4325 · physics+10 13.91dB/0.4341 · hybrid@5 16.27dB/0.4842 · hybrid@10 16.26dB/0.4843
+  leaf_214040_R512 sub_00 (74 LEDs): physics 12.81dB/0.4459 · v2 12.93dB/0.4512 · fpm_v1 16.68dB/0.9360 · physics+5 12.73dB/0.4491 · physics+10 12.67dB/0.4524 · hybrid@5 14.88dB/0.5050 · hybrid@10 14.70dB/0.4934
+  leaf_214040_R512 sub_01 (114 LEDs): physics 14.28dB/0.4379 · v2 14.54dB/0.4505 · fpm_v1 16.88dB/0.8339 · physics+5 14.24dB/0.4384 · physics+10 14.18dB/0.4392 · hybrid@5 15.95dB/0.4674 · hybrid@10 15.81dB/0.4684

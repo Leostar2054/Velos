@@ -47,4 +47,4 @@ stack is rehearsed by CI on every push). Handover, retraining and routine tasks:
 | M4 (Nov 2026) | in-house LED-array FPM engine (MATLAB → Python, validated) and real biological samples (blood smear, leaf) through the API; FPM AI model fine-tuned and evaluated on real data; production stack rehearsed in CI with load test and monitoring; GHCR images; runbook, handover guide, licences |
 
 Configuration and secrets are environment variables only (`deploy/.env.example`, `backend/.env.example`).
-Development used an AI coding assistant; such commits carry a `Co-Authored-By` trailer.
+Development used an AI coding assistant (Claude) throughout; commits from M3 on carry a `Co-Authored-By` trailer.

@@ -61,7 +61,7 @@ alert rules), logs, backups and recovery procedures, GPU worker, CI/CD settings,
 | Model | Data | Pipeline | Time (CPU, 2 cores) |
 |---|---|---|---|
 | `velos-refine-v2` (scanning ptychography) | simulated phantoms + 635 nm clam scan | `ml/scripts/m3_pipeline.sh` (`MAT_DIR=<folder with the .mat datasets>`) | several hours (GPU: < 1 h) |
-| `velos-refine-fpm-v1` (LED-array FPM) | blood-smear and leaf scans of 23 Nov 2026 | `PACK=<packed crops> ml/scripts/m4_fpm_pipeline.sh` (stages `data`, `train`, `eval`, `package`) | ~1.5 h data + ~1 h training |
+| `velos-refine-fpm-v1` (LED-array FPM) | blood-smear and leaf scans of 23 Nov 2026 (+ side regions for testing) | `PACK=<packed crops> ml/scripts/m4_fpm_pipeline.sh` (stages `data`, `train`, `eval`, `package`) | ~1.5 h data + 50 min training + 30 min evaluation (GPU: much less) |
 
 To add new FPM samples: pack the acquisitions (`tools/fpm_packing/`: `pack_fpm_for_velos.py` / `.m` keeps all frames
 of the central N×N pixels; `pack_fpm_side_regions.m` packs the regions left and right of it), add them to the `data` stage of
@@ -87,8 +87,10 @@ the model output.
 
 * No Velos cloud account yet: the production stack is rehearsed on every push in CI; the server rollout follows the
   runbook (§4 B of `docs/deployment.md`). TLS on the real domain and the GPU worker are untested until then.
-* The FPM AI model was fine-tuned on one field of view per specimen type (blood smear, leaf section); it must be
-  re-evaluated on new samples before use (see its model card and `docs/ml-pipeline.md`).
+* The FPM AI model is validated for the **blood smear in the hybrid mode** (`hybrid_iters` 5) only. Its output alone
+  removes reduced-LED artefacts but does not predict unmeasured LED images better (for viewing, not for quantitative
+  values); for the **leaf section it is not validated** (output inconsistent with the measured images). It was trained
+  on one field of view per specimen type: re-evaluate it on new samples before use (model card, `docs/ml-pipeline.md`).
 * The four blood scans (and the leaf scans) of 23 Nov repeat the same field of view; the evaluation therefore uses
   spatial hold-out regions, unseen LED draws and sensor regions outside the training crop.
 * `run_info.json` labels the LEDs GREEN while the analysis uses 633 nm (red, as in the set-up photo) — confirm.

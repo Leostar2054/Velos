@@ -88,9 +88,30 @@ summary reports `modality: "fpm"`. Jobs use the FPM engines:
  "iters": 24,                                  // passes after the warm-up
  "fpm": {"Np": 256, "geometry_check": "report"},
  "sparse_fraction": 0.5,                       // optional: reduced LED set (all LEDs inside 1.1 × NA + 50 % of the rest)
- "refine_ml": true, "hybrid_iters": 10}        // optional: FPM model package + hybrid polish
+ "refine_ml": true, "hybrid_iters": 5}         // optional: FPM model package + hybrid polish (5 recommended)
 ```
 
 The result summary contains the residuals, the patch geometry, the check list, the data residual and —
 for a reduced LED set — the prediction error on the LEDs that were not used, and, with `refine_ml`, the
 same numbers for the refined and the hybrid estimates (`consistency` flag as for ptychography).
+
+## AI refinement on real samples (M4)
+
+`models/velos-refine-fpm-v1` (modality `fpm`) refines the EPRY reconstruction of a **reduced LED set** (all LEDs
+inside 1.1 × NA + 30–50 % of the dark-field LEDs, i.e. about a third to a half of the acquisition time) toward the
+reconstruction from all LEDs. It was fine-tuned from the M3 model on the blood-smear and leaf scans of 23 Nov
+(left 65 % of the field only) and evaluated on the right 35 %, on unseen LED draws and on sensor regions never used
+for training — results, figures and limitations in `docs/ml-pipeline.md` (M4) and `evidence/ml_m4/`.
+
+**End-to-end through the API** (`scripts/demo_m4.sh`, transcripts in `evidence/api_m4/`) on 160 × 160-px crops of
+the hold-out region: upload → reference job with all LEDs → job with ~73 LEDs + FPM model + 10 hybrid passes.
+
+| Hold-out crop | LEDs used / all | Data error on the LEDs used (physics / AI / hybrid) | Prediction error on the LEDs **not** used (physics / AI / hybrid) | Job time (2 CPU cores) |
+|---|---|---|---|---|
+| blood smear 222619 | 72 / 218 | 0.155 / 0.154 / 0.151 | 0.405 / **0.361** (−11 %) / 0.384 (−5 %) | 19 s all LEDs · 11 s reduced + AI + hybrid |
+| leaf section 214040 | 74 / 222 | 0.223 / 0.231 / 0.202 | 0.513 / 0.565 (+10 %) / **0.504** (−2 %) | 18 s · 11 s |
+
+![API demo, blood hold-out crop: physics, AI and hybrid](../evidence/api_m4/blood_222619/comparison_ml.png)
+
+The consistency numbers come with every job, so the user sees when the AI estimate fits the measurements worse than
+physics (leaf: prefer the hybrid or the physics result).

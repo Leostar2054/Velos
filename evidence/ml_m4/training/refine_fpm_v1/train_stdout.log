@@ -1,0 +1,13 @@
+[train] initialised from runs/refine_v2/best.pt (epoch 15)
+[train] refine_fpm_v1: 2448 train / 25 val · 7,766,018 params · cpu
+  epoch   1/10  train 0.5161  val 0.1594  lr 3.0e-04  (271s)
+  epoch   2/10  train 0.3857  val 0.1744  lr 2.9e-04  (593s)
+  epoch   3/10  train 0.3839  val 0.1512  lr 2.6e-04  (867s)
+  epoch   4/10  train 0.3731  val 0.1433  lr 2.2e-04  (1158s)
+  epoch   5/10  train 0.3688  val 0.1320  lr 1.8e-04  (1444s)
+  epoch   6/10  train 0.3700  val 0.1368  lr 1.2e-04  (1748s)
+  epoch   7/10  train 0.3746  val 0.1289  lr 7.5e-05  (2030s)
+  epoch   8/10  train 0.3679  val 0.1380  lr 3.5e-05  (2317s)
+  epoch   9/10  train 0.3623  val 0.1498  lr 9.0e-06  (2610s)
+  epoch  10/10  train 0.3634  val 0.1464  lr 1.3e-09  (2887s)  *
+[train] done in 2887s · best val loss 0.1464 → runs/refine_fpm_v1
