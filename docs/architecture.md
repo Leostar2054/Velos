@@ -1,4 +1,4 @@
-# Velos BioImaging platform — architecture (M1 deliverable, updated at M2 and M3)
+# Velos BioImaging platform — architecture (M1 deliverable, updated at M2, M3 and M4)
 
 ```
                          ┌──────────────────────────────┐
@@ -14,19 +14,23 @@
                          └──────────────┬───────────────┘        └──────────┬──────────┘│
                                         │ writes uploads                     │ claims    │
                          ┌──────────────▼───────────────┐        ┌──────────▼──────────┐│
-                         │  Storage (local volume;       │◀──────▶│  Worker process(es)  ││
-                         │  S3/GCS adapter at M4)        │ results│  velos_backend.worker││
+                         │  Storage (Docker volume;      │◀──────▶│  Worker process(es)  ││
+                         │  object storage: later)       │ results│  velos_backend.worker││
                          │  datasets/<id>/  jobs/<id>/   │        └──────────┬──────────┘│
                          └──────────────────────────────┘                   │           │
                                                                  ┌───────────▼──────────┐│
                                                                  │ velos_recon           ││
                                                                  │ Client's physics      ││
-                                                                 │ engines (core.py)     ││
+                                                                 │ engines (core.py),    ││
+                                                                 │ LED-array FPM (fpm.py)││
                                                                  │ + refine.py: ONNX     ││
                                                                  │ model package, hybrid ││
                                                                  └──────────────────────┘│
-   Production (M4): Caddy edge (TLS, static site, /api proxy) → api → worker(s); see docs/deployment.md
+   Production (M4): Caddy edge (TLS, static site, /api proxy) → api → worker(s); Prometheus scrapes /metrics
+   (compose profile "monitoring"); the whole stack is rehearsed by CI on every push — see docs/deployment.md
 ```
+
+![Platform architecture at M4](../evidence/diagrams/platform_architecture_m4.png)
 
 ## Components
 
@@ -38,7 +42,9 @@
 | Physics engines | `backend/velos_recon/` | Client's `ptycho_core.py` vendored unchanged (`core.py`) + driver, data loaders, metrics, viz | ePIE / rPIE / WASP / GD / MAP selectable per job |
 | ML pipeline | `ml/velos_ml/` | PyTorch, YAML configs | Synthetic (v2) and experimental training data, refinement U-Net v2, two-stage training, evaluation vs GT / dense reference with registration, ONNX + TorchScript packaging with model card (M3) |
 | ML runtime | `backend/velos_recon/refine.py`, `normalise.py` | ONNX Runtime (CPU/CUDA), TorchScript fallback | Model packages in `VELOS_MODEL_DIR`; 256-px tiles with Hann blending; hybrid physics polish; data-consistency check (M3) |
-| Deployment | `docker-compose.prod.yml`, `deploy/`, `*/Dockerfile`, `.github/workflows/ci.yml` | Docker, Caddy, GitHub Actions | Deployment-ready (M3): validated configs, smoke test, runbook; cloud deployment on a Velos-owned account in M4 |
+| LED-array FPM (M4) | `backend/velos_recon/fpm.py`, `velos_backend/fpm_jobs.py` | NumPy/SciPy | Port of the in-house MATLAB AP/EPRY/rPIE engine (validated against MATLAB), acquisition-folder / packed / API loaders, reduced-LED sets, data and prediction errors, FPM model packages |
+| Monitoring (M4) | `GET /metrics`, `deploy/prometheus/` | Prometheus, JSON logs, health checks | jobs, queue age, durations, HTTP counters, worker heartbeats; 5 alert rules |
+| Deployment | `docker-compose.prod.yml`, `docker-compose.gpu.yml`, `deploy/`, `*/Dockerfile*`, `scripts/deploy_server.sh`, `.github/workflows/ci.yml` | Docker, Caddy, GitHub Actions, GHCR | M4: production stack built, started, smoke/load/monitoring/redeploy-tested by CI on every push; images published; server deploy script; GPU worker override |
 
 ## Key design decisions
 
@@ -63,6 +69,12 @@
 8. **Every ML output is checked against the measurements (M3).** The worker reports the data-consistency error
    (Fourier-magnitude misfit to the measured diffraction patterns) of the physics, ML and hybrid estimates and
    flags results that fit the data much worse than the physics; the physics result is always kept.
+9. **One platform, two microscopes (M4).** LED-array FPM datasets carry `modality = fpm`; the same upload, job,
+   status, result, model-package and consistency-check machinery serves both modalities; model cards declare their
+   modality and a job only ever uses a package of its own modality.
+10. **Operations are part of the code (M4).** Metrics, alert rules, health checks, log format, deploy script and the
+    CI rehearsal of the production stack live in the repository, so a redeployment is reproducible by anyone with
+    the repository and a server.
 
 ## Request flow (end to end)
 

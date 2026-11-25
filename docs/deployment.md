@@ -1,10 +1,12 @@
-# Deployment runbook — Velos platform (website + API + worker + ML model)
+# Deployment and operations runbook — Velos platform (website + API + worker + AI models)
 
-Status (M3, 12 Nov 2026): **deployment-ready package**. The images, production compose file,
-edge-server configuration, CI/CD workflow and smoke test are in the repository and were
-validated as far as possible without a cloud account and without a Docker daemon (see
-§9). The actual staging/production deployment on a **Velos-owned** cloud account is
-scheduled for **M4** (agreed with the Client on 11 Nov 2026).
+Status (M4, 25 Nov 2026). The complete production stack is built, started and tested automatically on every
+push to `main` of the Client-owned repository (`github.com/Leostar2054/Velos`, GitHub Actions job **stack**):
+HTTPS edge server with the website, API, worker, Prometheus monitoring; smoke test including an FPM job on
+real blood-smear data, a load/stability test, a monitoring check and a redeployment test. Images are published
+to the GitHub Container Registry. The rollout on a Velos-owned cloud or on-premises server uses the same files
+with `scripts/deploy_server.sh` (§4); a GPU worker is one override file away (§8). No Velos cloud account existed
+at M4; see the M4 scope-change confirmation.
 
 ## 1. Topology
 
@@ -12,145 +14,162 @@ scheduled for **M4** (agreed with the Client on 11 Nov 2026).
                     Internet (HTTPS 443 / HTTP 80 → redirect)
                                    │
                         ┌──────────▼──────────┐
-                        │ edge  (Caddy 2.8)   │  TLS certificates (automatic), gzip/zstd,
-                        │ static website      │  security headers, JSON access log
+                        │ edge  (Caddy 2.8)   │  automatic TLS certificates, gzip/zstd, security headers,
+                        │ static website      │  JSON access log; /metrics is NOT exposed
                         │ /api/* /health /docs│──────────┐
                         └─────────────────────┘          │ reverse proxy
+                                                ┌────────▼────────┐        ┌──────────────────┐
+                                                │ api (FastAPI)   │◄───────│ prometheus       │  scrapes /metrics,
+                                                │ uvicorn :8000   │ /metrics│ (profile         │  alert rules,
+                                                └────────┬────────┘        │  "monitoring")   │  127.0.0.1:9090
+                               SQLite (WAL) job queue +  │                 └──────────────────┘
+                               datasets + job outputs    │  volume velos-data:/data
                                                 ┌────────▼────────┐
-                                                │ api (FastAPI)   │  uploads, jobs, results,
-                                                │ uvicorn :8000   │  auth, model cards
-                                                └────────┬────────┘
-                               SQLite (WAL) job queue +  │  volume velos-data:/data
-                               datasets + job outputs    │
-                                                ┌────────▼────────┐
-                                                │ worker (1..n)   │  physics engines (client's
-                                                │ CPU now, GPU M4 │  ptycho_core) + ONNX model
-                                                └─────────────────┘  read-only volume ./models
+                                                │ worker (1..n)   │  ptychography engines (Client's ptycho_core),
+                                                │ CPU or GPU      │  LED-array FPM engine (port of the MATLAB code),
+                                                └─────────────────┘  ONNX models from ./models (read-only)
 ```
 
-* One VM is enough for staging and early production (e.g. 4 vCPU / 16 GB; for GPU
-  inference a single T4/L4-class GPU instance).
+* One VM is enough for the product-validation stage (4 vCPU / 16 GB RAM; for GPU inference one T4/L4-class GPU).
 * Datasets, results and the job database live on the `velos-data` volume (back it up, §6).
-* Model packages are plain directories under `./models` on the host (mounted read-only).
+* Model packages are directories under `./models` (tracked in git: `velos-refine-v2` for scanning ptychography,
+  `velos-refine-fpm-v1` for LED-array FPM; the TorchScript copies are in the release package).
 
-## 2. Prerequisites (Client side, M4)
+## 2. Prerequisites (Client side)
 
 | Item | Owner | Notes |
 |---|---|---|
-| Cloud account (AWS / GCP / Azure / NCP) | **Velos BioImaging** | Created and paid by Velos; the contractor gets a limited IAM user. No deployment runs under a personal account. |
-| VM with Docker Engine + Compose v2 | Velos / contractor | Ubuntu 22.04/24.04 LTS; ports 80/443 open; SSH restricted to admin IPs |
-| DNS record | Velos | `A` record of the chosen domain (or sub-domain such as `app.`) → VM public IP |
-| Mailbox for certificate notices | Velos | used as `ACME_EMAIL` |
-| Container registry (optional) | Velos | GHCR / ECR / Artifact Registry — needed only for the CI deploy job |
-| GitHub repository settings | Velos | secrets for the deploy job (§7) |
+| Cloud account (AWS / GCP / Azure / NCP) or an on-premises Linux server | **Velos BioImaging** | Paid by Velos; contractors get a limited user. No deployment runs under a personal account. |
+| VM with Docker Engine + Compose v2 | Velos | Ubuntu 22.04/24.04 LTS; ports 80/443 open; SSH key-only, restricted to admin IPs |
+| DNS record | Velos | `A` record of the domain (or a sub-domain such as `app.`) → VM public IP |
+| Mailbox for certificate notices | Velos | `ACME_EMAIL` |
+| GitHub repository | Velos (done) | `Leostar2054/Velos`; secrets/variables for the deploy job (§7) |
 
 ## 3. Configuration and secrets
 
-All configuration comes from environment variables; nothing secret is stored in git.
-
-| File | Purpose |
-|---|---|
-| `deploy/.env.example` | template for the server's `deploy/.env` (domain, API keys, model, tag) |
-| `backend/.env.example` | template for local development |
-
-Generate API keys with `python -c "import secrets; print(secrets.token_urlsafe(32))"` and
-set `VELOS_API_KEYS=key1:lab:user,key2:admin:admin`. Rotate keys by editing the file and
-running `docker compose … up -d` (the API re-reads the environment on restart).
-
-Main variables (full list in `backend/velos_backend/config.py`):
+Everything comes from environment variables; nothing secret is stored in git (`deploy/.env.example` is the template
+for the server's `deploy/.env`, `chmod 600`).
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `SITE_DOMAIN` | — | public domain served by the edge (":8080" = plain HTTP rehearsal) |
-| `VELOS_API_KEYS` | dev key (insecure) | API keys and roles |
-| `VELOS_MODEL_DIR` | `/models` | model packages |
-| `VELOS_DEFAULT_MODEL` | first package | package used when a job does not name one |
-| `VELOS_ML_RUNTIME` | `auto` | `onnxruntime` (preferred) or `torchscript` |
-| `VELOS_MAX_UPLOAD_MB` | 2048 | upload limit (Caddy also limits bodies to 2 GB) |
+| `SITE_DOMAIN` | — | domain served by the edge (`:80` = plain HTTP, used in CI) |
+| `SITE_URL` | `https://velos.example.com` | public address used in canonical URLs and the sitemap |
+| `ACME_EMAIL` | — | certificate-authority contact |
+| `CONTACT_EMAIL` | empty (hidden) | contact address shown on the website |
+| `VELOS_API_KEYS` | — (dev key if unset) | `key:name:role` list; generate keys with `python -c "import secrets; print(secrets.token_urlsafe(32))"` |
+| `VELOS_DEFAULT_MODEL` | first package of the modality | ptychography default package; FPM jobs pick an FPM package automatically |
+| `VELOS_ML_RUNTIME` | `auto` | `onnxruntime` (CPU or CUDA) or `torchscript` |
+| `VELOS_MAX_UPLOAD_MB` | 2048 | upload limit (the edge also limits bodies to 2 GB) |
+| `VELOS_LOG_FORMAT` | `json` in production | `json` (one object per line) or `text` |
+| `VELOS_METRICS_TOKEN` | empty | if set, `/metrics` needs `Authorization: Bearer <token>` (add it to `deploy/prometheus/prometheus.yml`) |
+| `VELOS_TAG` | `0.4.0` | image tag |
 
-## 4. First deployment
+## 4. Deployment
+
+**A. Automatic rehearsal on every push (already running).** The CI job *stack* (`.github/workflows/ci.yml`) copies
+`deploy/.env.example`, sets CI values, then runs exactly the production commands: `docker compose -f
+docker-compose.prod.yml --profile monitoring build/up`, `scripts/smoke_test.sh` (with `FPM_DATA=examples/fpm/
+blood_222619_c256.npz`), `scripts/load_test.py`, the Prometheus checks and a redeployment (`up -d --force-recreate api
+worker`). Its log is the deployment evidence (Actions tab → run → *Production stack*).
+
+**B. First deployment on a Velos server.**
 
 ```bash
-# on the server
-sudo mkdir -p /opt/velos && cd /opt/velos
-git clone <velos repository> .            # or copy the release bundle
-cp deploy/.env.example deploy/.env && nano deploy/.env
-mkdir -p models && cp -r <package>/velos-refine-v2 models/   # from 03_Model_Package
-docker compose -f docker-compose.prod.yml --env-file deploy/.env up -d --build
-docker compose -f docker-compose.prod.yml ps                 # api must be "healthy"
-scripts/smoke_test.sh https://$SITE_DOMAIN <user-api-key>    # all checks must PASS
+sudo mkdir -p /opt/velos && sudo chown $USER /opt/velos && cd /opt/velos
+git clone https://github.com/Leostar2054/Velos.git .
+cp deploy/.env.example deploy/.env && chmod 600 deploy/.env && nano deploy/.env   # domain, keys, e-mails
+MONITORING=1 SMOKE_API_KEY=<a user key> scripts/deploy_server.sh                  # build, start, wait, smoke test
 ```
 
-The edge obtains the TLS certificate automatically on first start (DNS must already point
-to the VM). The smoke test checks health, the four website pages, authentication, the model
-list, an upload, a reconstruction job with ML refinement + hybrid mode, the result and an
-artifact download.
+`deploy_server.sh` validates the compose file, builds the images for the real domain, starts or updates the stack,
+waits for `/health` and runs the smoke test. The edge obtains the TLS certificate on first start (DNS must point to
+the VM). Alternatively pull the published images: `ghcr.io/leostar2054/velos-backend:<sha>` and
+`ghcr.io/leostar2054/velos-edge:<sha>` (the edge image is built for the placeholder site URL; build it on the server
+for the real domain).
 
 ## 5. Updates, model releases and rollback
 
-* **Code update:** `git pull && docker compose -f docker-compose.prod.yml --env-file deploy/.env up -d --build`,
-  then the smoke test. Running jobs finish on the old worker (stop it with `docker compose stop worker`
-  first if a long job must not be interrupted).
-* **Model update:** copy the new package directory into `models/` (e.g. `velos-refine-v3/`),
-  check its `model_card.json` (verification passed, evaluation, limitations), set
-  `VELOS_DEFAULT_MODEL` and restart `api worker`. Older packages stay selectable per job
-  (`"model": "<id>"`), so a model rollback is a one-line change.
-* **Rollback (images):** set `VELOS_TAG` to the previous tag in `deploy/.env` and `up -d`.
+* **Code update:** `git pull && MONITORING=1 scripts/deploy_server.sh`. Running jobs finish on the old worker
+  (`docker compose stop worker` first if a long job must not be interrupted). With `DEPLOY_ENABLED=true` the CI deploy
+  job does this over SSH after every green build of `main`.
+* **Model update:** copy the new package directory into `models/` (e.g. `velos-refine-fpm-v2/`), check its
+  `model_card.json` (verification passed, evaluation, limitations), restart `api worker`. Older packages stay
+  selectable per job (`"model": "<id>"`), so a model rollback is a one-line change.
+* **Rollback (code):** `git checkout <previous tag or commit> && scripts/deploy_server.sh`.
 
-## 6. Backups, logs and monitoring
+## 6. Monitoring, logging, backups and recovery
 
-* **Backup:** nightly copy of the `velos-data` volume (SQLite database + datasets + results):
-  `docker run --rm -v velos_velos-data:/d -v /backup:/b alpine tar czf /b/velos-$(date +%F).tgz -C /d .`
-  plus the `models/` directory and `deploy/.env` (store the latter encrypted).
-* **Logs:** `docker compose logs -f api worker edge` (edge logs are JSON). Configure the Docker
-  `json-file` driver with rotation (`max-size: 50m`, `max-file: 5`) or ship to the cloud's log service.
-* **Monitoring:** an external uptime check on `https://<domain>/health` (status, version,
-  queue depth, installed models); alert when the queue stays non-empty with no running job.
-* **Disk:** alert at 80 % on the data volume (uploads up to 2 GB each).
+**Metrics.** `GET /metrics` (Prometheus text format, inside the compose network only): jobs by status, queue age,
+job durations, datasets, installed models, per-route HTTP counts and latency, worker heartbeats. Start Prometheus with
+`MONITORING=1` (profile `monitoring`); UI on `127.0.0.1:9090` (SSH tunnel: `ssh -L 9090:localhost:9090 <server>`).
+Alert rules (`deploy/prometheus/alerts.yml`): API down, worker stalled (no heartbeat for 2 min), queue backlog
+(> 15 min), more than 3 failed jobs per hour, API 5xx errors. Connect Alertmanager or Grafana for e-mail/chat delivery.
+External uptime check: `https://<domain>/health` (status, version, queue depth, models).
+
+**Health checks.** `api`: HTTP `/health` every 30 s; `worker`: heartbeat file `/data/heartbeats/<id>.json` younger
+than 120 s; `docker compose ps` shows both as *healthy*.
+
+**Logs.** `docker compose logs -f api worker edge`; API and worker write JSON lines (`VELOS_LOG_FORMAT=json`), the edge
+writes JSON access logs; the Docker json-file driver rotates at 20 MB × 5 files.
+
+**Backups.** Nightly copy of the `velos-data` volume (database, datasets, results) plus `models/` and `deploy/.env`
+(encrypted):
+
+```bash
+docker run --rm -v velos_velos-data:/d -v /backup:/b alpine tar czf /b/velos-$(date +%F).tgz -C /d .
+```
+
+**Recovery procedures.**
+
+| Situation | Action |
+|---|---|
+| API unhealthy / 5xx alerts | `docker compose logs --tail=200 api`; `docker compose restart api`; if a bad release: roll back (§5) |
+| Worker stalled (heartbeat alert) or a job stuck in "running" | `docker compose restart worker`; jobs that were running are reported failed/cancelled by the queue (fixed in M3); resubmit |
+| Queue backlog | add workers: `docker compose up -d --scale worker=2` (SQLite queue claims jobs atomically) |
+| Disk full | delete old job outputs (`/data/jobs/<id>`) after export, extend the volume; alert at 80 % |
+| Lost server | new VM → §4 B → restore: `docker run --rm -v velos_velos-data:/d -v /backup:/b alpine tar xzf /b/velos-<date>.tgz -C /d` → `scripts/deploy_server.sh` |
+| Certificate problem | check DNS and port 80/443, `docker compose logs edge`; Caddy retries automatically |
 
 ## 7. CI/CD (`.github/workflows/ci.yml`)
 
 | Job | What it does | When |
 |---|---|---|
-| backend | installs the backend with ONNX Runtime, runs the 19 tests | every push / PR |
-| ml | tiny simulate → train → package, with the ONNX/TorchScript verification | every push / PR |
+| backend | installs the backend with ONNX Runtime, runs the test suite (scanning ptychography, FPM, ML runtime, metrics) | every push / PR |
+| ml | tiny simulate → train → package with ONNX/TorchScript verification; FPM engine on the real blood sample; real-sample FPM pipeline (training pairs → evaluation with model, control and hybrid → summary) | every push / PR |
 | website | build + QA crawl (3 viewports, links, images, duplicate ids, axe-core) — fails on any issue | every push / PR |
-| images | `docker compose config`, builds both images, starts the stack, runs the smoke test | every push / PR |
-| deploy | pushes images to the Velos registry, rolls out on staging over SSH, smoke-tests | `main`, only when the repository variable `DEPLOY_ENABLED=true` (M4) |
+| stack | production stack on the runner: build, start, smoke test incl. real FPM data, load test, Prometheus checks, redeployment; evidence artifact | every push / PR |
+| publish | images to `ghcr.io/<owner>/velos-backend` and `velos-edge` (tags: commit, `latest`) | push to `main` |
+| deploy | SSH to the Velos server, checkout the commit, `MONITORING=1 scripts/deploy_server.sh`, smoke test | `main`, only with the repository variable `DEPLOY_ENABLED=true` |
 
-Deploy job settings (M4): variables `REGISTRY`, `DEPLOY_HOST`, `STAGING_DOMAIN`,
-`DEPLOY_ENABLED`; secrets `REGISTRY_USER`, `REGISTRY_TOKEN`, `DEPLOY_SSH_KEY`, `SMOKE_API_KEY`.
+Deploy job settings: variables `DEPLOY_ENABLED`, `DEPLOY_HOST` (`user@host`), `SITE_DOMAIN`; secrets `DEPLOY_SSH_KEY`,
+`SMOKE_API_KEY`; GitHub environment `production` (add required reviewers to approve each rollout).
 
-## 8. GPU inference worker (M4)
+## 8. GPU inference worker
 
-The worker uses ONNX Runtime and picks the CUDA execution provider automatically when it is
-available (`velos_recon.refine`). For a GPU VM: install the NVIDIA driver + container toolkit,
-build the backend image on a CUDA runtime base with `--build-arg ML_EXTRA=ml-gpu`, and enable
-the `deploy.resources.reservations.devices` block of the `worker` service. `/health` and each
-job's `ml_refinement.runtime` field report which provider ran (e.g. `onnxruntime (CUDAExecutionProvider)`).
-On CPU, one 256×256 tile takes about 0.5 s with ONNX Runtime (2 vCPU; 3–4× faster than eager PyTorch).
+`docker compose -f docker-compose.prod.yml -f docker-compose.gpu.yml --env-file deploy/.env up -d --build` (or
+`GPU=1 scripts/deploy_server.sh`) builds the worker from `backend/Dockerfile.gpu` (CUDA 12.4 runtime + onnxruntime-gpu)
+and reserves one GPU; the NVIDIA driver and container toolkit must be installed on the VM. ONNX Runtime then uses the
+CUDA execution provider automatically; each job reports the runtime it used (`ml_refinement.runtime`). The physics
+engines run on the CPU in both images.
 
-## 9. What was verified in M3 (no cloud account, no Docker daemon in the build environment)
+## 9. What was verified in M4
 
 | Check | Result |
 |---|---|
-| `docker compose -f docker-compose.prod.yml --env-file deploy/.env.example config` | valid |
-| `docker compose -f docker-compose.yml config` | valid |
-| CI workflow against the GitHub Actions JSON schema | valid |
-| Backend test suite incl. ONNX runtime, hybrid mode, models endpoint | 19 passed |
-| Smoke test script against a running API + worker (without and with a model package) | all checks passed |
-| End-to-end demo through the API with the packaged model (ONNX Runtime) | see `01_Evidence/api_m3/` |
-| Website QA crawl (4 pages × 3 viewports, axe-core WCAG 2.1 AA) | 0 issues after fixes |
+| Backend tests (API, queue, worker, FPM engine, ML runtime, metrics, JSON logs) | 30 passed (local and in CI) |
+| Production stack on the GitHub runner: build, start, health, website pages, auth, models, ptychography job with ML + hybrid, FPM job on real blood data (116 of 221 LEDs) | all checks passed |
+| Load / stability test (24 jobs, 6 parallel submitters + 2 polling clients, 2 cancelled on purpose) | 22 succeeded, 2 cancelled, 0 request errors, 32.8 jobs/min with one CPU worker; p95 latency 9.8 ms (`/health`), 4.9 ms (job status), 43 ms (job submit) |
+| Monitoring | Prometheus target *up*, 5 alert rules loaded, `velos_jobs` query answered, `/metrics` not reachable through the edge |
+| Redeployment (recreate api + worker) | 26 jobs still visible afterwards, smoke test passed again |
+| Website QA crawl (4 pages × 3 viewports, axe-core) | 0 issues |
 
-Not yet verified (requires M4 resources): building and running the images (`docker build`
-and `caddy validate` run in CI and in the edge image build), TLS issuance on the real
-domain, GPU execution, backups on the cloud volume.
+Not verified (needs Velos resources): TLS issuance on the real domain, GPU execution, backups on the cloud volume.
 
 ## 10. Security checklist
 
 - [ ] `deploy/.env` readable only by the deploy user (`chmod 600`); never committed
-- [ ] default dev key absent (`/health` works, but the API logs a warning if the insecure default is used)
-- [ ] SSH key-only login, firewall: 22 (admin IPs), 80, 443
-- [ ] automatic security updates on the VM; images rebuilt monthly
-- [ ] backups tested by a restore at least once
-- [ ] contact-form leads are personal data: access limited to admin keys; retention policy agreed by Velos
+- [ ] no insecure default key (the API logs a warning if `VELOS_API_KEYS` is unset)
+- [ ] SSH key-only login; firewall 22 (admin IPs), 80, 443; Prometheus only on 127.0.0.1
+- [ ] automatic security updates on the VM; images rebuilt monthly (CI does this on every push)
+- [ ] backups tested by one restore
+- [ ] contact-form leads are personal data: admin keys only; retention policy agreed by Velos

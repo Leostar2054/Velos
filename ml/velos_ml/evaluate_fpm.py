@@ -8,9 +8,10 @@ M4 evaluation on REAL samples (blood smear, leaf section) from the in-house LED-
 Every test case is a reduced LED set (test draws only: sub_00, sub_01) reconstructed with EPRY;
 the reference is the reconstruction from ALL usable LEDs of the same acquisition.
 
-Methods: ``physics`` (EPRY on the reduced set — the input of every model), each ``<model>`` applied
-to the flattened physics result exactly as the backend does (normalise → tiles → model), and
-``hybrid@k`` (the chosen model's output seeding k further EPRY passes on the reduced set).
+Methods: ``physics`` (EPRY on the reduced set — the input of every model), ``physics+k`` (k more EPRY
+passes from the physics result: the control for the hybrid mode), each ``<model>`` applied to the
+flattened physics result exactly as the backend does (normalise → tiles → model), and ``hybrid@k``
+(the chosen model's output seeding k further EPRY passes on the reduced set).
 
 Regions: ``holdout`` = the right 35 % of the high-resolution field (the models were trained on the
 left 65 % only); ``full`` = an acquisition region never used for training (whole field).
@@ -38,7 +39,9 @@ SPLIT = 0.65
 
 
 def _metrics(est, ref, mask):
-    m = amplitude_phase_metrics(np.asarray(est, np.complex128), np.asarray(ref, np.complex128), mask, register=True)
+    # no sub-pixel registration: reconstructions of one acquisition share the grid (offsets <= 0.1 px);
+    # the global complex scalar and phase ramp are still removed
+    m = amplitude_phase_metrics(np.asarray(est, np.complex128), np.asarray(ref, np.complex128), mask, register=False)
     return {k: float(m[k]) for k in METRICS}
 
 
@@ -90,6 +93,11 @@ def eval_dataset(root: Path, mode: str, models: dict, hybrid_model: str | None, 
             est_flat[name] = o
             est_raw[name] = fpm.undo_flatten(o, fp)
             pup[name] = P
+        for n_h in hybrid_passes:     # control: the same number of extra EPRY passes without a model
+            h = fpm.hybrid_fpm(prep_sub, raw, P, n_h, "EPRY")
+            est_raw[f"physics+{n_h}"] = h.obj
+            est_flat[f"physics+{n_h}"] = fpm.apply_flatten(h.obj, fp)
+            pup[f"physics+{n_h}"] = h.pupil
         if hybrid_model:
             for n_h in hybrid_passes:
                 h = fpm.hybrid_fpm(prep_sub, est_raw[hybrid_model], P, n_h, "EPRY")
@@ -161,9 +169,43 @@ def save_example_figure(ex: dict, methods, path, crop: int = 360):
     plt.close(fig)
 
 
+def _read_rows(csv_path: Path) -> list:
+    rows = []
+    with open(csv_path, newline="") as f:
+        for r in csv.DictReader(f):
+            out = {}
+            for k, v in r.items():
+                if k in ("case", "dataset", "mode", "method"):
+                    out[k] = v
+                elif k in ("leds", "n_predict_leds"):
+                    out[k] = int(float(v)) if v not in ("", None) else None
+                else:
+                    try:
+                        out[k] = float(v)
+                    except (TypeError, ValueError):
+                        out[k] = v
+            rows.append(out)
+    return rows
+
+
+def write_summary(out: Path, rows: list, repeat_pairs) -> dict:
+    keys = sorted({k for r in rows for k in r}, key=lambda k: (k not in ("case", "method", "leds"), k))
+    with open(out / "metrics_fpm.csv", "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=keys); w.writeheader(); w.writerows(rows)
+    summary = {"by_case": aggregate(rows, ("case", "method")),
+               "by_dataset": aggregate(rows, ("dataset", "method")),
+               "by_mode_fraction": aggregate(rows, ("mode", "fraction", "method")),
+               "overall": aggregate(rows, ("method",)),
+               "repeatability": repeatability(repeat_pairs)}
+    (out / "summary_fpm.json").write_text(json.dumps(summary, indent=1, default=float))
+    return summary
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument("--data", nargs="+", required=True, help="dir:holdout | dir:full")
+    ap.add_argument("--merge", nargs="*", default=None,
+                    help="combine the metrics_fpm.csv of several partial runs (dirs) into --out (no evaluation)")
+    ap.add_argument("--data", nargs="+", default=[], help="dir:holdout | dir:full")
     ap.add_argument("--model", action="append", default=[], help="name=checkpoint.pt")
     ap.add_argument("--hybrid-model", default=None)
     ap.add_argument("--hybrid", type=int, nargs="*", default=[5, 10])
@@ -171,6 +213,17 @@ def main(argv=None):
     ap.add_argument("--out", required=True)
     a = ap.parse_args(argv)
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
+    if a.merge is not None:          # partial runs (e.g. two processes on two cores) → one summary
+        import shutil
+        rows = []
+        for d in a.merge:
+            rows += _read_rows(Path(d) / "metrics_fpm.csv")
+            for fig_file in Path(d).glob("fig_*.png"):
+                if fig_file.parent.resolve() != out.resolve():
+                    shutil.copy(fig_file, out / fig_file.name)
+        summary = write_summary(out, rows, [p.split(",") for p in a.repeat])
+        print(json.dumps(summary["overall"], indent=1, default=float))
+        return
     models = {}
     for spec in a.model:
         n, ck = spec.split("=", 1)
@@ -180,16 +233,10 @@ def main(argv=None):
         d, mode = spec.rsplit(":", 1)
         r, e = eval_dataset(Path(d), mode, models, a.hybrid_model, a.hybrid)
         rows += r; examples += e
-    keys = sorted({k for r in rows for k in r}, key=lambda k: (k not in ("case", "method", "leds"), k))
-    with open(out / "metrics_fpm.csv", "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=keys); w.writeheader(); w.writerows(rows)
-    summary = {"by_case": aggregate(rows, ("case", "method")),
-               "by_dataset": aggregate(rows, ("dataset", "method")),
-               "by_mode_fraction": aggregate(rows, ("mode", "fraction", "method")),
-               "overall": aggregate(rows, ("method",)),
-               "repeatability": repeatability([p.split(",") for p in a.repeat])}
-    (out / "summary_fpm.json").write_text(json.dumps(summary, indent=1, default=float))
-    methods = ["physics"] + list(models) + [f"hybrid@{h}" for h in a.hybrid if a.hybrid_model]
+    summary = write_summary(out, rows, [p.split(",") for p in a.repeat])
+    hmax = max(a.hybrid) if a.hybrid else None
+    methods = ["physics"] + ([f"physics+{hmax}"] if hmax else []) + list(models) + \
+        ([f"hybrid@{hmax}"] if (hmax and a.hybrid_model) else [])
     for ex in examples:
         save_example_figure(ex, [m for m in methods if m in ex], out / f"fig_{ex['case'].replace('/', '_')}.png")
     print(json.dumps(summary["overall"], indent=1, default=float))

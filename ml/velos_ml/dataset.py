@@ -166,7 +166,8 @@ class RealPatchDataset(Dataset):
 
     def __init__(self, root: str | Path, subsets: Sequence[int], crop: int = 128,
                  col_range=(0.0, 0.65), n_per_epoch: int = 240, augment: bool = True,
-                 seed: int = 0, norm: str = "median_ramp", target_frame: str = "input"):
+                 seed: int = 0, norm: str = "median_ramp", target_frame: str = "input",
+                 register: bool = True):
         root = Path(root)
         dense = np.load(root / "dense.npz")
         D, MD = dense["obj"].astype(np.complex128), dense["mask"]
@@ -179,9 +180,10 @@ class RealPatchDataset(Dataset):
             x, z, _ = prepare_input(s["obj"], s["mask"], norm)
             m = erode(s["mask"] & MD, 4)
             # reduced-scan and full-scan reconstructions differ by a sub-pixel translation
-            # (0.1-0.7 px on the clam data); register the target to the input first
-            Dk = shift_image(D, estimate_shift(D, z, m & region))
-            t = target_in_frame(Dk, z, m & region, target_frame)
+            # (0.1-0.7 px on the clam data); register the target to the input first. LED-array FPM
+            # reconstructions share one grid (measured offsets <= 0.1 px): register = False there.
+            Dk = shift_image(D, estimate_shift(D, z, m & region)) if register else D
+            t = target_in_frame(Dk, z, m & region, target_frame, register=register)
             y = np.stack([t.real, t.imag], 0).astype(np.float32)
             self.items.append((x, y, (m & region)[None].astype(np.float32)))
         self.crop, self.n, self.augment = crop, n_per_epoch, augment

@@ -49,16 +49,32 @@ def calibrate(acq: fpm.FPMAcquisition, base: fpm.FPMConfig, log=print) -> fpm.FP
 
 def run(source: str, name: str, out: str, lambda_um: float = 0.633, z_mm: float = 55.0, Np: int = 512,
         passes: int = 30, warmup: int = 2, algo: str = "EPRY", fractions=(0.30, 0.50), draws: int = 4,
-        seed: int = 2026, calibrate_geometry: bool = True, border: int = 24, log=print) -> dict:
+        seed: int = 2026, calibrate_geometry: bool = True, border: int = 24, config_from: str | None = None,
+        log=print) -> dict:
     out = Path(out); (out / "subsets").mkdir(parents=True, exist_ok=True)
     acq = fpm.load_fpm(source, name=name)
+    # the patch is the stored region itself (packed crops: centre crop or side regions of the sensor);
+    # for the centre crop this equals the default image-centre patch
+    h, w = acq.frames.shape[1:]
+    centre = {"crop_center_x_px": acq.crop_col0 + (w + 1) / 2, "crop_center_y_px": acq.crop_row0 + (h + 1) / 2}
     base = fpm.FPMConfig(lambda_um=lambda_um, objective_NA=0.10, magnification=4.0, z_source_mm=z_mm, Np=Np,
-                         n_warmup=warmup, n_passes=passes, algorithms=[algo], geometry_check="off")
+                         n_warmup=warmup, n_passes=passes, algorithms=[algo], geometry_check="off", **centre)
     meta_file = out / "meta.json"
     meta = json.loads(meta_file.read_text()) if meta_file.exists() else {}
     if "config" in meta:
         cfg = fpm.FPMConfig.from_dict(meta["config"])
         log(f"[{name}] calibrated configuration reused")
+    elif config_from:
+        # another region of the same acquisition: the set-up geometry (LED distance, optical axis,
+        # orientation) is a property of the microscope, so the calibration of the centre region is reused
+        ref = fpm.FPMConfig.from_dict(json.loads(Path(config_from).read_text())["config"])
+        cfg = replace(ref, Np=Np, n_warmup=warmup, n_passes=passes, algorithms=[algo], geometry_check="off",
+                      upsample=None, **centre)
+        meta.update({"name": name, "source": str(source), "config": cfg.to_dict(), "calibration_s": 0.0,
+                     "config_from": str(config_from), "acquisition": acq.summary()})
+        meta_file.write_text(json.dumps(meta, indent=2, default=float))
+        log(f"[{name}] geometry from {config_from}: z {cfg.z_source_mm:.2f} mm, axis ({cfg.optical_axis_x_mm:+.2f}, "
+            f"{cfg.optical_axis_y_mm:+.2f}) mm; patch centre ({centre['crop_center_x_px']:.1f}, {centre['crop_center_y_px']:.1f}) px")
     else:
         t = time.time()
         cfg = calibrate(acq, base, log=log) if calibrate_geometry else base
@@ -134,9 +150,11 @@ def main(argv=None):
     ap.add_argument("--fractions", type=float, nargs="+", default=[0.30, 0.50])
     ap.add_argument("--draws", type=int, default=4)
     ap.add_argument("--no-calibration", action="store_true")
+    ap.add_argument("--config-from", default=None,
+                    help="meta.json of another region of the same acquisition: reuse its calibrated geometry")
     a = ap.parse_args(argv)
     run(a.source, a.name, a.out, a.lam, a.z, a.Np, a.passes, a.warmup, "EPRY", tuple(a.fractions), a.draws,
-        calibrate_geometry=not a.no_calibration, log=lambda m: print(m, flush=True))
+        calibrate_geometry=not a.no_calibration, config_from=a.config_from, log=lambda m: print(m, flush=True))
 
 
 if __name__ == "__main__":

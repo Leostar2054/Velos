@@ -1,52 +1,50 @@
-# Velos BioImaging platform — monorepo
+# Velos BioImaging platform
 
-End-to-end software stack for Velos QPI / SPARK (Contractor Services Agreement, 12 Oct – 27 Nov 2026):
-company website, reconstruction backend/API with asynchronous jobs, ML training pipeline, and deployment files.
+Software stack of **Velos QPI / SPARK** — label-free quantitative phase imaging with physics-based and AI-assisted
+reconstruction: company website, reconstruction API with asynchronous jobs, AI training pipeline, trained models,
+and the production deployment (HTTPS edge server, API, workers, monitoring).
 
-| Folder | Module (Schedule A) | What is inside |
-|---|---|---|
-| `website/` | 1 — Website | Next.js 15 + Tailwind static site: Home, Product, Team, Contact; editable `content/site.json`; SEO, sitemap, analytics hook; contact form → API |
-| `backend/` | 2 — Backend/API | FastAPI API, SQLite job queue, worker, storage, API-key auth; `velos_recon` physics-engine integration; tests |
-| `ml/` | 3 — ML pipeline | Config-driven PyTorch pipeline: synthetic + experimental training data, refinement U-Net (v2), two-stage training, evaluation vs ground truth / dense reference, ONNX + TorchScript packaging with model card |
-| `docker-compose.yml`, `docker-compose.prod.yml`, `deploy/`, `*/Dockerfile`, `.github/workflows/` | 4 — Deployment | Local stack; production/staging stack with Caddy edge (TLS), hardened images, CI/CD workflow, smoke test — runbook in `docs/deployment.md` |
-| `docs/` | — | Architecture, data review, API reference, ML pipeline notes, deployment runbook |
-| `evidence/` | — | Milestone evidence: screenshots, API transcripts, figures, metrics, QA reports |
-| `scripts/` | — | `demo_m2.sh`, `demo_m3.sh` (end-to-end demos), `smoke_test.sh`, `website_qa.js`, report builders |
+[![ci](https://github.com/Leostar2054/Velos/actions/workflows/ci.yml/badge.svg)](https://github.com/Leostar2054/Velos/actions/workflows/ci.yml)
 
-## Run everything locally (5 minutes)
+| Folder | What is inside |
+|---|---|
+| `website/` | Next.js 15 + Tailwind static site: Home, Product, Team, Contact; editable `content/site.json`; SEO, sitemap; contact form → API |
+| `backend/` | FastAPI API, job queue, workers, storage, API-key auth, Prometheus metrics; `velos_recon`: scanning ptychography (the Client's engines, unchanged) and **LED-array Fourier ptychography** (Python port of the in-house MATLAB AP/EPRY/rPIE code), model runtime (ONNX Runtime / TorchScript) |
+| `ml/` | config-driven PyTorch pipeline: simulated and real training pairs, refinement U-Net, two-stage training, evaluation against ground truth and full-data references, ONNX + TorchScript packaging with model cards |
+| `models/` | trained packages: `velos-refine-v2` (scanning ptychography), `velos-refine-fpm-v1` (LED-array FPM, real samples) |
+| `examples/fpm/` | real data: 256-px crops of the in-house microscope's blood-smear and leaf scans (225 LEDs each) |
+| `tools/fpm_packing/` | packing scripts for raw FPM acquisitions (Python / MATLAB / Windows launcher) |
+| `deploy/`, `docker-compose.prod.yml`, `docker-compose.gpu.yml`, `scripts/deploy_server.sh` | production deployment (Caddy TLS edge, API, worker, Prometheus; optional GPU worker) |
+| `.github/workflows/ci.yml` | tests, ML smoke run, website QA, **full production stack on every push** (smoke + real FPM job, load test, monitoring, redeploy), image publishing, optional server deploy |
+| `docs/` | [architecture](docs/architecture.md) · [API](docs/api.md) · [FPM](docs/fpm.md) · [ML pipeline](docs/ml-pipeline.md) · [data review](docs/data-review.md) · [deployment runbook](docs/deployment.md) · [handover guide](docs/handover.md) · [licences](docs/THIRD_PARTY_LICENSES.md) |
+| `evidence/` | milestone evidence: figures, metrics, API transcripts, QA reports, CI logs |
+
+## Quick start
 
 ```bash
-# backend (API + worker)
-cd backend && pip install -e ".[dev]" && cp .env.example .env && set -a && . ./.env && set +a
-uvicorn velos_backend.main:app --port 8000 &          # http://localhost:8000/docs
+cd backend && pip install -e ".[dev,ml]" && pytest -q
+export VELOS_MODEL_DIR=$PWD/../models VELOS_API_KEYS=dev-key:dev:admin
+uvicorn velos_backend.main:app --port 8000 &        # API docs: http://localhost:8000/docs
 python -m velos_backend.worker &
-pytest -q                                              # 20 tests
+cd .. && FPM_DATA=examples/fpm/blood_222619_c256.npz SKIP_WEB=1 scripts/smoke_test.sh http://localhost:8000 dev-key
+
+# LED-array FPM from the command line (AP / EPRY / rPIE, MATLAB-compatible outputs)
+python -m velos_recon.fpm run examples/fpm/leaf_214040_c256.npz --passes 30 --out results/leaf
 
 # website
-cd ../website && npm install && npm run build && npx serve out   # or: npm run dev
-
-# ML (needs torch; CPU is fine for the baseline)
-cd ../ml && pip install -e . 
-python -m velos_ml.simulate --config configs/data_synthetic.yaml --out data/synthetic
-python -m velos_ml.train    --config configs/baseline_unet.yaml --data data/synthetic --out runs/baseline_unet
-python -m velos_ml.evaluate --data data/synthetic --checkpoint runs/baseline_unet/best.pt --out results/baseline_unet
-
-# M3 model (refinement v2): full pipeline in ml/scripts/m3_pipeline.sh; package → backend
-python -m velos_ml.package runs/refine_v2/best.pt --out ../backend/models/velos-refine-v2 --version 2.0.0
-
-# end-to-end API demos (API + worker running; VELOS_MODEL_DIR=backend/models for M3)
-API=http://localhost:8000 KEY=dev-key scripts/demo_m2.sh path/to/dataset.npz epie 60 demo_out
-API=http://localhost:8000 KEY=dev-key scripts/demo_m3.sh path/to/clam_dense_c128.npz 0.35 200 30 demo_m3_out
-scripts/smoke_test.sh http://localhost:8000 dev-key     # SKIP_WEB=1 when only the API runs
+cd website && npm ci && npm run dev                   # http://localhost:3000
 ```
 
-## Milestone status
+Production: see [docs/deployment.md](docs/deployment.md) (`scripts/deploy_server.sh` on a Velos server; the same
+stack is rehearsed by CI on every push). Handover, retraining and routine tasks: [docs/handover.md](docs/handover.md).
 
-| Milestone | Scope | Status |
-|---|---|---|
-| M1 (12–19 Oct) | architecture, repositories, website/API scaffold, data review, ML scaffold | delivered with M2 (see `docs/architecture.md`, `docs/data-review.md`) |
-| M2 (20–28 Oct) | backend core (queue/storage/auth), website pages, first ML baseline, demo + baseline comparison | delivered 28 Oct — see the M2 report |
-| M3 (29 Oct–12 Nov) | model refinement, packaging (ONNX/TorchScript) and backend integration (ML + hybrid modes), end-to-end inference demo, website QA, deployment-ready package | **this delivery** — see the M3 report; cloud staging moved to M4 (agreed 11 Nov) |
-| M4 (13–27 Nov) | staging + production deployment on a Velos-owned cloud account (GPU worker), biological sample data, real setup figure, monitoring, handover | next |
+## Project history
 
-Secrets are never stored in the repository; see the `.env.example` files.
+| Milestone | Scope |
+|---|---|
+| M1–M2 (Oct 2026) | architecture, repositories, data review; backend core (queue, storage, auth, Client's engines); website; first ML baseline |
+| M3 (Nov 2026) | refinement model v2 (synthetic + experimental fine-tuning), ONNX/TorchScript packaging, backend integration (ML + hybrid modes), end-to-end inference, website QA, deployment-ready package |
+| M4 (Nov 2026) | in-house LED-array FPM engine (MATLAB → Python, validated) and real biological samples (blood smear, leaf) through the API; FPM AI model fine-tuned and evaluated on real data; production stack rehearsed in CI with load test and monitoring; GHCR images; runbook, handover guide, licences |
+
+Configuration and secrets are environment variables only (`deploy/.env.example`, `backend/.env.example`).
+Development used an AI coding assistant; such commits carry a `Co-Authored-By` trailer.

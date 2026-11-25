@@ -139,6 +139,18 @@ def test_fpm_reduced_leds_and_ml(client, fpm_dataset, tmp_root):
     assert abs(ml["data_error"]["ml"] - ml["data_error"]["physics"]) < 1e-3
     assert ml["consistency"] == "ok" and "hybrid" in ml
     assert "comparison_ml.png" in res["artifacts"]
+    # two packages of different modalities: one default each, and the worker never mixes them up
+    h = client.get("/health").json()["models"]
+    assert h["default"] == "identity-test"
+    assert h["default_by_modality"] == {"ptychography": "identity-test", "fpm": "identity-fpm-test"}
+    cards = {c["id"]: c for c in client.get("/api/v1/models", headers=USER).json()}
+    assert cards["identity-test"]["default"] and cards["identity-test"]["modality"] == "ptychography"
+    assert cards["identity-fpm-test"]["default"] and cards["identity-fpm-test"]["modality"] == "fpm"
+    from velos_backend.worker import resolve_model
+    assert resolve_model(None, "ptychography").name == "identity-test"
+    assert resolve_model(None, "fpm").name == "identity-fpm-test"
+    with pytest.raises(ValueError, match="for fpm"):
+        resolve_model("identity-test", "fpm")
 
 
 def test_fpm_validation_errors(client, fpm_dataset, synthetic_npz):
@@ -151,3 +163,23 @@ def test_fpm_validation_errors(client, fpm_dataset, synthetic_npz):
         d = client.post("/api/v1/datasets", headers=USER, files={"file": ("p.npz", f)}).json()
     r = client.post("/api/v1/jobs", headers=USER, json={"dataset_id": d["id"], "engine": "fpm"})
     assert r.status_code == 422
+
+
+def test_phase_ramp_estimate_robust_to_pixel_noise():
+    """FPM reconstructions can have strong pixel-level phase noise; the wrapped-difference median then
+    invents ramps (M4 finding). The estimate must find a true ramp and add none to a flat noisy phase."""
+    from velos_recon.metrics import estimate_phase_ramp
+    rng = np.random.default_rng(5)
+    n = 256
+    yy, xx = np.mgrid[0:n, 0:n].astype(float)
+    mask = np.ones((n, n), bool)
+    noise = rng.normal(0, 1.4, (n, n))                     # rad, per pixel
+    flat = np.exp(1j * noise)
+    kx, ky = estimate_phase_ramp(flat, mask)
+    assert abs(kx) < 2e-3 and abs(ky) < 2e-3
+    ramp = np.exp(1j * (0.05 * xx - 0.03 * yy + noise))
+    kx, ky = estimate_phase_ramp(ramp, mask)
+    assert abs(kx - 0.05) < 2e-3 and abs(ky + 0.03) < 2e-3
+    smooth = np.exp(1j * (0.02 * xx + 0.01 * yy + 0.05 * rng.normal(size=(n, n))))   # the usual case
+    kx, ky = estimate_phase_ramp(smooth, mask)
+    assert abs(kx - 0.02) < 1e-3 and abs(ky - 0.01) < 1e-3

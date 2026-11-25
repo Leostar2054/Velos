@@ -65,6 +65,15 @@ jobs:
         run: python -m velos_ml.package /tmp/run/best.pt --out /tmp/models/ci-model --version 0.0.0-ci
       - name: FPM engine on the real blood-smear sample (AP / EPRY / rPIE, 5 passes)
         run: python -m velos_recon.fpm run examples/fpm/blood_222619_c256.npz --passes 5 --out /tmp/fpm_blood
+      - name: Real-sample FPM pipeline (training pairs → evaluation with model, control and hybrid → merge)
+        working-directory: ml
+        run: |
+          python -m velos_ml.fpm_realdata --source ../examples/fpm/blood_222619_c256.npz --name ci_blood \
+            --out /tmp/fpm_pairs/ci_blood --Np 256 --z 59.4 --passes 3 --warmup 0 --draws 1 --no-calibration
+          python -m velos_ml.evaluate_fpm --data /tmp/fpm_pairs/ci_blood:holdout --model ci=/tmp/run/best.pt \
+            --hybrid-model ci --hybrid 2 --out /tmp/fpm_eval/part
+          python -m velos_ml.evaluate_fpm --merge /tmp/fpm_eval/part --out /tmp/fpm_eval
+          python -m velos_ml.report_fpm /tmp/fpm_eval/summary_fpm.json
 
   website:
     name: Website build + QA crawl

@@ -139,7 +139,8 @@ def main(argv=None):
                                                col_range=tuple(rc.get("col_range", (0.0, 0.65))),
                                                n_per_epoch=int(rc.get("n_per_epoch", len(tr))),
                                                seed=tcfg["seed"] + 1, norm=common["norm"],
-                                               target_frame=common["target_frame"]))
+                                               target_frame=common["target_frame"],
+                                               register=bool(rc.get("register", True))))
     from torch.utils.data import ConcatDataset
     tr_all = ConcatDataset(train_sets) if len(train_sets) > 1 else tr
     bs = int(tcfg["batch_size"])

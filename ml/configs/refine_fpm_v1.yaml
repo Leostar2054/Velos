@@ -20,6 +20,7 @@ data:
     col_range: [0.0, 0.65]
     n_per_epoch: 480
     crop: 128
+    register: false       # FPM reconstructions share one grid (offsets <= 0.1 px measured)
 model:
   base: 32
   depth: 4

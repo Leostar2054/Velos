@@ -31,7 +31,7 @@ results can be compared directly:
 | output | `<ALGO>_amplitude.tif`, `<ALGO>_phase.tif` (curvature and tilt removed), `<ALGO>_pupil_phase.tif`, `frames.csv`, `summary.txt`, `comparison.png`, plus `result.npz` (complex objects, pupils, residuals, unwrapped phase) |
 
 Additions for the platform: loaders for packed crops (`*_meta.npz` / `*_meta.mat` from
-`pack_fpm_for_velos.py` / `.m`) and for the single-file API format, a least-squares (DCT) phase
+`tools/fpm_packing/pack_fpm_for_velos.py` / `.m`) and for the single-file API format, a least-squares (DCT) phase
 unwrapper, the data residual of any object against the frames (`fpm_data_error`), the prediction
 error on LEDs that were not used, the reduced-LED-set selection, and the hybrid polish (EPRY seeded with a
 refined object).
@@ -75,7 +75,7 @@ selects z = 59.4 mm and an optical-axis offset of (−0.70, −0.23) mm (MATLAB:
   frame per exposure time (`dark_<exposure>us.tif`) would improve the dark-field frames.
 * About 3 300 isolated hot pixels per 512-px patch are repaired automatically.
 * The four blood scans of 23 Nov show the same field of view (repeated acquisitions; one with 2 s
-  exposure), and so do the two leaf scans — useful for repeatability, but the AI model must be tested on
+  exposure), and so do the three leaf scans — useful for repeatability, but the AI model must be tested on
   other regions of the sample (see `docs/ml-pipeline.md`, M4).
 
 ## API

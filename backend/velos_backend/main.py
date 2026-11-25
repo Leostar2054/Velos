@@ -120,10 +120,24 @@ def health(session: Session = Depends(get_session)):
     from velos_recon.refine import list_packages
     settings = get_settings()
     cards = list_packages(settings.model_dir)
+    defaults = _default_models(cards, settings.default_model)
     models = {"installed": [c["id"] for c in cards],
-              "default": settings.default_model or (cards[0]["id"] if cards else None)}
+              "default": defaults.get("ptychography"),          # unchanged meaning (M3): ptychography default
+              "default_by_modality": defaults}
     return {"status": "ok", "version": __version__, "queue": {"queued": queued, "running": running},
             "models": models}
+
+
+def _default_models(cards: list, configured: str | None) -> dict:
+    """Default package per modality, as the worker resolves it (``VELOS_DEFAULT_MODEL`` if it is of that
+    modality, otherwise the first installed package of the modality)."""
+    out: dict = {}
+    for c in cards:
+        mod = c.get("modality") or "ptychography"
+        out.setdefault(mod, c["id"])
+        if c["id"] == configured:
+            out[mod] = c["id"]
+    return out
 
 
 @app.get("/metrics", tags=["system"], include_in_schema=True)
@@ -183,9 +197,10 @@ def list_models(who: ApiKeyInfo = Depends(require_api_key)):
     from velos_recon.refine import list_packages
     settings = get_settings()
     cards = list_packages(settings.model_dir)
-    default = settings.default_model or (cards[0]["id"] if cards else None)
+    defaults = set(_default_models(cards, settings.default_model).values())
     for c in cards:
-        c["default"] = c["id"] == default
+        c.setdefault("modality", "ptychography")      # M3 packages predate the field
+        c["default"] = c["id"] in defaults
     return cards
 
 

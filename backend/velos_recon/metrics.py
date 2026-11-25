@@ -54,15 +54,8 @@ def _bbox(mask: np.ndarray):
     return slice(rows[0], rows[-1] + 1), slice(cols[0], cols[-1] + 1)
 
 
-def estimate_phase_ramp(z: np.ndarray, mask: np.ndarray, n_iter: int = 3):
-    """Robustly estimate a linear phase ramp exp(i(kx·x + ky·y)) in ``z`` over ``mask``.
-
-    Uses the median of wrapped nearest-neighbour phase differences, so it is dominated
-    by the (flat) background and insensitive to the steep phase edges of cells.
-    Returns (kx, ky) in rad/pixel.
-    """
-    z = z.copy(); kx_tot = ky_tot = 0.0
-    yy, xx = np.mgrid[0:z.shape[0], 0:z.shape[1]].astype(float)
+def _median_ramp(z: np.ndarray, mask: np.ndarray, xx, yy, n_iter: int, kx0: float = 0.0, ky0: float = 0.0):
+    z = z * np.exp(-1j * (kx0 * xx + ky0 * yy)); kx_tot, ky_tot = kx0, ky0
     for _ in range(n_iter):
         mx = mask[:, 1:] & mask[:, :-1]; my = mask[1:, :] & mask[:-1, :]
         gx = np.angle(z[:, 1:] * np.conj(z[:, :-1]))[mx]
@@ -73,6 +66,59 @@ def estimate_phase_ramp(z: np.ndarray, mask: np.ndarray, n_iter: int = 3):
         z = z * np.exp(-1j * (kx * xx + ky * yy))
         kx_tot += kx; ky_tot += ky
     return kx_tot, ky_tot
+
+
+def _coherence(u: np.ndarray, mask: np.ndarray, kx: float, ky: float, xx, yy) -> float:
+    """|mean of the unit phasors after removing the ramp| — 1 for a perfectly flat phase."""
+    return float(np.abs(np.mean((u * np.exp(-1j * (kx * xx + ky * yy)))[mask])))
+
+
+def _fft_ramp(u: np.ndarray, mask: np.ndarray):
+    """Dominant spatial frequency of the unit phasors, rad/pixel: peak of the zero-padded spectrum
+    with parabolic (log-magnitude) interpolation between bins."""
+    H, W = u.shape
+    pad = lambda n: min(max(1 << int(np.ceil(np.log2(2 * n))), 512), 2048)
+    nh, nw = pad(H), pad(W)
+    F = np.abs(np.fft.fft2(np.where(mask, u, 0), s=(nh, nw))) + 1e-30
+    iy, ix = np.unravel_index(int(np.argmax(F)), F.shape)
+
+    def sub(l0, lm, lp):
+        den = lm - 2 * l0 + lp
+        return 0.0 if den >= 0 else float(np.clip(0.5 * (lm - lp) / den, -0.5, 0.5))
+    L = np.log(F)
+    dy = sub(L[iy, ix], L[(iy - 1) % nh, ix], L[(iy + 1) % nh, ix])
+    dx = sub(L[iy, ix], L[iy, (ix - 1) % nw], L[iy, (ix + 1) % nw])
+    fy = ((iy if iy < nh // 2 else iy - nh) + dy) / nh
+    fx = ((ix if ix < nw // 2 else ix - nw) + dx) / nw
+    return 2 * np.pi * fx, 2 * np.pi * fy
+
+
+def estimate_phase_ramp(z: np.ndarray, mask: np.ndarray, n_iter: int = 3):
+    """Robustly estimate a linear phase ramp exp(i(kx·x + ky·y)) in ``z`` over ``mask``.
+
+    Uses the median of wrapped nearest-neighbour phase differences, so it is dominated
+    by the (flat) background and insensitive to the steep phase edges of cells.
+    When the per-pixel phase noise is large (e.g. LED-array FPM reconstructions near the edge
+    of the field), wrapped differences are nearly uniform and their median underestimates a
+    steep ramp; the estimate is therefore also started from the peak of the phasor spectrum,
+    and that result is kept only if it flattens the phase clearly better (M4).
+    Returns (kx, ky) in rad/pixel.
+    """
+    yy, xx = np.mgrid[0:z.shape[0], 0:z.shape[1]].astype(float)
+    kx, ky = _median_ramp(z, mask, xx, yy, n_iter)
+    if mask.sum() < 64:
+        return kx, ky
+    u = z / np.maximum(np.abs(z), 1e-30)
+    c_med = _coherence(u, mask, kx, ky, xx, yy)
+    if c_med > 0.9:                       # already flat: nothing to improve (the usual case)
+        return kx, ky
+    kx0, ky0 = _fft_ramp(u, mask)
+    best = (_coherence(u, mask, kx0, ky0, xx, yy), kx0, ky0)
+    kx2, ky2 = _median_ramp(z, mask, xx, yy, n_iter, kx0, ky0)     # can drift on very noisy phases
+    c2 = _coherence(u, mask, kx2, ky2, xx, yy)
+    if c2 > best[0]:
+        best = (c2, kx2, ky2)
+    return (best[1], best[2]) if best[0] > 1.05 * c_med else (kx, ky)
 
 
 def remove_phase_ramp(z: np.ndarray, mask: np.ndarray) -> np.ndarray:

@@ -26,3 +26,6 @@ ml/models/
 ml/results/
 ml/runs/
 ml/data/
+
+# local model folder for the M4 API demo (packages are in models/)
+ml/models_m4/

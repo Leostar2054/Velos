@@ -1,6 +1,7 @@
 {
   "name": "velos-refine",
   "version": "2.0.0",
+  "modality": "ptychography",
   "created": "2026-11-11",
   "task": "refinement of physics-based ptychographic reconstructions from reduced (sparse) scans",
   "architecture": {

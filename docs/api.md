@@ -5,7 +5,7 @@ Authentication: header `X-API-Key: <key>`; keys and roles come from `VELOS_API_K
 
 | Method | Path | Auth | Purpose |
 |---|---|---|---|
-| GET | `/health` | – | liveness, version, queue depth, installed model packages |
+| GET | `/health` | – | liveness, version, queue depth, installed model packages (`models.default`: ptychography default; `models.default_by_modality`: one default per modality) |
 | POST | `/api/v1/contact` | – | website lead capture (honeypot + 10/h per IP) |
 | GET | `/api/v1/contact` | admin | list captured leads |
 | POST | `/api/v1/datasets` | key | upload `.mat` / `.npz` / `.h5` (multipart `file`, optional `name`) |
@@ -17,22 +17,23 @@ Authentication: header `X-API-Key: <key>`; keys and roles come from `VELOS_API_K
 | POST | `/api/v1/jobs/{id}/cancel` | key | cancel queued/running job |
 | GET | `/api/v1/jobs/{id}/result` | key | summary + artifact links (409 until succeeded) |
 | GET | `/api/v1/jobs/{id}/artifacts/{name}` | key | download PNG / NPZ / JSON |
-| GET | `/api/v1/models` | key | installed ML model packages with their model cards (M3) |
+| GET | `/api/v1/models` | key | installed ML model packages with their model cards (`modality`: ptychography or fpm; `default`: true for the default of its modality) |
+| GET | `/metrics` | internal (optional bearer token) | Prometheus metrics: jobs by status, queue age, job durations, HTTP counters, worker heartbeats (M4; not exposed by the edge server) |
 
 ## Job parameters
 
 ```json
 {
   "dataset_id": "…",
-  "engine": "epie",          // epie | rpie | wasp | gd | map
-  "iters": 100,
+  "engine": "epie",          // epie | rpie | wasp | gd | map;  FPM datasets: fpm | fpm-ap | fpm-epry | fpm-rpie | fpm-all
+  "iters": 100,              // iterations (default 100) — for FPM: passes after the warm-up (default 30)
   "seed": 0,
   "crop": 256,               // optional centre-crop of diffraction frames (fast preview)
   "sparse_every": 1,         // 2 → keep every 2nd grid row & column (sparse-scan experiment)
   "sparse_fraction": null,   // 0.35 → keep a random 35 % of the frames (reduced-scan experiment, M3)
   "engine_params": {},       // e.g. {"alpha": 1.0, "beta": 1.0} or {"probe_lr": 0.1}
   "refine_ml": false,        // M3: apply the packaged refinement model after the physics engine
-  "model": null,             // M3: model package id from GET /api/v1/models (default package if null)
+  "model": null,             // M3: model package id from GET /api/v1/models (null: the default package of the dataset's modality)
   "hybrid_iters": 0          // M3: hybrid mode — N physics iterations seeded with the ML-refined object
 }
 ```
@@ -92,3 +93,24 @@ curl -s -H "X-API-Key: $KEY" -o phase.png $API/api/v1/jobs/9a2b…/artifacts/pha
 `queued → running → succeeded | failed | cancelled`; a running job that receives `/cancel` passes through
 `cancelling` until the worker acknowledges. Errors are returned in `error` and written to `error.log` in the
 job directory.
+
+## LED-array Fourier ptychography (M4)
+
+Datasets in the Velos FPM format (`.npz` with `modality = "fpm"`, made by `python -m velos_recon.fpm convert`)
+are recognised on upload (`summary.modality = "fpm"`, `n_frames`, stored region, set-up defaults). Jobs on them
+must use an FPM engine; a scanning-ptychography engine on an FPM dataset (or the reverse) returns 422.
+
+```json
+{"dataset_id": "…", "engine": "fpm", "iters": 24,
+ "fpm": {"Np": 256, "z_source_mm": 59.4, "geometry_check": "report"},   // any velos_recon.fpm.FPMConfig field
+ "sparse_fraction": 0.5,          // reduced LED set: all LEDs inside 1.1 × NA + 50 % of the dark-field LEDs
+ "refine_ml": true, "hybrid_iters": 10}
+```
+
+Artifacts: `amplitude.png`, `phase.png`, `preview.png` (curvature and tilt removed), `convergence.png`,
+`<ALGO>_amplitude.tif` / `_phase.tif` / `_pupil_phase.tif` (same format as the MATLAB script), `comparison.png`,
+`frames.csv`, `summary.txt`, `fpm_log.txt`, `result.npz` (complex objects, pupils, residuals, unwrapped phase); with
+`refine_ml`: `refined_*.png`, `refined.npz`, `hybrid_*.png`, `hybrid.npz`, `comparison_ml.png`. The summary reports
+the residuals, the data residual of the primary (EPRY) result, and for reduced LED sets the prediction error on the
+LEDs that were not used — for the physics, refined and hybrid estimates. Details: `docs/fpm.md`.
+
