@@ -86,7 +86,7 @@ jobs:
           npm install --no-save playwright@1.49.1 axe-core@4.10.2
           npx playwright install --with-deps chromium
           (python3 -m http.server 3100 --directory out &) && sleep 1
-          node ../scripts/website_qa.js http://localhost:3100 qa node_modules/axe-core/axe.min.js
+          NODE_PATH="$PWD/node_modules" node ../scripts/website_qa.js http://localhost:3100 qa node_modules/axe-core/axe.min.js
           test "$(node -e "console.log(require('./qa/qa_report.json').issues.length)")" = "0"
       - uses: actions/upload-artifact@v4
         if: always()
