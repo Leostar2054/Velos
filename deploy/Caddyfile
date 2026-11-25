@@ -13,7 +13,9 @@
 
 	# metrics stay inside the compose network (Prometheus scrapes api:8000/metrics directly)
 	@metrics path /metrics /metrics/*
-	respond @metrics 404
+	handle @metrics {
+		respond 404
+	}
 
 	@api path /api/* /health /docs /docs/* /redoc /openapi.json
 	handle @api {

@@ -105,7 +105,7 @@ jobs:
       - name: Environment (CI values; production values live only on the server)
         run: |
           cp deploy/.env.example deploy/.env
-          sed -i 's/^SITE_DOMAIN=.*/SITE_DOMAIN=:80/; s/^VELOS_API_KEYS=.*/VELOS_API_KEYS=ci-user-key:ci:user,ci-admin-key:ops:admin/; s/^VELOS_TAG=.*/VELOS_TAG=ci/' deploy/.env
+          sed -i 's/^SITE_DOMAIN=.*/SITE_DOMAIN=:80/; s|^SITE_URL=.*|SITE_URL=http://localhost|; s/^VELOS_API_KEYS=.*/VELOS_API_KEYS=ci-user-key:ci:user,ci-admin-key:ops:admin/; s/^VELOS_TAG=.*/VELOS_TAG=ci/' deploy/.env
           mkdir -p evidence/ci
       - name: Validate the compose file
         run: $COMPOSE config --quiet

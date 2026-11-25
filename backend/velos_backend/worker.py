@@ -246,15 +246,22 @@ def main(argv=None):
     configure_logging(settings.log_level)
     poll = a.poll or settings.worker_poll_s
     log.info("worker started (storage=%s, poll=%.1fs)", settings.storage_dir, poll)
-    import os, socket
+    import os, socket, threading
     wid = a.worker_id or f"{socket.gethostname()}-{os.getpid()}"
     hb = settings.storage_dir / "heartbeats" / f"{wid}.json"
     hb.parent.mkdir(parents=True, exist_ok=True)
+
+    def heartbeat():                                 # liveness for /metrics and the container health check
+        while True:
+            try:
+                hb.write_text(json.dumps({"worker": wid, "time": time.time()}))
+            except OSError:
+                pass
+            time.sleep(15)
+
+    if not a.once:
+        threading.Thread(target=heartbeat, daemon=True, name="heartbeat").start()
     while True:
-        try:                                         # liveness for /metrics (velos_worker_heartbeat_age_seconds)
-            hb.write_text(json.dumps({"worker": wid, "time": time.time()}))
-        except OSError:
-            pass
         job_id = run_once(wid)
         if a.once:
             return 0 if job_id else 1
