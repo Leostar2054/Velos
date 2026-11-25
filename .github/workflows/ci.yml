@@ -100,8 +100,15 @@ jobs:
     runs-on: ubuntu-latest
     env:
       COMPOSE: docker compose -f docker-compose.prod.yml --env-file deploy/.env --profile monitoring
+    defaults:
+      run:
+        shell: bash          # -eo pipefail: a failing test piped into tee fails the step
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install numpy          # test clients (synthetic data, load test)
       - name: Environment (CI values; production values live only on the server)
         run: |
           cp deploy/.env.example deploy/.env
