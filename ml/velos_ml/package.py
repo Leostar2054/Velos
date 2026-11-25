@@ -47,9 +47,33 @@ def _realistic_input(tile: int, seed: int = 0) -> np.ndarray:
     return np.stack([z.real, z.imag, mask], 0)[None].astype(np.float32)
 
 
+FPM_CARD = {
+    "task": "refinement of LED-array Fourier ptychographic (FPM) reconstructions from reduced LED sets",
+    "inputs": "x float32 [1, 3, T, T] = (Re, Im, mask) of the FLATTENED, NORMALISED EPRY object "
+              "(point-source curvature, tilt and mean phase removed: velos_recon.fpm.apply_flatten; then "
+              "velos_recon.normalise.normalise)",
+    "outputs": "y float32 [1, 2, T, T] = (Re, Im) of the refined object in the same frame",
+    "intended_use": "Research and development use inside the Velos/SPARK platform: optional refinement of EPRY "
+                    "reconstructions of the in-house LED-array microscope (633 nm, 4x/0.10, 15x15 LEDs at 3 mm, "
+                    "about 55-60 mm below the sample) acquired with a reduced LED set (all LEDs inside 1.1 x NA "
+                    "plus 30-50 % of the dark-field LEDs), followed by the hybrid physics polish. The physics "
+                    "result is always kept and returned alongside.",
+    "limitations": [
+        "Fine-tuned on ONE field of view per specimen type (blood smear; leaf section), left 65 % of a "
+        "645 um patch, five acquisitions; tested on the right 35 %, on unseen frame draws and on sensor "
+        "regions never used for training. Other specimens, objectives, wavelengths or LED geometries are "
+        "out of distribution.",
+        "Outputs are estimates, not measurements: use the data-consistency check (residual on the LEDs used "
+        "and prediction error on LEDs not used) and prefer the physics or hybrid result when it disagrees.",
+        "References are full-LED EPRY reconstructions, not ground truth; their own repeatability is reported "
+        "in the evaluation summary.",
+    ],
+}
+
+
 def export(checkpoint: str, out: str, tile: int = 256, overlap: int = 64, version: str = "2.0.0",
            name: str = "velos-refine", eval_summary: str | None = None, opset: int = 17,
-           extra_inputs: list | None = None) -> dict:
+           extra_inputs: list | None = None, modality: str = "ptychography") -> dict:
     out = Path(out); out.mkdir(parents=True, exist_ok=True)
     state = torch.load(checkpoint, map_location="cpu", weights_only=False)
     cfg = state["config"]
@@ -142,6 +166,10 @@ def export(checkpoint: str, out: str, tile: int = 256, overlap: int = 64, versio
         "owner": "Velos BioImaging (all rights reserved)",
         "files": {},
     }
+    card["modality"] = modality
+    if modality == "fpm":
+        card.update(FPM_CARD)
+        card["recommended_hybrid_iters"] = {"experimental": 10}
     for f in (onnx_path, ts_path):
         card["files"][f.name] = {"sha256": _sha256(f), "bytes": f.stat().st_size}
     (out / "model_card.json").write_text(json.dumps(card, indent=2, default=float))
@@ -154,8 +182,9 @@ def main(argv=None):
     ap.add_argument("--tile", type=int, default=256); ap.add_argument("--overlap", type=int, default=64)
     ap.add_argument("--version", default="2.0.0"); ap.add_argument("--name", default="velos-refine")
     ap.add_argument("--eval", default=None, help="evaluation summary JSON to embed in the card")
+    ap.add_argument("--modality", default="ptychography", choices=["ptychography", "fpm"])
     a = ap.parse_args(argv)
-    card = export(a.checkpoint, a.out, a.tile, a.overlap, a.version, a.name, a.eval)
+    card = export(a.checkpoint, a.out, a.tile, a.overlap, a.version, a.name, a.eval, modality=a.modality)
     print(json.dumps({"files": card["files"], "verification": card["verification"]}, indent=2))
 
 

@@ -1,0 +1,14 @@
+# GPU worker image: same code as backend/Dockerfile, ONNX Runtime with the CUDA execution provider.
+FROM nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
+ENV DEBIAN_FRONTEND=noninteractive PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
+    VELOS_STORAGE_DIR=/data VELOS_MODEL_DIR=/models MPLCONFIGDIR=/tmp/mpl
+RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-pip && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY pyproject.toml README.md ./
+COPY velos_recon ./velos_recon
+COPY velos_backend ./velos_backend
+RUN pip3 install --no-cache-dir ".[ml-gpu]" \
+ && useradd --system --uid 10001 --home /app velos \
+ && mkdir -p /data /models && chown -R velos /data
+USER velos
+CMD ["python3", "-m", "velos_backend.worker"]

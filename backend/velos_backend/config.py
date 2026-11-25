@@ -15,6 +15,8 @@ VELOS_DEFAULT_MODEL      (first package found)        Package used when a job do
 VELOS_ML_RUNTIME         auto                         auto | onnxruntime | torchscript
 VELOS_WORKER_POLL_S      1.0                          Worker poll interval
 VELOS_LOG_LEVEL          INFO
+VELOS_LOG_FORMAT         text                         text | json (one JSON object per line, for log collectors)
+VELOS_METRICS_TOKEN      (unset)                      if set, /metrics requires "Authorization: Bearer <token>"
 """
 from __future__ import annotations
 
@@ -86,6 +88,30 @@ def get_settings() -> Settings:
     if _settings is None:
         _settings = Settings.from_env()
     return _settings
+
+
+def configure_logging(level: str = "INFO") -> None:
+    """Plain text (default) or JSON lines (VELOS_LOG_FORMAT=json) on stdout."""
+    import json as _json
+    import logging
+    import time as _time
+
+    class _JsonFormatter(logging.Formatter):
+        def format(self, record):
+            d = {"ts": _time.strftime("%Y-%m-%dT%H:%M:%S", _time.gmtime(record.created)) + f".{int(record.msecs):03d}Z",
+                 "level": record.levelname, "logger": record.name, "msg": record.getMessage()}
+            if record.exc_info:
+                d["exc"] = self.formatException(record.exc_info)
+            return _json.dumps(d, ensure_ascii=False)
+
+    handler = logging.StreamHandler()
+    if os.getenv("VELOS_LOG_FORMAT", "text").lower() == "json":
+        handler.setFormatter(_JsonFormatter())
+    else:
+        handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
+    root = logging.getLogger()
+    root.handlers[:] = [handler]
+    root.setLevel(level)
 
 
 def reset_settings() -> None:

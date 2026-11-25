@@ -12,6 +12,7 @@ services:
       args:
         NEXT_PUBLIC_API_URL: ""
         NEXT_PUBLIC_SITE_URL: https://${SITE_DOMAIN:?set SITE_DOMAIN in deploy/.env}
+        NEXT_PUBLIC_CONTACT_EMAIL: ${CONTACT_EMAIL:-}
     image: velos-edge:${VELOS_TAG:-dev}
     restart: unless-stopped
     environment:
@@ -34,8 +35,13 @@ services:
       VELOS_MAX_UPLOAD_MB: ${VELOS_MAX_UPLOAD_MB:-2048}
       VELOS_DEFAULT_MODEL: ${VELOS_DEFAULT_MODEL:-}
       VELOS_LOG_LEVEL: ${VELOS_LOG_LEVEL:-INFO}
+      VELOS_LOG_FORMAT: ${VELOS_LOG_FORMAT:-json}
+      VELOS_METRICS_TOKEN: ${VELOS_METRICS_TOKEN:-}
     volumes: ["velos-data:/data", "./models:/models:ro"]
     expose: ["8000"]
+    logging: &logging
+      driver: json-file
+      options: {max-size: "20m", max-file: "5"}
   worker:
     image: velos-backend:${VELOS_TAG:-dev}
     command: ["python", "-m", "velos_backend.worker"]
@@ -45,14 +51,35 @@ services:
     depends_on:
       api:
         condition: service_healthy
+    logging: *logging
     healthcheck:
-      disable: true
+      # liveness: the worker touches /data/heartbeats/<id>.json every poll (also exported by /metrics)
+      test: ["CMD", "python", "-c", "import glob,os,sys,time; f=glob.glob('/data/heartbeats/*.json'); sys.exit(0 if f and time.time()-max(map(os.path.getmtime,f))<120 else 1)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
     # GPU worker (M4): uncomment and build the backend with ML_EXTRA=ml-gpu on a CUDA base image
     # deploy:
     #   resources:
     #     reservations:
     #       devices: [{driver: nvidia, count: 1, capabilities: [gpu]}]
+  # Monitoring (optional):  docker compose --profile monitoring ... up -d
+  # Prometheus scrapes the API's /metrics inside the compose network (never exposed by the edge server)
+  # and evaluates the alert rules in deploy/prometheus/alerts.yml. UI on 127.0.0.1:9090 (SSH tunnel).
+  prometheus:
+    profiles: ["monitoring"]
+    image: prom/prometheus:v2.53.2
+    restart: unless-stopped
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.retention.time=30d",
+              "--web.listen-address=:9090"]
+    volumes: ["./deploy/prometheus:/etc/prometheus:ro", "prometheus-data:/prometheus"]
+    ports: ["127.0.0.1:9090:9090"]
+    depends_on:
+      api:
+        condition: service_healthy
 volumes:
   velos-data:
   caddy-data:
   caddy-config:
+  prometheus-data:

@@ -12,13 +12,17 @@ ml/data/
 ml/runs/*/last.pt
 *.npz
 !ml/sample_data/*.npz
+!examples/fpm/*.npz
 
 # large binaries are delivered in the evidence folder, not tracked in git
 evidence/ml/*.pt
 reports/
 
-# model packages (ONNX/TorchScript, ~30 MB each) are delivered separately (03_Model_Package)
-models/
+# model packages: ONNX + model card are tracked (~31 MB each); the TorchScript fallback copies are
+# delivered with the release package only
+models/*/model.ts
 backend/models/
 ml/models/
 ml/results/
+ml/runs/
+ml/data/

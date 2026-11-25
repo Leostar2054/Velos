@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { API_URL, SITE } from "@/lib/site";
+import { API_URL, CONTACT_EMAIL, SITE } from "@/lib/site";
 
 type State = { status: "idle" | "sending" | "sent" | "error"; message?: string };
 
@@ -80,8 +80,9 @@ export default function ContactForm() {
         </button>
         {state.status === "error" && (
           <p className="text-sm text-rose-300" role="alert">
-            Could not send ({state.message}). Please email us directly at{" "}
-            <a className="underline" href={`mailto:${SITE.company.email}`}>{SITE.company.email}</a>.
+            Could not send ({state.message}).{" "}
+            {CONTACT_EMAIL ? (<>Please email us directly at{" "}
+              <a className="underline" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</>) : "Please try again later."}
           </p>
         )}
       </div>

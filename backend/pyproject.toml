@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "velos-backend"
-version = "0.3.0"
+version = "0.4.0"
 description = "Velos BioImaging / SPARK reconstruction backend: FastAPI API, job queue, worker and physics-engine integration"
 requires-python = ">=3.10"
 dependencies = [

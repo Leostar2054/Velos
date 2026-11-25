@@ -1,0 +1,27 @@
+# Alert rules (evaluated by Prometheus; connect Alertmanager or Grafana for e-mail / chat delivery).
+groups:
+  - name: velos
+    rules:
+      - alert: VelosApiDown
+        expr: up{job="velos-api"} == 0
+        for: 2m
+        labels: {severity: critical}
+        annotations: {summary: "Velos API is not answering /metrics"}
+      - alert: VelosWorkerStalled
+        expr: max(velos_worker_heartbeat_age_seconds) > 120
+        for: 2m
+        labels: {severity: critical}
+        annotations: {summary: "No worker has polled the queue for 2 minutes"}
+      - alert: VelosQueueBacklog
+        expr: velos_queue_oldest_seconds > 900
+        for: 5m
+        labels: {severity: warning}
+        annotations: {summary: "A job has waited more than 15 minutes in the queue"}
+      - alert: VelosJobFailures
+        expr: increase(velos_jobs{status="failed"}[1h]) > 3
+        labels: {severity: warning}
+        annotations: {summary: "More than 3 failed jobs in the last hour"}
+      - alert: VelosApiErrors
+        expr: sum(increase(velos_http_requests_total{code="5xx"}[15m])) > 5
+        labels: {severity: warning}
+        annotations: {summary: "API returned more than 5 server errors in 15 minutes"}

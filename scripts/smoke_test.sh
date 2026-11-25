@@ -2,6 +2,7 @@
 # Post-deployment smoke test (staging / production / CI).
 #
 #   scripts/smoke_test.sh BASE_URL API_KEY [dataset.npz]
+#   FPM_DATA=examples/fpm/blood_222619_c256.npz scripts/smoke_test.sh ...   (adds an LED-array FPM job on real data)
 #
 # BASE_URL is the public address (edge server), e.g. https://velos.example.com or
 # http://localhost:8000 for an API-only run (set SKIP_WEB=1). Without a dataset a small
@@ -86,5 +87,31 @@ pass "result + artifact download (phase.png)"
 if [ "$REFINE" = true ]; then
   C=$(echo "$R" | json summary.ml_refinement.consistency)
   pass "ML refinement · model $(echo "$R" | json summary.ml_refinement.model) · runtime $(echo "$R" | json summary.ml_refinement.runtime) · consistency: $C"
+fi
+# 8. LED-array FPM on real data (M4): reduced LED set + ML refinement (if an FPM model is installed) + hybrid
+if [ -n "${FPM_DATA:-}" ]; then
+  U=$(curl -fsS -H "X-API-Key: $KEY" -F "file=@$FPM_DATA" -F "name=smoke-fpm" "$BASE/api/v1/datasets") || fail "FPM upload"
+  FDS=$(echo "$U" | json id)
+  [ "$(echo "$U" | json summary.modality)" = "fpm" ] || fail "FPM dataset not recognised: $U"
+  pass "FPM upload · dataset $FDS · $(echo "$U" | json summary.n_frames) LED frames"
+  NFPM=$(echo "$M" | python3 -c 'import sys,json; print(sum(1 for c in json.load(sys.stdin) if c.get("modality") == "fpm"))')
+  FREF=false; [ "$NFPM" -gt 0 ] && FREF=true
+  J=$(curl -fsS -H "X-API-Key: $KEY" -H 'Content-Type: application/json' \
+       -d "{\"dataset_id\": \"$FDS\", \"engine\": \"fpm\", \"iters\": ${FPM_PASSES:-10}, \"sparse_fraction\": 0.5, \"refine_ml\": $FREF, \"hybrid_iters\": $([ $FREF = true ] && echo 3 || echo 0)}" \
+       "$BASE/api/v1/jobs") || fail "submit FPM job"
+  FJOB=$(echo "$J" | json id)
+  for i in $(seq 1 ${TIMEOUT_S:-600}); do
+    S=$(curl -fsS -H "X-API-Key: $KEY" "$BASE/api/v1/jobs/$FJOB" | json status)
+    case "$S" in succeeded) break ;; failed|cancelled) fail "FPM job ended $S: $(curl -fsS -H "X-API-Key: $KEY" "$BASE/api/v1/jobs/$FJOB" | json error)" ;; esac
+    sleep 1
+  done
+  [ "$S" = "succeeded" ] || fail "FPM job not finished in time (status $S)"
+  R=$(curl -fsS -H "X-API-Key: $KEY" "$BASE/api/v1/jobs/$FJOB/result") || fail "FPM result"
+  pass "FPM job succeeded after ~${i}s · $(echo "$R" | json summary.reconstruction.reduced_leds.leds_used)/$(echo "$R" | json summary.reconstruction.reduced_leds.leds_available) LEDs · residual $(echo "$R" | json summary.reconstruction.data_error_normalised) · prediction error $(echo "$R" | json summary.reconstruction.prediction_error_unused_frames)"
+  code=$(curl -s -o "$TMP/fpm_phase.png" -w '%{http_code}' -H "X-API-Key: $KEY" "$BASE/api/v1/jobs/$FJOB/artifacts/phase.png")
+  [ "$code" = "200" ] || fail "FPM artifact download → $code"
+  if [ "$FREF" = true ]; then
+    pass "FPM ML refinement · model $(echo "$R" | json summary.ml_refinement.model) · consistency: $(echo "$R" | json summary.ml_refinement.consistency)"
+  fi
 fi
 echo "ALL CHECKS PASSED ($BASE)"

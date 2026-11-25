@@ -32,7 +32,7 @@ def test_normalise_roundtrip_and_ramp_removal():
 
 def test_identity_package_tiled_onnx(tmp_root):
     cards = list_packages(tmp_root / "models")
-    assert [c["id"] for c in cards] == ["identity-test"]
+    assert "identity-test" in [c["id"] for c in cards]      # (test_fpm adds an FPM package to the same folder)
     pkg = load_package(str(tmp_root / "models" / "identity-test"))
     assert pkg.runtime.startswith("onnxruntime")
     obj, mask = _test_object()                     # 150×230 > 64-px tiles: many overlapping tiles

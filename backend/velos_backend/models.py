@@ -79,8 +79,11 @@ class DatasetOut(BaseModel):
 
 class JobCreate(BaseModel):
     dataset_id: str
-    engine: str = PField(default="epie", description="epie | rpie | wasp | gd | map")
-    iters: int = PField(default=100, ge=1, le=5000)
+    engine: str = PField(default="epie", description=(
+        "scanning ptychography: epie | rpie | wasp | gd | map;  LED-array FPM datasets: "
+        "fpm (= fpm-epry) | fpm-ap | fpm-rpie | fpm-all"))
+    iters: Optional[int] = PField(default=None, ge=1, le=5000,
+                                  description="iterations (ptychography, default 100) or passes (FPM, default 30)")
     seed: int = 0
     crop: Optional[int] = PField(default=None, ge=32, description="centre-crop frames to N px (fast preview)")
     sparse_every: int = PField(default=1, ge=1, le=8, description="keep every k-th grid row/col (sparse-scan test)")
@@ -91,6 +94,10 @@ class JobCreate(BaseModel):
     model: Optional[str] = PField(default=None, description="model package id (GET /api/v1/models); default if omitted")
     hybrid_iters: int = PField(default=0, ge=0, le=1000,
                                description="hybrid mode: physics iterations seeded with the ML-refined object (0 = off)")
+    fpm: Dict[str, Any] = PField(default_factory=dict, description=(
+        "FPM settings that override the defaults stored with the dataset, e.g. {\"Np\": 256, "
+        "\"z_source_mm\": 55, \"lambda_um\": 0.633, \"n_warmup\": 0, \"geometry_check\": \"report\"} "
+        "(field names as in velos_recon.fpm.FPMConfig)"))
     probe_from_job: Optional[str] = PField(default=None, description=(
         "probe calibration: start from the probe reconstructed by this earlier (succeeded) job, e.g. a dense "
         "scan of the same illumination — needed for strongly reduced scans of some samples"))
@@ -99,9 +106,18 @@ class JobCreate(BaseModel):
     @classmethod
     def _engine_ok(cls, v: str) -> str:
         from velos_recon.engine import ENGINE_NAMES
+        from .fpm_jobs import FPM_ENGINES
         v = v.lower()
-        if v not in ENGINE_NAMES:
-            raise ValueError(f"engine must be one of {sorted(ENGINE_NAMES)}")
+        if v not in ENGINE_NAMES and v not in FPM_ENGINES:
+            raise ValueError(f"engine must be one of {sorted(ENGINE_NAMES) + sorted(FPM_ENGINES)}")
+        return v
+
+    @field_validator("fpm")
+    @classmethod
+    def _fpm_ok(cls, v: Dict[str, Any]) -> Dict[str, Any]:
+        if v:
+            from velos_recon.fpm import FPMConfig
+            FPMConfig.from_dict(v)          # unknown keys -> 422
         return v
 
 

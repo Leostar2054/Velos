@@ -15,6 +15,7 @@ POST /api/v1/jobs/{id}/cancel             request cancellation                  
 GET  /api/v1/jobs/{id}/result             result summary + artifact links                [API key]
 GET  /api/v1/jobs/{id}/artifacts/{name}   download an artifact (png / npz / json)        [API key]
 GET  /api/v1/models                       installed ML model packages (model cards)      [API key]
+GET  /metrics                             Prometheus metrics (jobs, queue, HTTP, workers) [internal / token]
 
 Interactive docs: /docs (Swagger UI), /redoc.
 """
@@ -50,7 +51,8 @@ ALLOWED_EXT = {".mat", ".npz", ".h5", ".hdf5"}
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     settings = get_settings()
-    logging.basicConfig(level=settings.log_level, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+    from .config import configure_logging
+    configure_logging(settings.log_level)
     get_engine()           # creates tables
     get_storage()          # creates folders
     if settings.insecure_default_key:
@@ -70,12 +72,20 @@ app.add_middleware(CORSMiddleware, allow_origins=get_settings().cors_origins,
                    allow_methods=["*"], allow_headers=["*"])
 
 
+_http_count: dict = defaultdict(int)
+_http_seconds: dict = defaultdict(float)
+
+
 @app.middleware("http")
 async def _access_log(request: Request, call_next):
     t0 = time.perf_counter()
     response = await call_next(request)
-    log.info("%s %s → %s (%.0f ms)", request.method, request.url.path, response.status_code,
-             (time.perf_counter() - t0) * 1000)
+    dt = time.perf_counter() - t0
+    route = request.scope.get("route")
+    key = (request.method, getattr(route, "path", "unmatched"), f"{response.status_code // 100}xx")
+    _http_count[key] += 1
+    _http_seconds[key] += dt
+    log.info("%s %s → %s (%.0f ms)", request.method, request.url.path, response.status_code, dt * 1000)
     return response
 
 
@@ -114,6 +124,56 @@ def health(session: Session = Depends(get_session)):
               "default": settings.default_model or (cards[0]["id"] if cards else None)}
     return {"status": "ok", "version": __version__, "queue": {"queued": queued, "running": running},
             "models": models}
+
+
+@app.get("/metrics", tags=["system"], include_in_schema=True)
+def metrics(request: Request, session: Session = Depends(get_session)):
+    """Prometheus text format: job counts by status, queue depth, job durations, datasets,
+    installed models, worker heartbeats and per-route HTTP counters / latency sums.
+    Protected by ``VELOS_METRICS_TOKEN`` (Bearer) when set; the edge server does not expose it."""
+    from fastapi.responses import PlainTextResponse
+    import os
+    token = os.getenv("VELOS_METRICS_TOKEN")
+    if token and request.headers.get("authorization", "") != f"Bearer {token}":
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "metrics token required")
+    from velos_recon.refine import list_packages
+    settings = get_settings()
+    lines = ["# HELP velos_build_info Velos API version.", "# TYPE velos_build_info gauge",
+             f'velos_build_info{{version="{__version__}"}} 1',
+             "# HELP velos_jobs Jobs by status.", "# TYPE velos_jobs gauge"]
+    counts = dict(session.exec(select(Job.status, func.count()).group_by(Job.status)).all())
+    for st in JobStatus:
+        lines.append(f'velos_jobs{{status="{st.value}"}} {int(counts.get(st, 0))}')
+    rows = session.exec(select(Job.started_at, Job.finished_at).where(Job.status == JobStatus.succeeded)).all()
+    durs = [(f - s).total_seconds() for s, f in rows if s and f]
+    lines += ["# HELP velos_job_duration_seconds Run time of succeeded jobs.", "# TYPE velos_job_duration_seconds summary",
+              f"velos_job_duration_seconds_sum {sum(durs):.3f}", f"velos_job_duration_seconds_count {len(durs)}"]
+    oldest = session.exec(select(func.min(Job.created_at)).where(Job.status == JobStatus.queued)).one()
+    age = 0.0
+    if oldest is not None:
+        from datetime import datetime, timezone
+        o = oldest if oldest.tzinfo else oldest.replace(tzinfo=timezone.utc)
+        age = (datetime.now(timezone.utc) - o).total_seconds()
+    lines += ["# HELP velos_queue_oldest_seconds Age of the oldest queued job.", "# TYPE velos_queue_oldest_seconds gauge",
+              f"velos_queue_oldest_seconds {age:.1f}"]
+    n_ds = session.exec(select(func.count()).select_from(Dataset)).one()
+    lines += ["# TYPE velos_datasets gauge", f"velos_datasets {int(n_ds)}",
+              "# TYPE velos_models_installed gauge", f"velos_models_installed {len(list_packages(settings.model_dir))}"]
+    lines += ["# HELP velos_worker_heartbeat_age_seconds Seconds since each worker last polled the queue.",
+              "# TYPE velos_worker_heartbeat_age_seconds gauge"]
+    hb_dir = settings.storage_dir / "heartbeats"
+    now = time.time()
+    if hb_dir.is_dir():
+        for f in sorted(hb_dir.glob("*.json")):
+            lines.append(f'velos_worker_heartbeat_age_seconds{{worker="{f.stem}"}} {now - f.stat().st_mtime:.1f}')
+    lines += ["# HELP velos_http_requests_total HTTP requests by method, route and status class.",
+              "# TYPE velos_http_requests_total counter"]
+    for (m, r, c), n in sorted(_http_count.items()):
+        lines.append(f'velos_http_requests_total{{method="{m}",route="{r}",code="{c}"}} {n}')
+    lines += ["# HELP velos_http_request_seconds_total Summed request latency.", "# TYPE velos_http_request_seconds_total counter"]
+    for (m, r, c), v in sorted(_http_seconds.items()):
+        lines.append(f'velos_http_request_seconds_total{{method="{m}",route="{r}",code="{c}"}} {v:.4f}')
+    return PlainTextResponse("\n".join(lines) + "\n", media_type="text/plain; version=0.0.4")
 
 
 @app.get("/api/v1/models", tags=["models"])
@@ -173,8 +233,15 @@ def upload_dataset(file: UploadFile = File(...), name: str | None = Form(None),
     except ValueError as e:
         raise HTTPException(status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, str(e))
     try:
-        ds = load_dataset(path, name=row.name)       # validates format + geometry
-        summary = ds.summary()
+        from velos_recon.fpm import is_fpm_npz, load_fpm_npz
+        if is_fpm_npz(path):                          # LED-array FPM dataset (M4)
+            acq = load_fpm_npz(path, name=row.name)
+            summary = acq.summary()
+            summary["n_patterns"] = acq.n_frames
+        else:
+            ds = load_dataset(path, name=row.name)   # validates format + geometry
+            summary = ds.summary()
+            summary.setdefault("modality", "ptychography")
     except Exception as e:
         import shutil; shutil.rmtree(storage.dataset_dir(row.id), ignore_errors=True)
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, f"dataset could not be parsed: {e}")
@@ -206,6 +273,12 @@ def submit_job(payload: JobCreate, who: ApiKeyInfo = Depends(require_api_key), s
     d = session.get(Dataset, payload.dataset_id)
     if d is None or not can_access(who, d.owner):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "dataset not found")
+    from .fpm_jobs import FPM_ENGINES
+    modality = json.loads(d.summary_json or "{}").get("modality", "ptychography")
+    if (modality == "fpm") != (payload.engine in FPM_ENGINES):
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY,
+                            f"engine '{payload.engine}' does not fit a {modality} dataset "
+                            f"({'use fpm, fpm-ap, fpm-epry, fpm-rpie or fpm-all' if modality == 'fpm' else 'use epie, rpie, wasp, gd or map'})")
     if payload.probe_from_job:
         ref = session.get(Job, payload.probe_from_job)
         if ref is None or not can_access(who, ref.owner):

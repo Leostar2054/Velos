@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { PageHeader, Section } from "@/components/Section";
 import ContactForm from "@/components/ContactForm";
-import { SITE } from "@/lib/site";
+import { CONTACT_EMAIL, SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -18,10 +18,12 @@ export default function ContactPage() {
         <div className="grid gap-10 lg:grid-cols-5">
           <div className="lg:col-span-3"><ContactForm /></div>
           <aside className="space-y-6 lg:col-span-2">
-            <div className="card">
-              <h2 className="font-semibold text-white">Email</h2>
-              <a className="mt-2 block text-cyan-300 hover:underline" href={`mailto:${SITE.company.email}`}>{SITE.company.email}</a>
-            </div>
+            {CONTACT_EMAIL && (
+              <div className="card">
+                <h2 className="font-semibold text-white">Email</h2>
+                <a className="mt-2 block text-cyan-300 hover:underline" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+              </div>
+            )}
             <div className="card">
               <h2 className="font-semibold text-white">Address</h2>
               <p className="mt-2 text-slate-400">{SITE.company.address}</p>

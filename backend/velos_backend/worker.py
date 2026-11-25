@@ -33,19 +33,22 @@ from .storage import get_storage
 log = logging.getLogger("velos.worker")
 
 
-def resolve_model(name: str | None):
-    """Path of the requested (or default) model package, or None if none is installed."""
+def resolve_model(name: str | None, modality: str = "ptychography"):
+    """Path of the requested (or default) model package for this modality, or None if none is installed.
+
+    Model cards carry ``modality`` (missing = "ptychography", the M3 packages)."""
     settings = get_settings()
     from velos_recon.refine import list_packages
-    cards = list_packages(settings.model_dir)
+    cards = [c for c in list_packages(settings.model_dir) if c.get("modality", "ptychography") == modality]
+    if name:
+        if not any(c["id"] == name for c in cards):
+            raise ValueError(f"unknown model '{name}' for {modality} (installed: {[c['id'] for c in cards]})")
+        return settings.model_dir / name
     if not cards:
         return None
-    wanted = name or settings.default_model
-    if wanted is None:
-        return settings.model_dir / cards[0]["id"]
-    if not (settings.model_dir / wanted / "model_card.json").exists():
-        raise ValueError(f"unknown model '{wanted}' (installed: {[c['id'] for c in cards]})")
-    return settings.model_dir / wanted
+    if settings.default_model and any(c["id"] == settings.default_model for c in cards):
+        return settings.model_dir / settings.default_model
+    return settings.model_dir / cards[0]["id"]
 
 
 def _run_ml_refinement(ds, cfg, res, params: dict, out_dir: Path, progress=None, should_cancel=None) -> dict:
@@ -56,7 +59,7 @@ def _run_ml_refinement(ds, cfg, res, params: dict, out_dir: Path, progress=None,
     from velos_recon.refine import hybrid, load_package, refine
 
     settings = get_settings()
-    path = resolve_model(params.get("model"))
+    path = resolve_model(params.get("model"), "ptychography")
     if path is None:
         return {"applied": False, "reason": f"no model package installed in {settings.model_dir}"}
     pkg = load_package(str(path), settings.ml_runtime)
@@ -121,16 +124,19 @@ def process_job(job_id: str) -> JobStatus:
             return JobStatus.failed
         out_dir = storage.job_dir(job_id)
         log.info("job %s: start (%s)", job_id, params)
+        if json.loads(ds_row.summary_json or "{}").get("modality") == "fpm":
+            return _process_fpm(session, job_id, ds_row, params, out_dir)
         try:
             ds = load_dataset(ds_row.path, name=ds_row.name)
             if int(params.get("sparse_every", 1)) > 1:
                 ds = ds.sparse_subset(every=int(params["sparse_every"]))
             if params.get("sparse_fraction") and float(params["sparse_fraction"]) < 1.0:
                 ds = ds.sparse_subset(fraction=float(params["sparse_fraction"]), seed=int(params.get("seed", 0)))
-            cfg = ReconConfig(engine=params.get("engine", "epie"), iters=int(params.get("iters", 100)),
+            n_it = int(params.get("iters") or 100)
+            cfg = ReconConfig(engine=params.get("engine", "epie"), iters=n_it,
                               seed=int(params.get("seed", 0)), crop=params.get("crop"),
                               engine_params=params.get("engine_params") or {},
-                              progress_every=max(1, int(params.get("iters", 100)) // 50))
+                              progress_every=max(1, n_it // 50))
             last = {"t": 0.0}
 
             def progress(it, n, info):
@@ -186,6 +192,39 @@ def process_job(job_id: str) -> JobStatus:
             return JobStatus.failed
 
 
+def _process_fpm(session, job_id: str, ds_row, params: dict, out_dir: Path) -> JobStatus:
+    """LED-array FPM job (M4) — see velos_backend.fpm_jobs."""
+    from velos_recon.fpm import FPMCancelled
+    from .fpm_jobs import run_fpm_job
+    last = {"t": 0.0}
+
+    def progress(it, n, info):
+        now = time.perf_counter()
+        if now - last["t"] > 0.5 or it == n:
+            update_progress(session, job_id, it, n,
+                            f"{info.get('algorithm', 'FPM')} pass {it}/{n} · residual {info['err']:.4f}")
+            last["t"] = now
+
+    def cancelled():
+        return is_cancel_requested(session, job_id)
+
+    try:
+        summary = run_fpm_job(ds_row.path, params, out_dir, progress=progress, should_cancel=cancelled,
+                              resolve_model=resolve_model, ml_runtime=get_settings().ml_runtime)
+        (out_dir / "summary.json").write_text(json.dumps(summary, indent=2, default=float))
+        finish(session, job_id, JobStatus.succeeded, result=json.loads(json.dumps(summary, default=float)))
+        log.info("job %s: FPM succeeded in %.1fs", job_id, summary.get("elapsed_s", 0))
+        return JobStatus.succeeded
+    except FPMCancelled as e:
+        finish(session, job_id, JobStatus.cancelled, error=str(e))
+        return JobStatus.cancelled
+    except Exception as e:  # noqa: BLE001
+        (out_dir / "error.log").write_text(traceback.format_exc())
+        finish(session, job_id, JobStatus.failed, error=f"{type(e).__name__}: {e}")
+        log.exception("job %s: FPM failed", job_id)
+        return JobStatus.failed
+
+
 def run_once(worker_id: str | None = None) -> str | None:
     with session_scope() as session:
         job = claim_next(session, worker_id)
@@ -203,11 +242,20 @@ def main(argv=None):
     p.add_argument("--worker-id", default=None)
     a = p.parse_args(argv)
     settings = get_settings()
-    logging.basicConfig(level=settings.log_level, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+    from .config import configure_logging
+    configure_logging(settings.log_level)
     poll = a.poll or settings.worker_poll_s
     log.info("worker started (storage=%s, poll=%.1fs)", settings.storage_dir, poll)
+    import os, socket
+    wid = a.worker_id or f"{socket.gethostname()}-{os.getpid()}"
+    hb = settings.storage_dir / "heartbeats" / f"{wid}.json"
+    hb.parent.mkdir(parents=True, exist_ok=True)
     while True:
-        job_id = run_once(a.worker_id)
+        try:                                         # liveness for /metrics (velos_worker_heartbeat_age_seconds)
+            hb.write_text(json.dumps({"worker": wid, "time": time.time()}))
+        except OSError:
+            pass
+        job_id = run_once(wid)
         if a.once:
             return 0 if job_id else 1
         if job_id is None:

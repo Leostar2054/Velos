@@ -1,0 +1,14 @@
+# GPU worker override (cloud GPU VM with the NVIDIA container toolkit):
+#   docker compose -f docker-compose.prod.yml -f docker-compose.gpu.yml --env-file deploy/.env up -d --build
+# The worker image is built with onnxruntime-gpu on a CUDA base image; ONNX Runtime then uses the
+# CUDA execution provider automatically (the job summary reports the runtime that was used).
+services:
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.gpu
+    image: velos-backend-gpu:${VELOS_TAG:-dev}
+    deploy:
+      resources:
+        reservations:
+          devices: [{driver: nvidia, count: 1, capabilities: [gpu]}]

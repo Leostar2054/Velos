@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SITE } from "@/lib/site";
+import { CONTACT_EMAIL, SITE } from "@/lib/site";
 import Logo from "./Logo";
 
 export default function Footer() {
@@ -25,7 +25,7 @@ export default function Footer() {
         <div>
           <h3 className="text-sm font-semibold text-white">Contact</h3>
           <address className="mt-3 space-y-2 text-sm not-italic text-slate-400">
-            <p><a className="hover:text-white" href={`mailto:${SITE.company.email}`}>{SITE.company.email}</a></p>
+            {CONTACT_EMAIL && <p><a className="hover:text-white" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></p>}
             <p>{SITE.company.address}</p>
           </address>
         </div>

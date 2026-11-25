@@ -8,7 +8,10 @@ COPY website/ ./
 # empty API URL = same-origin requests (/api/... is proxied by Caddy; no CORS needed)
 ARG NEXT_PUBLIC_API_URL=""
 ARG NEXT_PUBLIC_SITE_URL=https://velosbioimaging.example
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+# contact address shown on the site (kept out of the repository; empty = hidden)
+ARG NEXT_PUBLIC_CONTACT_EMAIL=""
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL \
+    NEXT_PUBLIC_CONTACT_EMAIL=$NEXT_PUBLIC_CONTACT_EMAIL
 RUN npm run build
 
 FROM caddy:2.8-alpine

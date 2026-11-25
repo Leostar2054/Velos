@@ -1,5 +1,15 @@
-# Continuous integration (runs on every push / pull request) and a deployment job that stays
-# disabled until the Velos-owned cloud account, registry and server exist (M4).
+# Continuous integration and delivery for the Velos platform.
+#
+#   backend   unit + API tests (scanning ptychography, LED-array FPM, ML runtime, metrics)
+#   ml        ML pipeline smoke run (simulate -> train -> package -> verify) + FPM engine smoke run
+#   website   static build + QA crawl (3 viewports, links, images, axe-core accessibility)
+#   stack     the PRODUCTION compose stack (HTTPS edge server, API, worker, Prometheus) built and
+#             started on the runner: smoke test incl. an FPM job on real blood-smear data with the
+#             AI model, load/stability test, monitoring check, redeployment test; logs and evidence
+#             are kept as workflow artifacts
+#   publish   container images to GitHub Container Registry (main branch)
+#   deploy    rollout to a Velos-owned cloud server — switched on with the repository variable
+#             DEPLOY_ENABLED=true once the account, server and secrets exist (docs/deployment.md)
 name: ci
 
 on:
@@ -12,9 +22,12 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   backend:
-    name: Backend tests (API, queue, worker, ML runtime)
+    name: Backend tests (API, queue, worker, FPM, ML runtime, metrics)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -29,7 +42,7 @@ jobs:
       - run: pytest -q
 
   ml:
-    name: ML pipeline smoke run (simulate → train → package → verify)
+    name: ML pipeline smoke run + FPM engine
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -50,6 +63,8 @@ jobs:
       - name: Package (ONNX + TorchScript) and verify against PyTorch
         working-directory: ml
         run: python -m velos_ml.package /tmp/run/best.pt --out /tmp/models/ci-model --version 0.0.0-ci
+      - name: FPM engine on the real blood-smear sample (AP / EPRY / rPIE, 5 passes)
+        run: python -m velos_recon.fpm run examples/fpm/blood_222619_c256.npz --passes 5 --out /tmp/fpm_blood
 
   website:
     name: Website build + QA crawl
@@ -79,44 +94,93 @@ jobs:
           name: website-qa
           path: website/qa
 
-  images:
-    name: Container images + stack smoke test
+  stack:
+    name: Production stack (build, start, smoke + FPM, load test, monitoring, redeploy)
     needs: [backend, website]
     runs-on: ubuntu-latest
     env:
-      SITE_DOMAIN: ":80"
-      VELOS_API_KEYS: "ci-user-key:ci:user,ci-admin-key:ci:admin"
-      VELOS_TAG: ci
+      COMPOSE: docker compose -f docker-compose.prod.yml --env-file deploy/.env --profile monitoring
     steps:
       - uses: actions/checkout@v4
-      - run: cp deploy/.env.example deploy/.env && mkdir -p models
-      - run: docker compose -f docker-compose.prod.yml --env-file deploy/.env config --quiet
-      - run: docker compose -f docker-compose.prod.yml --env-file deploy/.env build
-      - run: docker compose -f docker-compose.prod.yml --env-file deploy/.env up -d
-      - run: scripts/smoke_test.sh http://localhost ci-user-key
-      - if: always()
-        run: docker compose -f docker-compose.prod.yml --env-file deploy/.env logs --no-color | tail -200
+      - name: Environment (CI values; production values live only on the server)
+        run: |
+          cp deploy/.env.example deploy/.env
+          sed -i 's/^SITE_DOMAIN=.*/SITE_DOMAIN=:80/; s/^VELOS_API_KEYS=.*/VELOS_API_KEYS=ci-user-key:ci:user,ci-admin-key:ops:admin/; s/^VELOS_TAG=.*/VELOS_TAG=ci/' deploy/.env
+          mkdir -p evidence/ci
+      - name: Validate the compose file
+        run: $COMPOSE config --quiet
+      - name: Build images
+        run: $COMPOSE build
+      - name: Start the stack (edge + api + worker + prometheus)
+        run: |
+          $COMPOSE up -d
+          for i in $(seq 1 60); do curl -fsS http://localhost/health > /dev/null && break; sleep 2; done
+          $COMPOSE ps | tee evidence/ci/compose_ps.txt
+      - name: Smoke test (website, auth, models, ptychography job with ML + hybrid, FPM job on real data)
+        run: FPM_DATA=examples/fpm/blood_222619_c256.npz scripts/smoke_test.sh http://localhost ci-user-key | tee evidence/ci/smoke_test.txt
+      - name: Load / stability test (24 jobs from 6 parallel clients, 2 cancelled on purpose)
+        run: python3 scripts/load_test.py --base http://localhost --key ci-user-key --jobs 24 --concurrency 6 --out evidence/ci
+      - name: Monitoring (Prometheus scrapes the API; alert rules loaded)
+        run: |
+          for i in $(seq 1 30); do
+            curl -fsS 'http://localhost:9090/api/v1/targets' | python3 -c 'import sys,json; t=json.load(sys.stdin)["data"]["activeTargets"]; sys.exit(0 if t and t[0]["health"]=="up" else 1)' && break
+            sleep 3
+          done
+          curl -fsS 'http://localhost:9090/api/v1/targets' | tee evidence/ci/prometheus_targets.json | python3 -c 'import sys,json; t=json.load(sys.stdin)["data"]["activeTargets"]; assert t[0]["health"]=="up", t'
+          curl -fsS 'http://localhost:9090/api/v1/rules' | tee evidence/ci/prometheus_rules.json | python3 -c 'import sys,json; g=json.load(sys.stdin)["data"]["groups"]; assert sum(len(x["rules"]) for x in g) >= 5'
+          curl -fsS 'http://localhost:9090/api/v1/query?query=velos_jobs' | tee evidence/ci/prometheus_query.json
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost/metrics)" = "404"   # not exposed publicly
+      - name: Redeployment (recreate api + worker from the same images; data must survive)
+        run: |
+          $COMPOSE up -d --force-recreate api worker
+          for i in $(seq 1 60); do curl -fsS http://localhost/health > /dev/null && break; sleep 2; done
+          n=$(curl -fsS -H 'X-API-Key: ci-user-key' http://localhost/api/v1/jobs | python3 -c 'import sys,json; print(len(json.load(sys.stdin)))')
+          echo "jobs visible after redeploy: $n" | tee evidence/ci/redeploy.txt
+          test "$n" -gt 0
+          scripts/smoke_test.sh http://localhost ci-user-key | tee -a evidence/ci/redeploy.txt
+      - name: Collect logs
+        if: always()
+        run: |
+          $COMPOSE logs --no-color > evidence/ci/stack_logs.txt 2>&1 || true
+          tail -200 evidence/ci/stack_logs.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stack-evidence
+          path: evidence/ci
+
+  publish:
+    name: Publish images to GitHub Container Registry
+    needs: [stack, ml]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and push velos-backend and velos-edge
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          docker build -t ghcr.io/$OWNER/velos-backend:${{ github.sha }} -t ghcr.io/$OWNER/velos-backend:latest backend
+          docker build -f deploy/Dockerfile.edge -t ghcr.io/$OWNER/velos-edge:${{ github.sha }} -t ghcr.io/$OWNER/velos-edge:latest .
+          for img in velos-backend velos-edge; do
+            docker push ghcr.io/$OWNER/$img:${{ github.sha }}
+            docker push ghcr.io/$OWNER/$img:latest
+          done
 
   deploy:
-    name: Deploy to staging (enabled in M4)
-    needs: [images, ml]
+    name: Deploy to the Velos cloud server (enable with DEPLOY_ENABLED=true)
+    needs: [publish]
     if: ${{ github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true' }}
     runs-on: ubuntu-latest
-    environment: staging
+    environment: production
     steps:
       - uses: actions/checkout@v4
-      - name: Build and push images to the Velos registry
-        run: |
-          echo "${{ secrets.REGISTRY_TOKEN }}" | docker login "${{ vars.REGISTRY }}" -u "${{ secrets.REGISTRY_USER }}" --password-stdin
-          docker compose -f docker-compose.prod.yml build
-          for s in backend edge; do
-            docker tag velos-$s:${VELOS_TAG:-dev} ${{ vars.REGISTRY }}/velos-$s:${{ github.sha }}
-            docker push ${{ vars.REGISTRY }}/velos-$s:${{ github.sha }}
-          done
-      - name: Roll out on the staging server and smoke-test
+      - name: Update the checkout on the server, rebuild, restart and smoke-test
         run: |
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > key && chmod 600 key
           ssh -i key -o StrictHostKeyChecking=accept-new "${{ vars.DEPLOY_HOST }}" \
-            "cd /opt/velos && VELOS_TAG=${{ github.sha }} docker compose -f docker-compose.prod.yml --env-file deploy/.env pull && \
-             VELOS_TAG=${{ github.sha }} docker compose -f docker-compose.prod.yml --env-file deploy/.env up -d"
-          scripts/smoke_test.sh "https://${{ vars.STAGING_DOMAIN }}" "${{ secrets.SMOKE_API_KEY }}"
+            "cd /opt/velos && git fetch --quiet origin && git checkout --quiet ${{ github.sha }} && MONITORING=1 scripts/deploy_server.sh"
+          scripts/smoke_test.sh "https://${{ vars.SITE_DOMAIN }}" "${{ secrets.SMOKE_API_KEY }}"
